@@ -1,20 +1,23 @@
 # Data Definition Engine
 
 This repository contains an open-source tool for generating CDISC 360i study artifacts from a USDM study design. This
-software was developed as part of the CDISC 360i Program by the Define-XML Generation Project Team.
+software is being developed as part of the CDISC 360i Program by the Define-XML Generation Project Team.
+
+![under development](https://img.shields.io/badge/under-development-blue)
 
 ## Description
-The Data Definition Engine (DDE) is a software tool created as part of the CDISC 360i Define-XML generation project.
-The DDE software populated the Data Definition Specification (DDS) model as JSON to facilitate the generation of 
-study artifacts, such as Define-XML, ODM CRFs, Dataset-JSON shells, and the Trial Design datasets. 
+The Data Definition Engine (DDE) is a software tool being created as part of the CDISC 360i Define-XML generation 
+project. The DDE software populates the Data Definition Specification (DDS) model as JSON to facilitate the generation 
+of study artifacts, such as Define-XML, ODM CRFs, Dataset-JSON shells, and the Trial Design datasets. 
 
-The DDE software will include multiple loaders and generators that use the DDS model. The loaders generate and load
-metadata content into the DDS model. The generators use the DDS model to generate the study artifacts.
+The DDE software will include multiple loaders and generators that use the DDS model. The loaders extract and load
+metadata content into the DDS model. The generators use the DDS model to generate the study artifacts such as a 
+define.xml of ODM-based CRFs.
 
 Loaders will include the primary 360i loader that reads the USDM study design content, gets the Biomedical Concepts 
 referenced in the SOA, retrieves the Dataset Specializations (DSSs), and uses the CDISC Library API to populate the 
-DDS model. An alternative loader will be created to load the DDS model from an Excel spreadsheet template that matches
-the metadata spreadsheets used by many organizations today.
+DDS model. An alternative loader will be created to load the DDS model from an Excel metadata spreadsheet template that 
+matches the metadata spreadsheets used by many organizations today.
 
 ## Contribution
 
@@ -56,9 +59,13 @@ This project is provided "as is" without any warranty or guarantee of suitabilit
 We are in the process of consolidating our project work into this repository. Today, our models and code are spread 
 across multiple repositories.
 - [DDS model (aka define.json)](https://github.com/TeMeta/define-json)
+- [DDS documentation site](https://temeta.github.io/define-json/)
 - [DDS USDM loader (create_define_json.py)](https://github.com/cdisc-org/360i)
 - [Define-XML generator (define_generator.py)](https://github.com/swhume/template2define)
 - [CRF generator (cdash_poc_odm132.py, cdash_poc_odm20.py)](https://github.com/lexjansen/cdisc360i-pocs)
+- [Phase 1 metadata gaps](https://wiki.cdisc.org/spaces/360i/pages/319525446/360i+Phase+1+Metadata+Gaps)
+- [DDS project repository (future)](https://github.com/cdisc-org/DataExchange-DDS)
+- [DDS project charter](https://wiki.cdisc.org/display/XMLT/define.json+project+charter)
 
 ## Related Projects
 Here are some related projects:
