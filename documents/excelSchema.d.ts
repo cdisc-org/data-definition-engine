@@ -46,7 +46,14 @@ export type ItemDefDataType =
   | "float"
   | "integer"
   | "date"
-  | "datetime";
+  | "datetime"
+  | "time"
+  | "partialDate"
+  | "partialTime"
+  | "partialDatetime"
+  | "incompleteDatetime"
+  | "durationDatetime"
+  | "intervalDatetime";
 
 export type OriginType =
   | "Assigned"
