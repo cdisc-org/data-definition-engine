@@ -52,7 +52,7 @@ python create_define_json.py --usdm_file <path> --output_template <path> --sdtmc
 | Argument | Required | Default | Description |
 |---|---|---|---|
 | `--usdm_file` | **Yes** | — | Path to the input USDM JSON file |
-| `--output_template` | **Yes** | — | Path for the output Define-360i JSON file |
+| `--output_template` | **Yes** | — | Path for the output Define-JSON file |
 | `--sdtmct` | **Yes** | — | SDTM Controlled Terminology date (`yyyy-mm-dd`) |
 | `--sdtmig` | No | `3.4` | SDTM Implementation Guide version |
 | `--studyversion` | No | `0` | Index of the study version within the USDM file |
@@ -108,7 +108,7 @@ python create_define_json.py \
 
 | File | Description |
 |---|---|
-| `<output_template>` (e.g. `define.json`) | Define-360i JSON with itemGroups, slices, conditions, whereClauses, and codeLists |
+| `<output_template>` (e.g. `define.json`) | Define-JSON with itemGroups, slices, conditions, whereClauses, and codeLists |
 | `<validation_report>` (e.g. `validation_report.xlsx`) | Excel report listing schema validation results (pass/fail per field) |
 
 ### Debug files (created with `--debug`)
