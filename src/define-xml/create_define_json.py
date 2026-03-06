@@ -1,9 +1,9 @@
 """
-USDM to Define-360i JSON Processor
+USDM to Define JSON Processor
 ===================================
 
 This module processes USDM (Unified Study Data Model) JSON files and generates
-Define-360i JSON structures with value-level metadata organized in "slices".
+Define-JSON structures with value-level metadata organized in "slices".
 
 The major difference from the standard Define-JSON format is that variable-level
 metadata (VLM) is organized under "slices" within each itemGroup rather than as
@@ -16,7 +16,6 @@ import os
 import argparse
 import hashlib
 import yaml
-import copy
 from jsonata import Jsonata
 from cdisc_library_client import CDISCLibraryClient
 from collections import defaultdict
@@ -24,18 +23,18 @@ from dotenv import load_dotenv
 from datetime import datetime
 
 
-class USDMDefine360iProcessor:
+class USDMDefineJSONProcessor:
     """
-    Processes USDM JSON files and generates Define-360i JSON structure.
+    Processes USDM JSON files and generates Define-JSON structure.
     
-    This class transforms USDM data into Define-360i format where VLM is
+    This class transforms USDM data into Define-JSON format where VLM is
     organized as "slices" within itemGroups instead of separate DataSpecialization
     itemGroups.
     
     Attributes:
         client (CDISCLibraryClient): CDISC Library API client
         usdm_data (dict): Loaded USDM JSON data
-        template (dict): Output Define-360i JSON structure
+        template (dict): Output Define-JSON structure
         datasets_dict (dict): Dataset variables and restricted values
         bc_dict (dict): Biomedical concepts with VLM metadata
         vlm_lookup (dict): VLM metadata keyed by variable name
@@ -60,7 +59,7 @@ class USDMDefine360iProcessor:
         
         Args:
             usdm_file (str): Path to USDM JSON file
-            output_template (str): Path to output Define-360i JSON file
+            output_template (str): Path to output Define-JSON file
             sdtmig (str): SDTM Implementation Guide version
             sdtmct (str): SDTM Controlled Terminology date in yyyy-mm-dd format
             studyversion (int): Study version index in USDM
@@ -101,7 +100,7 @@ class USDMDefine360iProcessor:
             'creationDateTime': '',
             'odmVersion': '1.3.2',
             'fileType': 'Snapshot',
-            'originator': 'Define-360i Processor',
+            'originator': 'Define-JSON Processor',
             'context': 'Other',
             'defineVersion': '2.1.0',
             'studyOID': '',
@@ -2317,7 +2316,7 @@ class USDMDefine360iProcessor:
     
     def save_output(self):
         """
-        Save the generated Define-360i JSON template to file.
+        Save the generated Define-JSON template to file.
         
         Assembles all processed components (itemGroups, conditions,
         whereClauses, codeLists) into the template and writes to output file.
@@ -2332,7 +2331,7 @@ class USDMDefine360iProcessor:
     
     def validate_against_schema(self, schema_file, excel_output=None):
         """
-        Validate the generated Define-360i file against a YAML schema.
+        Validate the generated Define-JSON file against a YAML schema.
         
         This method loads the YAML schema file and validates the generated
         JSON output against it using LinkML validation if available, or
@@ -2765,7 +2764,7 @@ class USDMDefine360iProcessor:
         2. Build VLM lookup tables
         3. Update datasets dictionary with VLM data
         4. Populate study metadata
-        5. Process datasets to generate Define-360i structures
+        5. Process datasets to generate Define-JSON structures
         6. Add CDISC standards information
         7. Save output to JSON file
         8. Save debug files if debug mode is enabled
@@ -2899,7 +2898,7 @@ class USDMDefine360iProcessor:
         
         Fetches controlled terminology from CDISC Library, applies restrictions
         if specified, and creates deduplicated codelist entries. Returns single
-        OID string instead of list for 360i format.
+        OID string instead of list for format.
         
         Args:
             var (dict): Variable metadata from SDTMIG
@@ -3086,7 +3085,7 @@ class USDMDefine360iProcessor:
         version_display = self.studyversion + 1
         design_display = self.studydesign + 1
 
-        self.template['fileOID'] = f"ODM.DEFINE-360i.{study_name}.Version{version_display}.Design{design_display}"
+        self.template['fileOID'] = f"ODM.DEFINE-JSON.{study_name}.Version{version_display}.Design{design_display}"
         self.template['creationDateTime'] = time_str
         self.template['studyOID'] = f"ODM.{study_name}.Version{version_display}.Design{design_display}"
         self.template['studyName'] = study_name
@@ -3101,7 +3100,7 @@ def main():
     """
     Main entry point for command-line execution.
     
-    Parses command-line arguments and orchestrates the USDM to Define-360i
+    Parses command-line arguments and orchestrates the USDM to Define-JSON
     transformation process.
     """
     # Reconfigure stdout to UTF-8 so Unicode symbols (✓, ✅, ❌, ⚠️) don't
@@ -3111,7 +3110,7 @@ def main():
         sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 
     parser = argparse.ArgumentParser(
-        description="Process USDM JSON file to generate Define-360i JSON with slices.",
+        description="Process USDM JSON file to generate Define-JSON with slices.",
         epilog="Example: python create_define_json.py --usdm_file data/study.json --output_template output.json --sdtmct 2025-03-28 --validate define.yaml --validation_report validation_report.xlsx"
     )
     parser.add_argument(
@@ -3122,7 +3121,7 @@ def main():
     parser.add_argument(
         "--output_template",
         required=True,
-        help="Path to output Define-360i JSON file"
+        help="Path to output Define-JSON file"
     )
     parser.add_argument(
         "--sdtmct",
@@ -3185,7 +3184,7 @@ def main():
     if args.validate and not args.validation_report:
         parser.error("--validation_report is required when --validate is used")
     
-    processor = USDMDefine360iProcessor(
+    processor = USDMDefineJSONProcessor(
         usdm_file=args.usdm_file,
         output_template=args.output_template,
         sdtmig=args.sdtmig,
@@ -3201,7 +3200,7 @@ def main():
     processor.output_template = args.output_template
     processor.process()
     
-    print(f"\n✅ Define-360i JSON file created successfully: {args.output_template}")
+    print(f"\n✅ Define-JSON file created successfully: {args.output_template}")
     
     # Validate if requested
     if args.validate:
