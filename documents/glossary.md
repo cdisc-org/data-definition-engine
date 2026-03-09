@@ -8,8 +8,10 @@ A software tool used to populate the Data Definition Specification (DDS) model a
 The model at the center of the DDE solution which carries the complete set of metadata needed to generate these artifacts in addition to supporting other automation tasks. 
 
 ## Define-XML
+An Extensible Markup Language format that stores and transmits metadata of tabular dataset structures.
 
 ## ODM CRFs
+Operational Data Model format that stores clinical data in Case Report Forms.
 
 ## Dataset-JSON shells
 
