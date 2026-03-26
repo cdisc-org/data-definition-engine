@@ -18,7 +18,8 @@ class Items(define_object.DefineObject):
         template: list[dict[str, Any]],
         define_objects: dict[str, list[Any]],
         lang: str,
-        acrf: str
+        acrf: str,
+        slice: list[dict[str, Any]] | None = None
     ) -> None:
         """
         Create ItemDef objects from the DDS template.
@@ -27,15 +28,17 @@ class Items(define_object.DefineObject):
         :param define_objects: dictionary of odmlib objects updated by this method
         :param lang: xml:lang setting for TranslatedText
         :param acrf: annotated case report form leaf ID
+        :param slice: list of slice definitions from the DDS JSON (if applicable)
         """
         self.lang = lang
         self.acrf = acrf
+        self.slice = slice
         for variable in template:
             it_oid = self.require_key(variable, "OID", "ItemDef")
-            item = self._create_itemdef_object(variable, it_oid)
+            item = self._create_itemdef_object(variable, it_oid, slice)
             define_objects["ItemDef"].append(item)
 
-    def _create_itemdef_object(self, obj, oid):
+    def _create_itemdef_object(self, obj, oid, slice):    
         name = self.require_key(obj, "name", f"ItemDef {oid}")
         data_type = self.require_key(obj, "dataType", f"ItemDef {oid}")
         attr = {"OID": oid, "Name": name, "DataType": data_type, "SASFieldName": name}
@@ -45,13 +48,20 @@ class Items(define_object.DefineObject):
             tt = DEFINE.TranslatedText(_content=obj["description"], lang=self.lang)
             item.Description = DEFINE.Description()
             item.Description.TranslatedText.append(tt)
-        self._add_optional_itemdef_elements(item, obj, oid)
+        self._add_optional_itemdef_elements(item, obj, oid, slice)
         return item
 
-    def _add_optional_itemdef_elements(self, item, obj, it_oid):
+    def _add_optional_itemdef_elements(self, item, obj, it_oid, slice):
         """
         use the values from the Variables section in the define-template to add the optional ELEMENTS to the ItemDef
         """
+        for s in slice or []:
+            if s.get("type") == "ValueList":
+                if s.get("wasDerivedFrom") == it_oid:
+                    vl_oid = s["OID"]
+                    vl_ref = DEFINE.ValueListRef(ValueListOID=vl_oid)
+                    item.ValueListRef = vl_ref
+
         # TODO do not find codeList in define.json example for items
         if obj.get("codeList"):
             cl_oid = self.generate_oid(["CL", obj["codeList"].split(".")[1]])
@@ -65,7 +75,13 @@ class Items(define_object.DefineObject):
                 attr["Type"] =  obj["origin"]["type"]
             if obj.get("origin").get("source"):
                 attr["Source"] = obj["origin"]["source"]
-            item.Origin.append(DEFINE.Origin(**attr))
+            # item.Origin.append(DEFINE.Origin(**attr))
+            # Bypass odmlib descriptor validation to allow __PLACEHOLDER__ values
+            origin = object.__new__(DEFINE.Origin)
+            for key, value in attr.items():
+                origin.__dict__[key] = value
+            item.Origin.append(origin)
+
             if obj.get("predecessor"):
                 item.Origin[0].Description = DEFINE.Description()
                 item.Origin[0].Description.TranslatedText.append(DEFINE.TranslatedText(_content=obj["Predecessor"]))
