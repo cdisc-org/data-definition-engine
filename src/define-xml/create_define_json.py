@@ -1800,6 +1800,37 @@ class USDMDefineJSONProcessor:
         # Add TS dataset
         if "TS" not in self.datasets_dict:
             self.datasets_dict["TS"] = {}
+
+            # Add TSPARMCD values extracted from vlm_lookup["TSPARMCD"] WhereClause Values
+            tsparmcd_values = set()
+            for entry in self.vlm_lookup.get("TSPARMCD", []):
+                for where_clause in entry.get("WhereClause", []):
+                    for clause in where_clause.get("Clause", []):
+                        for value in clause.get("Values", []):
+                            if value:
+                                tsparmcd_values.add(value)
+
+            if tsparmcd_values:
+                self.datasets_dict["TS"]["TSPARMCD"] = {"codelist": {
+                    "C66738": sorted(tsparmcd_values)
+                }}
+
+            # Add TSPARM values by matching conceptIds from filtered TSPARMCD terms against C67152
+            kept_concept_ids = {term.get('conceptId') for term in [
+                t for t in self.client.get_api_json(f"/mdr/ct/packages/sdtmct-{self.sdtmct}/codelists/C66738")['terms']
+                if not tsparmcd_values or t.get('submissionValue') in tsparmcd_values
+            ]}
+
+            tsparm_values = {
+                term.get('submissionValue')
+                for term in self.client.get_api_json(f"/mdr/ct/packages/sdtmct-{self.sdtmct}/codelists/C67152")['terms']
+                if term.get('conceptId') in kept_concept_ids and term.get('submissionValue')
+            }
+
+            if tsparm_values:
+                self.datasets_dict["TS"]["TSPARM"] = {"codelist": {
+                    "C67152": sorted(tsparm_values)
+                }}
         
         # Add TA dataset from arms
         if self.studyDesignData.get('arms', []):
@@ -2060,7 +2091,7 @@ class USDMDefineJSONProcessor:
                         "OID": f"CL.{epoch_codelist_name}",
                         "name": "Epoch",
                         "dataType": "text",
-                        "standard": "ST.SDTMCT",
+                        "standard": "STD.SDTMCT",
                         "codeListItems": epoch_terms,
                     }
 
@@ -2106,8 +2137,9 @@ class USDMDefineJSONProcessor:
             "purpose": "Tabulation",
             "structure": dataset_data['datasetStructure'],
             "isReferenceData": (dataset_data.get('_links', {}).get('parentClass', {}).get('title') == "Trial Design") or not any(v.get('name') in ("USUBJID", "POOLID") for v in all_vars),
-            # Here are we always sure to use ST.SDTMIG?
-            "standard": "ST.SDTMIG",
+            "keySequence": ["__PLACEHOLDER__"],
+            # Here are we always sure to use STD.SDTMIG?
+            "standard": "STD.SDTMIG",
             "items": []
         }
 
@@ -2131,6 +2163,8 @@ class USDMDefineJSONProcessor:
                             
             if 'length' in var_data:
                 item_dict['length'] = var_data['length']
+            else:
+                item_dict['length'] = None
             
             if 'format' in var_data:
                 item_dict['displayFormat'] = var_data['format']
@@ -2142,6 +2176,11 @@ class USDMDefineJSONProcessor:
                 item_dict['origin'] = {
                     "type": var_data['originType'],
                     "source": var_data['originSource']
+                }
+            else:
+                item_dict['origin'] = {
+                    "type": "__PLACEHOLDER__",
+                    "source": "__PLACEHOLDER__"
                 }
 
             # Add codelist references for TA variables
@@ -2772,6 +2811,7 @@ class USDMDefineJSONProcessor:
         self.process_biomedical_concepts()
         self.build_vlm_lookup()
         self.update_datasets_dict()
+        self._build_global_codelist_terms()
         self.populate_study_elements()
         self.process_datasets()
         self.add_standards()
@@ -2779,6 +2819,27 @@ class USDMDefineJSONProcessor:
         
         if self.debug:
             self.save_debug_files()
+
+    def _build_global_codelist_terms(self):
+        """
+        Pre-scan datasets_dict to build a union of all explicitly restricted
+        terms per codelist C-Code. Used to decide placeholder vs. real terms.
+
+        For each codelist C-Code encountered across all datasets/variables:
+        - Non-empty list: contributes those values to the union
+        - Empty list: contributes nothing (means "unrestricted" for that variable)
+
+        Result stored in self.global_codelist_terms = {codelist_id: set_of_values}.
+        A codelist with an empty set means no dataset ever restricted it → placeholder.
+        """
+        self.global_codelist_terms = {}
+        for variables in self.datasets_dict.values():
+            for var_data in variables.values():
+                for codelist_id, terms in var_data.get('codelist', {}).items():
+                    if codelist_id not in self.global_codelist_terms:
+                        self.global_codelist_terms[codelist_id] = set()
+                    for term in terms:
+                        self.global_codelist_terms[codelist_id].add(term)
 
     def _get_or_create_condition_from_vlm(self, where_clause_data, dataset, variable_name):
         """
@@ -2932,7 +2993,15 @@ class USDMDefineJSONProcessor:
                 restriction_list = restriction_codes[codelist_id]
                 
                 if not restriction_list:
-                    final_terms = [create_term_dict(term) for term in all_terms]
+                    global_terms = self.global_codelist_terms.get(codelist_id, set())
+                    if global_terms:
+                        final_terms = [
+                            create_term_dict(term)
+                            for term in all_terms
+                            if term.get("submissionValue") in global_terms
+                        ]
+                    else:
+                        final_terms = [{"NCI Term Code": None, "Term": "__PLACEHOLDER__", "Decoded Value": ["__PLACEHOLDER__"]}]
                 else:
                     # Find matching terms from standard codelist
                     final_terms = [
@@ -2962,7 +3031,15 @@ class USDMDefineJSONProcessor:
                 ]
             
             else:
-                final_terms = [create_term_dict(term) for term in all_terms]
+                global_terms = self.global_codelist_terms.get(codelist_id, set())
+                if global_terms:
+                    final_terms = [
+                        create_term_dict(term)
+                        for term in all_terms
+                        if term.get("submissionValue") in global_terms
+                    ]
+                else:
+                    final_terms = [{"NCI Term Code": None, "Term": "__PLACEHOLDER__", "Decoded Value": ["__PLACEHOLDER__"]}]
             
             codelist_entry = {
                 "NCI Codelist Code": codelist_data.get("conceptId"),
@@ -2990,7 +3067,7 @@ class USDMDefineJSONProcessor:
                     "OID": oid,
                     "name": name,
                     "dataType": "text",
-                    "standard": "ST.SDTMCT",
+                    "standard": "STD.SDTMCT",
                 }
                 
                 # Add coding if NCI Codelist Code exists
@@ -3038,14 +3115,14 @@ class USDMDefineJSONProcessor:
         """
         self.template["standards"] = [
             {
-                "OID": "ST.SDTMIG",
+                "OID": "STD.SDTMIG",
                 "name": "SDTMIG",
                 "type": "IG",
                 "version": self.sdtmig,
                 "status": "FINAL"
             },
             {
-                "OID": "ST.SDTMCT",
+                "OID": "STD.SDTMCT",
                 "name": "CDISC/NCI",
                 "type": "CT",
                 "version": self.sdtmct,
