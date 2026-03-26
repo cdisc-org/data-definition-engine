@@ -634,6 +634,52 @@ classes:
         description: >-
           Used to indicate that this ItemGroup has no data, e.g. for a manifest.
         range: boolean
+      observationClass:
+        description: >-
+          Identifies the predefined CDISC model Class.
+        range: DefClass
+        required: false
+
+  DefClass:
+    description: >-
+      The predefined CDISC model Class that applies to an ItemGroupDef.
+    attributes:
+      name:
+        description: >-
+          Name of the General Observation Class following CDISC Controlled Terminology.
+        range: string
+        required: true
+      subClasses:
+        description: >-
+          One or more SubClasses that further identify the specific SubClass within a Class.
+        range: SubClass
+        multivalued: true
+        required: false
+        inlined: true
+        inlined_as_list: true
+
+  SubClass:
+    description: >-
+      A specific SubClass within a CDISC model Class.
+    attributes:
+      name:
+        description: >-
+          Name of the SubClass following CDISC Controlled Terminology for SubClass.
+        range: string
+        required: true
+      parentClass:
+        description: >-
+          Name of the parent Class or SubClass following CDISC Controlled Terminology.
+        range: string
+        required: false
+      subClasses:
+        description: >-
+          Nested SubClass(es) for multi-level SubClass hierarchy.
+        range: SubClass
+        multivalued: true
+        required: false
+        inlined: true
+        inlined_as_list: true
 
   Relationship:
     description: >-
@@ -1848,7 +1894,8 @@ classes:
   # DPROD to complement Dataset class and link to DCAT ontology
   DataProduct:
     description: >-
-      A governed collection that represents a purpose-driven assembly of datasets and services with an owning team and lifecycle
+      A governed collection that represents a purpose-driven assembly of datasets and services with an owning team and lifecycle.
+      The DataProduct defines the boundary of accountability between data producers and consumers.
     exact_mappings:
       - dprod:DataProduct
       - dcat:DataService
@@ -1881,6 +1928,26 @@ classes:
         multivalued: true
         inlined: true
         inlined_as_list: true
+      inputDataflow:
+        description: >-
+          Description of the input interface before concrete Datasets exist.
+          Dataflows referenced here represent the demand side of a ProvisionAgreement.
+        range: Dataflow
+        multivalued: true
+        inlined: true
+        inlined_as_list: true
+        close_mappings:
+          - dcat:distribution
+      outputDataflow:
+        description: >-
+          Description of the output interface before concrete Datasets exist.
+          Dataflows referenced here represent the supply side of a ProvisionAgreement.
+        range: Dataflow
+        multivalued: true
+        inlined: true
+        inlined_as_list: true
+        close_mappings:
+          - dcat:distribution
       inputDataset:
         description: Source datasets used by the data product
         range: Dataset
@@ -1891,6 +1958,7 @@ classes:
         description: Output datasets produced by the data product
         range: Dataset
         multivalued: true
+        inlined: true
         inlined_as_list: true
       hasPolicy:
         description: Policies governing the use and access of the data product
@@ -1975,6 +2043,13 @@ classes:
         description: >-
           The Data Provider that is part of this agreement
         range: DataProvider
+      consumer:
+        description: >-
+          The Data Consumer that is part of this agreement
+        any_of:
+          - range: DataProduct
+          - range: Organization
+          - range: string
       dataFlow:
         description: >-
           The Dataflow that is covered by this agreement
