@@ -2140,6 +2140,10 @@ class USDMDefineJSONProcessor:
             "keySequence": ["__PLACEHOLDER__"],
             # Here are we always sure to use STD.SDTMIG?
             "standard": "STD.SDTMIG",
+            "observationClass": {
+                "name": dataset_data.get("_links", {}).get("parentClass", {}).get("title", "").upper()
+            },
+            # Here add future code for subClass in ADaM if needed
             "items": []
         }
 
@@ -2320,6 +2324,7 @@ class USDMDefineJSONProcessor:
                     "OID": f"VL.{dataset}.{var_name}",
                     "name": f"VL_{dataset}_{var_name}",
                     "type": "ValueList",
+                    "wasDerivedFrom": f"IT.{dataset}.{var_name}",
                     "items": self.vlm_items_by_variable[vlm_key]
                 }
                 slices.append(slice_dict)
