@@ -52,12 +52,12 @@ class ItemGroups(define_object.DefineObject):
         vars.create_define_objects(items_list, define_objects, lang, acrf, item_group=itg)
         # ItemDefs
         itd = items.Items()
-        itd.create_define_objects(dataset["items"], define_objects, lang, acrf)
+        itd.create_define_objects(dataset["items"], define_objects, lang, acrf, slice=dataset["slices"] if dataset.get("slices") else None)
 
         # TODO review this assumption that we have 1 class per dataset
         # assumption: 1 class per dataset - many need to expand this for ADaM
-        if dataset.get("class"):
-            ds_class = dataset["class"].upper().replace("-", " ")
+        if dataset.get("observationClass", {}).get("name", ""):
+            ds_class = dataset.get("observationClass", {}).get("name", "").upper().replace("-", " ")
             itg.Class = DEFINE.Class(Name=ds_class)
 
     def _create_itemgroupdef_object(self, obj):
@@ -69,17 +69,18 @@ class ItemGroups(define_object.DefineObject):
         attr["Structure"] = obj.get("structure", "NA")
         if obj.get("sasDatasetName"):
             attr["SASDatasetName"] = obj["sasDatasetName"]
-        if obj.get("isReferenceData"):
-            attr["IsReferenceData"] = obj["isReferenceData"]
-        else:
-            attr["IsReferenceData"] = self._generate_is_reference(attr)
-        if obj.get("repeating"):
-            if obj["repeating"]:
-                attr["Repeating"] = "Yes"
-            else:
-                attr["Repeating"] = "No"
-        else:
-            attr["Repeating"] = self._generate_repeating_value(attr)
+        if "isReferenceData" in obj:
+            attr["IsReferenceData"] = "Yes" if obj["isReferenceData"] else "No"
+        # else:
+        #     attr["IsReferenceData"] = self._generate_is_reference(attr)
+        # if obj.get("repeating"):
+        #     if obj["repeating"]:
+        #         attr["Repeating"] = "Yes"
+        #     else:
+        #         attr["Repeating"] = "No"
+        # else:
+        #     attr["Repeating"] = self._generate_repeating_value(attr)
+        attr["Repeating"] = self._generate_repeating_value(attr)
         # TODO how to tell if we're processing SDTM or ADaM define?
         if obj.get("purpose"):
             attr["Purpose"] = obj["purpose"]
@@ -90,8 +91,8 @@ class ItemGroups(define_object.DefineObject):
             attr["CommentOID"] = obj["comment"]
         if obj.get("isNonStandard"):
             attr["IsNonStandard"] = obj["isNonStandard"]
-        if obj.get("wasDerivedFrom"):
-            attr["StandardOID"] = obj["wasDerivedFrom"]
+        if obj.get("standard"):
+            attr["StandardOID"] = obj["standard"]
         if obj.get("hasNoData"):
             attr["HasNoData"] = obj["hasNoData"]
         igd = DEFINE.ItemGroupDef(**attr)
@@ -101,16 +102,16 @@ class ItemGroups(define_object.DefineObject):
         igd.Description.TranslatedText.append(tt)
         return igd
 
-    def _generate_is_reference(self, attributes: dict[str, str]) -> str:
-        """
-        Determine if the dataset is a reference dataset (trial design domains).
+    # def _generate_is_reference(self, attributes: dict[str, str]) -> str:
+    #     """
+    #     Determine if the dataset is a reference dataset (trial design domains).
 
-        :param attributes: ItemGroupDef attributes dictionary
-        :return: "Yes" if domain is a reference domain, "No" otherwise
-        """
-        if attributes["Domain"] in TRIAL_DESIGN_DOMAINS:
-            return "Yes"
-        return "No"
+    #     :param attributes: ItemGroupDef attributes dictionary
+    #     :return: "Yes" if domain is a reference domain, "No" otherwise
+    #     """
+    #     if attributes["Domain"] in TRIAL_DESIGN_DOMAINS:
+    #         return "Yes"
+    #     return "No"
 
     def _generate_repeating_value(self, attributes: dict[str, str]) -> str:
         """
@@ -119,7 +120,7 @@ class ItemGroups(define_object.DefineObject):
         :param attributes: ItemGroupDef attributes dictionary
         :return: "Yes" if dataset has repeating records, "No" otherwise
         """
-        if attributes["IsReferenceData"] == "Yes":
+        if attributes.get("IsReferenceData") == "Yes":
             return "No"
         if attributes["Domain"] in NON_REPEATING_DOMAINS:
             # TODO check for presence of -PARMCD for DI/OI domains
