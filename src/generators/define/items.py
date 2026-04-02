@@ -100,8 +100,8 @@ class Items(define_object.DefineObject):
         if obj.get("significantDigits"):
             attr["SignificantDigits"] = obj["significantDigits"]
         # TODO do not find format content in define.json example for items
-        if obj.get("format"):
-            attr["DisplayFormat"] = obj["format"]
+        if obj.get("displayFormat"):
+            attr["DisplayFormat"] = obj["displayFormat"]
         if obj.get("comment"):
             attr["CommentOID"] = obj["comment"]
 
