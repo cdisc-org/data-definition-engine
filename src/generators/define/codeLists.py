@@ -64,10 +64,10 @@ class CodeLists(define_object.DefineObject):
         attr = {"OID": oid, "Name": name, "DataType": data_type}
         if obj.get("comment"):
             attr["CommentOID"] = obj["comment"]
-        if obj.get("isNonStandard"):
-            attr["IsNonStandard"] = obj["isNonStandard"]
-        if obj.get("standardOID"):
-            attr["StandardOID"] = obj["standardOID"]
+        if "isNonStandard" in obj:
+            attr["IsNonStandard"] = "Yes"
+        if obj.get("standard"):
+            attr["StandardOID"] = obj["standard"]
         cl = DEFINE.CodeList(**attr)
         return cl
 

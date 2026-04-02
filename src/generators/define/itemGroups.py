@@ -86,11 +86,10 @@ class ItemGroups(define_object.DefineObject):
             attr["Purpose"] = obj["purpose"]
         else:
             attr["Purpose"] = DEFAULT_PURPOSE
-
         if obj.get("comment"):
             attr["CommentOID"] = obj["comment"]
-        if obj.get("isNonStandard"):
-            attr["IsNonStandard"] = obj["isNonStandard"]
+        if "isNonStandard" in obj:
+            attr["IsNonStandard"] = "Yes"
         if obj.get("standard"):
             attr["StandardOID"] = obj["standard"]
         if obj.get("hasNoData"):
