@@ -63,12 +63,12 @@ class ItemGroups(define_object.DefineObject):
     def _create_itemgroupdef_object(self, obj):
         name = self.require_key(obj, "name", "ItemGroupDef")
         oid = self.generate_oid(["IG", name])
-        attr = {"OID": oid, "Name": name, "Domain": name}
+        attr = {"OID": oid, "Name": name, "Domain": name, "SASDatasetName": name}
         if obj.get("archiveLocationID"):
             attr["ArchiveLocationID"] = ".".join(["LF", obj["archiveLocationID"]])
         attr["Structure"] = obj.get("structure", "NA")
-        if obj.get("sasDatasetName"):
-            attr["SASDatasetName"] = obj["sasDatasetName"]
+        # if obj.get("sasDatasetName"):
+        #     attr["SASDatasetName"] = obj["sasDatasetName"]
         if "isReferenceData" in obj:
             attr["IsReferenceData"] = "Yes" if obj["isReferenceData"] else "No"
         # else:

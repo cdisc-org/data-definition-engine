@@ -475,7 +475,7 @@ class USDMDefineJSONProcessor:
             tsparmcd_entry = {
                 "dataType": "text",
                 "length": 1,
-                "codeList": "CL.YN",
+                "codeList": "CL.NY",
                 "originType": "Protocol",
                 "originSource": "Sponsor",
                 "WhereClause": [
@@ -677,7 +677,7 @@ class USDMDefineJSONProcessor:
             tsparmcd_entry = {
                 "dataType": "text",
                 "length": 1,
-                "codeList": "CL.YN",
+                "codeList": "CL.NY",
                 "originType": "Protocol",
                 "originSource": "Sponsor",
                 "WhereClause": [
@@ -819,7 +819,7 @@ class USDMDefineJSONProcessor:
             tsparmcd_entry = {
                 "dataType": "text",
                 "length": 1,
-                "codeList": "CL.YN",
+                "codeList": "CL.NY",
                 "originType": "Protocol",
                 "originSource": "Sponsor",
                 "WhereClause": [
@@ -844,7 +844,7 @@ class USDMDefineJSONProcessor:
             tsparmcd_entry = {
                 "dataType": "text",
                 "length": 1,
-                "codeList": "CL.YN",
+                "codeList": "CL.NY",
                 "originType": "Protocol",
                 "originSource": "Sponsor",
                 "WhereClause": [
@@ -1373,7 +1373,7 @@ class USDMDefineJSONProcessor:
             tsparmcd_entry = {
                 "dataType": "text",
                 "length": 1,
-                "codeList": "CL.YN",
+                "codeList": "CL.NY",
                 "originType": "Protocol",
                 "originSource": "Sponsor",
                 "WhereClause": [
@@ -1400,7 +1400,7 @@ class USDMDefineJSONProcessor:
             tsparmcd_entry = {
                 "dataType": "text",
                 "length": 1,
-                "codeList": "CL.YN",
+                "codeList": "CL.NY",
                 "originType": "Protocol",
                 "originSource": "Sponsor",
                 "WhereClause": [
@@ -2097,6 +2097,10 @@ class USDMDefineJSONProcessor:
                         "name": "Epoch",
                         "dataType": "text",
                         "standard": "STD.SDTMCT",
+                        "coding": [{
+                            "code": "C99079",
+                            "codeSystem": "nci:ExtCodeID"
+                        }],
                         "codeListItems": epoch_terms,
                     }
 

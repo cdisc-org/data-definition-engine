@@ -55,18 +55,17 @@ class Items(define_object.DefineObject):
         """
         use the values from the Variables section in the define-template to add the optional ELEMENTS to the ItemDef
         """
+        # TODO do not find codeList in define.json example for items
+        if obj.get("codeList"):
+            cl_oid = self.generate_oid(["CL", obj["codeList"].split(".")[1]])
+            cl = DEFINE.CodeListRef(CodeListOID=cl_oid)
+            item.CodeListRef = cl
         for s in slice or []:
             if s.get("type") == "ValueList":
                 if s.get("wasDerivedFrom") == it_oid:
                     vl_oid = s["OID"]
                     vl_ref = DEFINE.ValueListRef(ValueListOID=vl_oid)
                     item.ValueListRef = vl_ref
-
-        # TODO do not find codeList in define.json example for items
-        if obj.get("codeList"):
-            cl_oid = self.generate_oid(["CL", obj["codeList"].split(".")[1]])
-            cl = DEFINE.CodeListRef(CodeListOID=cl_oid)
-            item.CodeListRef = cl
         # TODO do not find origin content in define.json example for items (nice to have that information)
         attr = {}
         if obj.get("origin"):

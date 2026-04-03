@@ -30,12 +30,17 @@ class CodeLists(define_object.DefineObject):
         for cl in template:
             # TODO template missing the NCI c-codes for codelists and terms
             cl_defn = self._create_codelist_object(cl)
-            cl_c_code = cl.get("nciCodelistCode")
+            coding = cl.get("coding", [])
+            cl_c_code = coding[0].get("code") if coding else None
             cl_name = cl.get("name", "unknown")
             codelist_items = self.require_key(cl, "codeListItems", f"CodeList {cl_name}")
             for term in codelist_items:
-                cl_item = self._create_codelistitem_object(term)
-                cl_defn.CodeListItem.append(cl_item)
+                if "decode" in term:
+                    cl_item = self._create_codelistitem_object(term)
+                    cl_defn.CodeListItem.append(cl_item)
+                else:
+                    en_item = self._create_enumerateditem_object(term)
+                    cl_defn.EnumeratedItem.append(en_item)
             # TODO no indicator that a codelist is a dictionary with an external codelist reference
             if len(cl["codeListItems"]) == 0:
                 self._create_external_code_list(cl_defn, cl)
@@ -71,22 +76,23 @@ class CodeLists(define_object.DefineObject):
         cl = DEFINE.CodeList(**attr)
         return cl
 
-    @staticmethod
-    def _create_enumerateditem_object(obj):
-        attr = {"CodedValue": obj["Term"]}
-        if obj.get("Order"):
-            attr["OrderNumber"] = obj["Order"]
+    def _create_enumerateditem_object(self, obj):
+        coded_value = self.require_key(obj, "codedValue", "CodeListItem")
+        attr = {"CodedValue": coded_value}
+        # if obj.get("Order"):
+        #     attr["OrderNumber"] = obj["Order"]
         en_item = DEFINE.EnumeratedItem(**attr)
-        if obj.get("NCI Term Code"):
-            alias = DEFINE.Alias(Context="nci:ExtCodeID", Name=obj["NCI Term Code"])
+        coding = obj.get("coding", {})
+        if coding:
+            alias = DEFINE.Alias(Context="nci:ExtCodeID", Name=coding.get("code"))
             en_item.Alias.append(alias)
         return en_item
 
     def _create_codelistitem_object(self, obj):
         coded_value = self.require_key(obj, "codedValue", "CodeListItem")
         attr = {"CodedValue": coded_value}
-        if obj.get("order"):
-            attr["OrderNumber"] = obj["order"]
+        # if obj.get("order"):
+        #     attr["OrderNumber"] = obj["order"]
         cl_item = DEFINE.CodeListItem(**attr)
         decode = DEFINE.Decode()
         if obj.get("decode", None):
@@ -97,7 +103,8 @@ class CodeLists(define_object.DefineObject):
         decode.TranslatedText.append(tt)
         cl_item.Decode = decode
         # TODO NCI c-codes for terms or codelists not available in template
-        if obj.get("nciTermCode"):
-            alias = DEFINE.Alias(Context="nci:ExtCodeID", Name=obj["nciTermCode"])
+        coding = obj.get("coding", {})
+        if coding:
+            alias = DEFINE.Alias(Context="nci:ExtCodeID", Name=coding.get("code"))
             cl_item.Alias.append(alias)
         return cl_item
