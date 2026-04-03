@@ -193,7 +193,6 @@ class USDMDefineJSONProcessor:
         expression_design = Jsonata(f'study.versions["{self.studyversion}"].studyDesigns["{self.studydesign}"]')
         self.studyDesignData = expression_design.evaluate(self.usdm_data)
 
-
     def process_biomedical_concepts(self):
         """
         Process all biomedical concepts from USDM.
@@ -476,7 +475,7 @@ class USDMDefineJSONProcessor:
             tsparmcd_entry = {
                 "dataType": "text",
                 "length": 1,
-                "codeList": "CL.YN",
+                "codeList": "CL.NY",
                 "originType": "Protocol",
                 "originSource": "Sponsor",
                 "WhereClause": [
@@ -678,7 +677,7 @@ class USDMDefineJSONProcessor:
             tsparmcd_entry = {
                 "dataType": "text",
                 "length": 1,
-                "codeList": "CL.YN",
+                "codeList": "CL.NY",
                 "originType": "Protocol",
                 "originSource": "Sponsor",
                 "WhereClause": [
@@ -820,7 +819,7 @@ class USDMDefineJSONProcessor:
             tsparmcd_entry = {
                 "dataType": "text",
                 "length": 1,
-                "codeList": "CL.YN",
+                "codeList": "CL.NY",
                 "originType": "Protocol",
                 "originSource": "Sponsor",
                 "WhereClause": [
@@ -845,7 +844,7 @@ class USDMDefineJSONProcessor:
             tsparmcd_entry = {
                 "dataType": "text",
                 "length": 1,
-                "codeList": "CL.YN",
+                "codeList": "CL.NY",
                 "originType": "Protocol",
                 "originSource": "Sponsor",
                 "WhereClause": [
@@ -1374,7 +1373,7 @@ class USDMDefineJSONProcessor:
             tsparmcd_entry = {
                 "dataType": "text",
                 "length": 1,
-                "codeList": "CL.YN",
+                "codeList": "CL.NY",
                 "originType": "Protocol",
                 "originSource": "Sponsor",
                 "WhereClause": [
@@ -1401,7 +1400,7 @@ class USDMDefineJSONProcessor:
             tsparmcd_entry = {
                 "dataType": "text",
                 "length": 1,
-                "codeList": "CL.YN",
+                "codeList": "CL.NY",
                 "originType": "Protocol",
                 "originSource": "Sponsor",
                 "WhereClause": [
@@ -1963,6 +1962,7 @@ class USDMDefineJSONProcessor:
                         "OID": f"CL.{armcd_codelist_name}",
                         "name": "ARM Code",
                         "dataType": "text",
+                        "isNonStandard": True,
                         "codeListItems": armcd_terms
                     }
 
@@ -1980,6 +1980,7 @@ class USDMDefineJSONProcessor:
                         "OID": f"CL.{arm_codelist_name}",
                         "name": "ARM",
                         "dataType": "text",
+                        "isNonStandard": True,
                         "codeListItems": arm_terms
                     }
 
@@ -2001,6 +2002,7 @@ class USDMDefineJSONProcessor:
                         "OID": f"CL.{ietest_codelist_name}",
                         "name": "Inclusion/Exclusion Test Name",
                         "dataType": "text",
+                        "isNonStandard": True,
                         "codeListItems": ietest_terms
                     }
             
@@ -2022,6 +2024,7 @@ class USDMDefineJSONProcessor:
                         "OID": f"CL.{ietestcd_codelist_name}",
                         "name": "Inclusion/Exclusion Test Code",
                         "dataType": "text",
+                        "isNonStandard": True,
                         "codeListItems": ietestcd_terms
                     }
         
@@ -2041,6 +2044,7 @@ class USDMDefineJSONProcessor:
                         "OID": f"CL.{element_codelist_name}",
                         "name": "Description of Element",
                         "dataType": "text",
+                        "isNonStandard": True,
                         "codeListItems": element_terms
                     }
             
@@ -2062,6 +2066,7 @@ class USDMDefineJSONProcessor:
                         "OID": f"CL.{etcd_codelist_name}",
                         "name": "Element Code",
                         "dataType": "text",
+                        "isNonStandard": True,
                         "codeListItems": etcd_terms
                     }
 
@@ -2092,6 +2097,10 @@ class USDMDefineJSONProcessor:
                         "name": "Epoch",
                         "dataType": "text",
                         "standard": "STD.SDTMCT",
+                        "coding": [{
+                            "code": "C99079",
+                            "codeSystem": "nci:ExtCodeID"
+                        }],
                         "codeListItems": epoch_terms,
                     }
 
