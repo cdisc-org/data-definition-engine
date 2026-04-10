@@ -1,10 +1,9 @@
 cdisc_library_client==0.1.6
-jsonata==0.2.5
+jmespath==1.0.1
 jsonschema==4.26.0
 linkml==1.10.0
 linkml_runtime==1.10.0
 openpyxl==3.1.5
 pandas==3.0.1
 python-dotenv==1.2.2
-PyYAML==6.0.2
 PyYAML==6.0.3

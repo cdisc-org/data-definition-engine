@@ -16,7 +16,7 @@ import os
 import argparse
 import hashlib
 import yaml
-from jsonata import Jsonata
+import jmespath
 from cdisc_library_client import CDISCLibraryClient
 from collections import defaultdict
 from dotenv import load_dotenv
@@ -186,12 +186,12 @@ class USDMDefineJSONProcessor:
     def _extract_usdm_data(self):
         """Extract biomedical concepts, eligibility criteria, and study elements from USDM."""
         # Extract study version data once
-        expression_version = Jsonata(f'study.versions["{self.studyversion}"]')
-        self.study_version_data = expression_version.evaluate(self.usdm_data)
+        self.study_version_data = jmespath.search(f'versions[{self.studyversion}]', self.usdm_data.get('study', {}))
         
         # Extract study design data once
-        expression_design = Jsonata(f'study.versions["{self.studyversion}"].studyDesigns["{self.studydesign}"]')
-        self.studyDesignData = expression_design.evaluate(self.usdm_data)
+        self.studyDesignData = jmespath.search(f'studyDesigns[{self.studydesign}]', self.study_version_data if self.study_version_data else {})
+
+
 
     def process_biomedical_concepts(self):
         """
@@ -3076,6 +3076,7 @@ class USDMDefineJSONProcessor:
             
             return_oid = oid
 
+            #TODO: dataType should ideally come from the variable metadata or codelist metadata, but defaulting to "text" for now
             if short_name not in self.code_lists_map:
                 codelist_dict = {
                     "OID": oid,
@@ -3097,6 +3098,7 @@ class USDMDefineJSONProcessor:
 
             existing_codes = {item["codedValue"] for item in self.code_lists_map[short_name]["codeListItems"]}
 
+            #TODO: decoded value is by default here the first synonym, but we may want to consider other options or concatenating multiple synonyms in the future
             for term in entry.get("Terms", []):
                 coded_value = term.get("Term")
                 decoded_values = term.get("Decoded Value") or []
@@ -3152,23 +3154,30 @@ class USDMDefineJSONProcessor:
         Extracts study name, description, protocol name from USDM titles
         and populates template header fields with study-specific information.
         """
-        expression_studyname = Jsonata(f'study.versions["{self.studyversion}"].titles[type.decode = "Study Acronym"].text')
-        study_name = expression_studyname.evaluate(self.usdm_data)
-
-        expression_studydescription = Jsonata(f'study.versions["{self.studyversion}"].titles[type.decode = "Official Study Title"].text')
-        study_description = expression_studydescription.evaluate(self.usdm_data)
-
-        expression_protocolname = Jsonata(f'study.versions["{self.studyversion}"].titles[type.decode = "Study Acronym"].text')
-        protocol_name = expression_protocolname.evaluate(self.usdm_data)
-
-        expression_language = Jsonata(f'''
-            (
-                $docVersionId := study.versions[{self.studyversion}].documentVersionIds[{self.docversion}];
-                study.documentedBy[versions[id = $docVersionId]].language.code
-            )
-        ''')
-        language = expression_language.evaluate(self.usdm_data)
+        # Extract study name, description, protocol name using jmespath filtering
+        titles = jmespath.search(f'versions[{self.studyversion}].titles', self.usdm_data.get('study', {}))
+        study_name = None
+        study_description = None
+        if titles:
+            for title in titles:
+                if title.get('type', {}).get('decode') == 'Study Acronym':
+                    study_name = title.get('text')
+                elif title.get('type', {}).get('decode') == 'Official Study Title':
+                    study_description = title.get('text')
+        protocol_name = study_name
         
+        # Extract language code
+        doc_version_id = jmespath.search(f'versions[{self.studyversion}].documentVersionIds[{self.docversion}]', self.usdm_data.get('study', {}))
+        documented_by = jmespath.search(f'documentedBy', self.usdm_data.get('study', {}))
+        language = None
+        if documented_by and doc_version_id:
+            for doc in documented_by:
+                versions = doc.get('versions', [])
+                for v in versions:
+                    if v.get('id') == doc_version_id:
+                        language = doc.get('language', {}).get('code')
+                        break
+
         current_time = datetime.now()
         time_str = current_time.strftime("%Y-%m-%dT%H:%M:%S.%f") + "+00:00"
         
