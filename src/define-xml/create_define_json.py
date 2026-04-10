@@ -3195,6 +3195,213 @@ class USDMDefineJSONProcessor:
         self.template['name'] = f"MDV {study_name}"
         self.template['description'] = f"Data Definitions for {study_name}"
 
+    # ------------------------------------------------------------------
+    # Patch-file helpers
+    # ------------------------------------------------------------------
+
+    def _collect_item_placeholders(self, item, item_section):
+        """Collect placeholder / null fields from a single item dict into item_section."""
+        patches = {}
+        if item.get('length') is None:
+            patches['length'] = None
+        origin = item.get('origin', {})
+        if origin.get('type') == '__PLACEHOLDER__':
+            patches['originType'] = '__PLACEHOLDER__'
+        if origin.get('source') == '__PLACEHOLDER__':
+            patches['originSource'] = '__PLACEHOLDER__'
+        if patches:
+            item_section[item['OID']] = patches
+
+    def _find_item_by_oid(self, oid):
+        """Return the first item dict in the assembled template matching *oid*, or None."""
+        for ig in self.template.get('itemGroups', []):
+            for item in ig.get('items', []):
+                if item.get('OID') == oid:
+                    return item
+            for sl in ig.get('slices', []):
+                for vlm_item in sl.get('items', []):
+                    if vlm_item.get('OID') == oid:
+                        return vlm_item
+        return None
+
+    def _apply_item_patch(self, item, item_patches):
+        """Apply patch fields to a single item dict in-place."""
+        oid = item.get('OID')
+        if oid not in item_patches:
+            return
+        ip = item_patches[oid]
+        if 'length' in ip and ip['length'] is not None:
+            item['length'] = ip['length']
+        if 'originType' in ip and ip['originType'] != '__PLACEHOLDER__':
+            item.setdefault('origin', {})['type'] = ip['originType']
+        if 'originSource' in ip and ip['originSource'] != '__PLACEHOLDER__':
+            item.setdefault('origin', {})['source'] = ip['originSource']
+
+    def generate_patch_file(self, patch_output_path):
+        """
+        Generate a YAML patch file listing all placeholder / null fields.
+
+        Scans the assembled template for any field set to '__PLACEHOLDER__' or
+        null and writes an OID-keyed YAML file that users can fill in and apply
+        back with --apply_patch.
+
+        Sections produced:
+        - itemGroups: datasets whose keySequence still contains __PLACEHOLDER__
+        - items: variables with null length or __PLACEHOLDER__ origin type/source
+        - codeLists: codelists with at least one __PLACEHOLDER__ coded value
+
+        Args:
+            patch_output_path (str): Path to write the YAML patch file
+        """
+        ig_section = {}
+        item_section = {}
+        cl_section = {}
+
+        for ig in self.template.get('itemGroups', []):
+            if '__PLACEHOLDER__' in ig.get('keySequence', []):
+                ig_section[ig['OID']] = {
+                    'name': ig.get('name', ''),
+                    'description': ig.get('description', ''),
+                }
+
+        for ig in self.template.get('itemGroups', []):
+            for item in ig.get('items', []):
+                self._collect_item_placeholders(item, item_section)
+            for sl in ig.get('slices', []):
+                for vlm_item in sl.get('items', []):
+                    self._collect_item_placeholders(vlm_item, item_section)
+
+        for cl in self.template.get('codeLists', []):
+            ph_count = sum(
+                1 for i in cl.get('codeListItems', [])
+                if i.get('codedValue') == '__PLACEHOLDER__'
+            )
+            if ph_count:
+                cl_section[cl['OID']] = {'name': cl.get('name', ''), 'count': ph_count}
+
+        lines = [
+            "# " + "=" * 68,
+            "# Define-JSON Placeholder Patch File",
+            f"# Study    : {self.template.get('studyName', 'N/A')}",
+            f"# Generated: {datetime.now().strftime('%Y-%m-%d')}",
+            "#",
+            "# Instructions:",
+            "#   1. Replace every __PLACEHOLDER__ with a valid value",
+            "#   2. Fill every null with an appropriate number",
+            "#   3. Apply with: --apply_patch <this_file> on your next run",
+            "#",
+            "# Valid values for originType:",
+            "#   Collected | Derived | Assigned | Protocol | eDT | Predecessor | Not Available",
+            "# Valid values for originSource:",
+            "#   Investigator | Sponsor | Subject | Vendor",
+            "# " + "=" * 68,
+            "",
+        ]
+
+        if ig_section:
+            lines.append("# keySequence: ordered list of variable names that form the sort / primary key")
+            lines.append("# Example:  keySequence: [STUDYID, USUBJID, DSSEQ]")
+            lines.append("itemGroups:")
+            for oid, meta in ig_section.items():
+                lines.append(f"  {oid}:  # {meta['name']} - {meta['description']}")
+                lines.append(f"    keySequence: [__PLACEHOLDER__]")
+            lines.append("")
+
+        if item_section:
+            lines.append("# length: integer (number of characters / digits for the variable)")
+            lines.append("# originType and originSource: see valid values in the header above")
+            lines.append("items:")
+            for oid, fields in item_section.items():
+                item_obj = self._find_item_by_oid(oid)
+                comment = (
+                    f"  # {item_obj.get('name', '')} - {item_obj.get('description', '')}"
+                    if item_obj else ""
+                )
+                lines.append(f"  {oid}:{comment}")
+                for field, value in fields.items():
+                    yaml_val = "null" if value is None else f'"{value}"'
+                    lines.append(f"    {field}: {yaml_val}")
+            lines.append("")
+
+        if cl_section:
+            lines.append("# codeListItems: add one entry per term;")
+            lines.append("# fill codedValue (submission value) and decode (display label)")
+            lines.append("codeLists:")
+            for oid, meta in cl_section.items():
+                lines.append(f"  {oid}:  # {meta['name']}")
+                lines.append("    codeListItems:")
+                for _ in range(meta['count']):
+                    lines.append('      - codedValue: "__PLACEHOLDER__"')
+                    lines.append('        decode: "__PLACEHOLDER__"')
+            lines.append("")
+
+        content = "\n".join(lines)
+        with open(patch_output_path, "w", encoding="utf-8") as f:
+            f.write(content)
+
+        print(f"\n📋 Patch file written: {patch_output_path}")
+        print(f"   {len(ig_section)} dataset(s) need keySequence, "
+              f"{len(item_section)} item(s) need origin/length, "
+              f"{len(cl_section)} codelist(s) need terms")
+
+    def apply_patch(self, patch_file):
+        """
+        Apply a YAML patch file to the assembled template and re-save.
+
+        Reads the patch YAML generated by --patch_file (or written manually)
+        and updates the in-memory template, then calls save_output() to write
+        the patched result to disk.  Fields still set to '__PLACEHOLDER__' or
+        null in the patch are left unchanged in the output.
+
+        Args:
+            patch_file (str): Path to the YAML patch file
+        """
+        with open(patch_file, "r", encoding="utf-8") as f:
+            patch = yaml.safe_load(f)
+
+        if not patch:
+            print("⚠️  Patch file is empty — nothing to apply")
+            return
+
+        # itemGroups — update keySequence when fully filled
+        for ig in self.template.get('itemGroups', []):
+            oid = ig['OID']
+            ip = patch.get('itemGroups', {}).get(oid, {})
+            ks = ip.get('keySequence', [])
+            if ks and '__PLACEHOLDER__' not in ks:
+                ig['keySequence'] = ks
+
+        # items — update length and origin fields
+        item_patches = patch.get('items', {})
+        if item_patches:
+            for ig in self.template.get('itemGroups', []):
+                for item in ig.get('items', []):
+                    self._apply_item_patch(item, item_patches)
+                for sl in ig.get('slices', []):
+                    for vlm_item in sl.get('items', []):
+                        self._apply_item_patch(vlm_item, item_patches)
+
+        # codeLists — replace placeholder items with provided terms
+        for cl in self.template.get('codeLists', []):
+            oid = cl['OID']
+            cp = patch.get('codeLists', {}).get(oid, {})
+            if 'codeListItems' not in cp:
+                continue
+            existing = [
+                i for i in cl.get('codeListItems', [])
+                if i.get('codedValue') != '__PLACEHOLDER__'
+            ]
+            existing_codes = {i['codedValue'] for i in existing}
+            for pi in cp['codeListItems']:
+                cv = pi.get('codedValue')
+                if cv and cv != '__PLACEHOLDER__' and cv not in existing_codes:
+                    existing.append({'codedValue': cv, 'decode': pi.get('decode', '')})
+                    existing_codes.add(cv)
+            cl['codeListItems'] = existing
+
+        self.save_output()
+        print(f"✅ Patch applied and output re-saved to {self.output_template}")
+
 
 def main():
     """
@@ -3278,11 +3485,32 @@ def main():
         action="store_true",
         help="Enable debug mode to save intermediate dictionaries as JSON files"
     )
+    parser.add_argument(
+        "--patch_file",
+        required=False,
+        help=(
+            "Path to a YAML patch file. On every run the file is (re)written with all "
+            "remaining placeholder/null values so users can fill them in. Required when "
+            "--apply_patch is used so the file is refreshed after applying (e.g., patch.yaml)."
+        )
+    )
+    parser.add_argument(
+        "--apply_patch",
+        required=False,
+        help=(
+            "Path to a previously completed YAML patch file produced by --patch_file. "
+            "Values are merged into the freshly generated template: OIDs that no "
+            "longer exist are silently ignored, new OIDs added by a USDM update will "
+            "appear in the refreshed --patch_file output. Requires --patch_file (e.g., patch.yaml)."
+        )
+    )
     args = parser.parse_args()
     
     # Validate conditional requirements
     if args.validate and not args.validation_report:
         parser.error("--validation_report is required when --validate is used")
+    if args.apply_patch and not args.patch_file:
+        parser.error("--patch_file is required when --apply_patch is used so the patch file is refreshed after applying")
     
     processor = USDMDefineJSONProcessor(
         usdm_file=args.usdm_file,
@@ -3299,9 +3527,15 @@ def main():
     
     processor.output_template = args.output_template
     processor.process()
-    
+
+    if args.apply_patch:
+        processor.apply_patch(args.apply_patch)
+
     print(f"\n✅ Define-JSON file created successfully: {args.output_template}")
-    
+
+    if args.patch_file:
+        processor.generate_patch_file(args.patch_file)
+
     # Validate if requested
     if args.validate:
         is_valid = processor.validate_against_schema(args.validate, excel_output=args.validation_report)
