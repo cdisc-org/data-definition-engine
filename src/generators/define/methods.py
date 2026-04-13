@@ -2,7 +2,6 @@ from odmlib.define_2_1 import model as DEFINE
 import define_object
 
 
-""" Note: Methods have not yet been implemented in the template """
 class Methods(define_object.DefineObject):
     """ create a Define-XML v2.1 MethodDef element """
     def __init__(self):
@@ -16,10 +15,11 @@ class Methods(define_object.DefineObject):
         :param lang: xml:lang setting for TranslatedText
         :param acrf: part of the common interface but not used by this class
         """
-        self.logger.info("in methods...")
         self.lang = lang
-        define_objects["MethodDef"] = []
         for method in template:
+            method_oid = self.require_key(method, "OID", "MethodDef")
+            if self.find_object(define_objects["MethodDef"], method_oid) is not None:
+                continue
             item = self._create_methoddef_object(method)
             define_objects["MethodDef"].append(item)
 
@@ -29,16 +29,21 @@ class Methods(define_object.DefineObject):
         :param method: Methods define-template dictionary section
         :return: a MethodDef odmlib template
         """
-        attr = {"OID": method["OID"], "Name": method["name"], "Type": method["type"]}
+        name = self.require_key(method, "name", f"MethodDef {method['OID']}")
+        mtype = self.require_key(method, "type", f"MethodDef {method['OID']}")
+        attr = {"OID": method["OID"], "Name": name, "Type": mtype}
         methoddef = DEFINE.MethodDef(**attr)
-        tt = DEFINE.TranslatedText(_content=method["description"], lang=self.lang)
+        description = method.get("description", "")
+        tt = DEFINE.TranslatedText(_content=description, lang=self.lang)
         methoddef.Description = DEFINE.Description()
         methoddef.Description.TranslatedText.append(tt)
         if method.get("context"):
-            methoddef.FormalExpression.append(DEFINE.FormalExpression(Context=method["context"], _content=method["code"]))
+            methoddef.FormalExpression.append(
+                DEFINE.FormalExpression(Context=method["context"], _content=method.get("code", ""))
+            )
         if method.get("document"):
             self._add_document(method, methoddef)
-        return method
+        return methoddef
 
     def _add_document(self, method, methoddef):
         """

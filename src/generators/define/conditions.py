@@ -1,8 +1,8 @@
-from odmlib.define_2_1 import model as DEFINE
 import define_object
 
+
 class Conditions(define_object.DefineObject):
-    """ create a Define-XML v2.1 WhereClauseDef element objects """
+    """ cache DDS conditions for use by WhereClauses to build RangeCheck elements """
     def __init__(self):
         super().__init__()
 
@@ -16,11 +16,9 @@ class Conditions(define_object.DefineObject):
         """
         self.lang = lang
         conditions = []
-        # store the conditions in define_objects for use when generating WhereClauseDef
         for condition in template:
             rc = self._create_condition(condition)
             conditions.append({rc["OID"]: rc})
-        # store in define_objects with underscore prefix to indicate internal use
         define_objects["_conditions"] = conditions
 
     @staticmethod
@@ -28,26 +26,12 @@ class Conditions(define_object.DefineObject):
         condition_obj = {"OID": condition["OID"]}
         range_checks = []
         for rc in condition["rangeChecks"]:
-            rc_attr = {"SoftHard": "Soft", "ItemOID": rc["item"], "Comparator": rc["comparator"]}
-            check_values = []
-            for value in rc["checkValues"]:
-                check_values.append(value)
-            rc_attr["CheckValue"] = check_values
+            rc_attr = {
+                "SoftHard": rc.get("softHard", "Soft"),
+                "ItemOID": rc["item"],
+                "Comparator": rc["comparator"],
+                "CheckValue": list(rc.get("checkValues", [])),
+            }
             range_checks.append(rc_attr)
         condition_obj["RangeCheck"] = range_checks
         return condition_obj
-
-    def _create_rangecheck(self, wc, dataset):
-        """
-        use the values from the conditions section of the DDS JSON to create a RangeCheck odmlib template
-        :param wc: WhereClause dictionary from the DDS JSON
-        :param dataset: dataset name
-        :return: a RangeCheck odmlib template
-        """
-        item_oid = self.generate_oid(["IT", dataset, wc["Variable"]])
-        rc_attr = {"SoftHard": "Soft", "ItemOID": item_oid, "Comparator": wc["Comparator"]}
-        rc = DEFINE.RangeCheck(**rc_attr)
-        for value in wc["Values"]:
-            cv = DEFINE.CheckValue(_content=value)
-            rc.CheckValue.append(cv)
-        return rc

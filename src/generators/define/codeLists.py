@@ -26,9 +26,13 @@ class CodeLists(define_object.DefineObject):
         :param acrf: part of the common interface but not used by this class
         """
         self.lang = lang
-        define_objects["CodeList"] = []
         for cl in template:
             # TODO template missing the NCI c-codes for codelists and terms
+            cl_oid = self.require_key(cl, "OID", "CodeList")
+            # Dedup CodeLists by OID so two datasets that reference the same codelist
+            # don't land duplicate definitions in the output.
+            if self.find_object(define_objects["CodeList"], cl_oid) is not None:
+                continue
             cl_defn = self._create_codelist_object(cl)
             coding = cl.get("coding", [])
             cl_c_code = coding[0].get("code") if coding else None
@@ -58,9 +62,7 @@ class CodeLists(define_object.DefineObject):
         if cl_c_code:
             alias = DEFINE.Alias(Context="nci:ExtCodeID", Name=cl_c_code)
             cl.Alias.append(alias)
-        # add the code list to the list of code list define_objects
-        if cl:
-            objects["CodeList"].append(cl)
+        objects["CodeList"].append(cl)
 
     def _create_codelist_object(self, obj):
         oid = self.require_key(obj, "OID", "CodeList")
