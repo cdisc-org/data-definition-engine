@@ -27,8 +27,6 @@ class ItemGroups(define_object.DefineObject):
         :param lang: xml:lang setting for TranslatedText
         :param acrf: annotated case report form leaf ID
         """
-        define_objects["ItemDef"] = []
-
         self.lang = lang
         for dataset in template:
             self._generate_dataset(dataset, define_objects, lang, acrf)
@@ -45,20 +43,24 @@ class ItemGroups(define_object.DefineObject):
     def _generate_dataset(self, dataset, define_objects, lang, acrf):
         itg = self._create_itemgroupdef_object(dataset)
         define_objects["ItemGroupDef"].append(itg)
-        # ItemRefs
-        vars = itemRefs.ItemRefs()
         dataset_name = dataset.get("name", "unknown")
         items_list = self.require_key(dataset, "items", f"ItemGroupDef {dataset_name}")
-        vars.create_define_objects(items_list, define_objects, lang, acrf, item_group=itg)
+        # ItemRefs
+        itemRefs.ItemRefs().create_define_objects(items_list, define_objects, lang, acrf, item_group=itg)
         # ItemDefs
-        itd = items.Items()
-        itd.create_define_objects(dataset["items"], define_objects, lang, acrf, slice=dataset["slices"] if dataset.get("slices") else None)
+        slices = dataset.get("slices")
+        items.Items().create_define_objects(items_list, define_objects, lang, acrf, slice=slices)
 
         # TODO review this assumption that we have 1 class per dataset
         # assumption: 1 class per dataset - many need to expand this for ADaM
         if dataset.get("observationClass", {}).get("name", ""):
-            ds_class = dataset.get("observationClass", {}).get("name", "").upper().replace("-", " ")
+            ds_class = dataset["observationClass"]["name"].upper().replace("-", " ")
             itg.Class = DEFINE.Class(Name=ds_class)
+
+        # TODO - where should we set the dataset file extension? (e.g., ndjson, xpt, etc.)
+        leaf = DEFINE.leaf(ID="LF." + dataset_name, href=dataset_name.lower() + ".ndjson")
+        leaf.title = DEFINE.title(_content=dataset_name.lower() + ".ndjson")
+        itg.leaf = leaf
 
     def _create_itemgroupdef_object(self, obj):
         name = self.require_key(obj, "name", "ItemGroupDef")
@@ -71,21 +73,8 @@ class ItemGroups(define_object.DefineObject):
         #     attr["SASDatasetName"] = obj["sasDatasetName"]
         if "isReferenceData" in obj:
             attr["IsReferenceData"] = "Yes" if obj["isReferenceData"] else "No"
-        # else:
-        #     attr["IsReferenceData"] = self._generate_is_reference(attr)
-        # if obj.get("repeating"):
-        #     if obj["repeating"]:
-        #         attr["Repeating"] = "Yes"
-        #     else:
-        #         attr["Repeating"] = "No"
-        # else:
-        #     attr["Repeating"] = self._generate_repeating_value(attr)
         attr["Repeating"] = self._generate_repeating_value(attr)
-        # TODO how to tell if we're processing SDTM or ADaM define?
-        if obj.get("purpose"):
-            attr["Purpose"] = obj["purpose"]
-        else:
-            attr["Purpose"] = DEFAULT_PURPOSE
+        attr["Purpose"] = self._resolve_purpose(obj)
         if obj.get("comment"):
             attr["CommentOID"] = obj["comment"]
         if "isNonStandard" in obj:
@@ -101,16 +90,22 @@ class ItemGroups(define_object.DefineObject):
         igd.Description.TranslatedText.append(tt)
         return igd
 
-    # def _generate_is_reference(self, attributes: dict[str, str]) -> str:
-    #     """
-    #     Determine if the dataset is a reference dataset (trial design domains).
-
-    #     :param attributes: ItemGroupDef attributes dictionary
-    #     :return: "Yes" if domain is a reference domain, "No" otherwise
-    #     """
-    #     if attributes["Domain"] in TRIAL_DESIGN_DOMAINS:
-    #         return "Yes"
-    #     return "No"
+    @staticmethod
+    def _resolve_purpose(obj: dict[str, Any]) -> str:
+        """
+        Resolve the ItemGroupDef Purpose from the dataset definition.
+        Prefers an explicit purpose, falls back to a standard-driven default
+        (ADaM standards use Analysis; everything else uses Tabulation).
+        """
+        if obj.get("purpose"):
+            return obj["purpose"]
+        standard = (obj.get("standard") or "").upper()
+        if "ADAM" in standard:
+            return "Analysis"
+        dataset_name = (obj.get("name") or "").upper()
+        if dataset_name.startswith("AD"):
+            return "Analysis"
+        return DEFAULT_PURPOSE
 
     def _generate_repeating_value(self, attributes: dict[str, str]) -> str:
         """

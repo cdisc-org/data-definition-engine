@@ -10,7 +10,6 @@ class Study(define_object.DefineObject):
     def create_define_objects(self, template, define_objects, lang, acrf):
         self.lang = lang
         self.acrf = acrf
-        # TODO missing attributes: language
         if "language" in template:
             self.lang = template["language"]
         if "annotatedCRF" in template and len(template["annotatedCRF"]) > 0:
@@ -40,8 +39,22 @@ class Study(define_object.DefineObject):
         :param study_dict: dictionary created from the study section in the DDS JSON
         :return: odmlib MetaDataVersion template
         """
-        # TODO no metadata version ID
-        mdv_oid = self.generate_oid(["MDV", study_dict["studyName"]])
-        mdv = DEFINE.MetaDataVersion(OID=mdv_oid, Name="MDV " + study_dict["studyName"],
-                                     Description=f"Data Definitions for {study_dict['studyName']}", DefineVersion="2.1.0")
+        # Prefer an explicit MDV OID from the DDS. Without one we synthesize from
+        # the study name, which collides whenever two studies share a name or one
+        # study carries multiple MDVs — warn loudly so callers notice.
+        mdv_oid = study_dict.get("metaDataVersionOID")
+        if not mdv_oid:
+            mdv_oid = self.generate_oid(["MDV", study_dict["studyName"]])
+            self.logger.warning(
+                "metaDataVersionOID missing from DDS; synthesized %s from studyName. "
+                "This collides across studies sharing a name or studies with multiple MDVs.",
+                mdv_oid,
+            )
+        name = study_dict.get("metaDataVersionName", "MDV " + study_dict["studyName"])
+        description = study_dict.get(
+            "metaDataVersionDescription", f"Data Definitions for {study_dict['studyName']}"
+        )
+        mdv = DEFINE.MetaDataVersion(
+            OID=mdv_oid, Name=name, Description=description, DefineVersion="2.1.0"
+        )
         return mdv
