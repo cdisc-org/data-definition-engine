@@ -112,6 +112,7 @@ class USDMDefineJSONProcessor:
             'whereClauses': [],
             'codeLists': [],
             'methods': [],
+            'comments': [],
             'standards': [],
             'annotatedCRF': [],
             'concepts': [],
