@@ -2,7 +2,6 @@ from odmlib.define_2_1 import model as DEFINE
 import define_object
 
 
-""" Note: Comments have not yet been implemented in the template """
 class Comments(define_object.DefineObject):
     """ create a Define-XML v2.1 CommentDef element template """
     def __init__(self):
@@ -17,13 +16,14 @@ class Comments(define_object.DefineObject):
         :param define_objects: dictionary of odmlib define_objects updated by this method
         :param lang: xml:lang setting for TranslatedText
         """
-        self.logger.info("in Comments...")
         self.lang = lang
-        define_objects["CommentDef"] = []
         for comment in template:
-            com_oid = self.generate_oid(["COM", comment.Name])
-            comment = self._create_commentdef_object(com_oid, comment)
-            define_objects["CommentDef"].append(comment)
+            name = self.require_key(comment, "name", "CommentDef")
+            com_oid = comment.get("OID") or self.generate_oid(["COM", name])
+            if self.find_object(define_objects["CommentDef"], com_oid) is not None:
+                continue
+            com_def = self._create_commentdef_object(com_oid, comment)
+            define_objects["CommentDef"].append(com_def)
 
     def _create_commentdef_object(self, com_oid, comment):
         """
@@ -32,11 +32,12 @@ class Comments(define_object.DefineObject):
         :param comment: comment dictionary from the DDS JSON
         :return: a CommentDef odmlib template
         """
-        com = DEFINE.CommentDef(OID=com_oid, CommentType="FreeText")
-        tt = DEFINE.TranslatedText(_content=comment["Description"], lang=self.lang)
+        com = DEFINE.CommentDef(OID=com_oid)
+        description = self.require_key(comment, "description", f"CommentDef {com_oid}")
+        tt = DEFINE.TranslatedText(_content=description, lang=self.lang)
         com.Description = DEFINE.Description()
         com.Description.TranslatedText.append(tt)
-        if comment.get("Document"):
+        if comment.get("document"):
             self._add_document(comment, com)
         return com
 
@@ -47,8 +48,8 @@ class Comments(define_object.DefineObject):
         :param comment: comment dictionary from the DDS JSON
         :param com: define comment template
         """
-        dr = DEFINE.DocumentRef(leafID=comment["Document"])
-        if comment.get("Pages"):
-            pdf = DEFINE.PDFPageRef(PageRefs=comment["Pages"], Type="NamedDestination")
+        dr = DEFINE.DocumentRef(leafID=comment["document"])
+        if comment.get("pages"):
+            pdf = DEFINE.PDFPageRef(PageRefs=comment["pages"], Type="NamedDestination")
             dr.PDFPageRef.append(pdf)
         com.DocumentRef.append(dr)

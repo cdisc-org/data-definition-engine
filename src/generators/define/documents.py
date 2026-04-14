@@ -2,7 +2,6 @@ from odmlib.define_2_1 import model as DEFINE
 import define_object
 
 
-""" Note: Documents have not yet been implemented in the template """
 class Documents(define_object.DefineObject):
     """ create a Define-XML v2.1 leaf element template """
     def __init__(self):
@@ -16,20 +15,21 @@ class Documents(define_object.DefineObject):
         :param lang: xml:lang setting for TranslatedText
         :param acrf: part of the common interface but not used by this class
         """
-        self.logger.info("in Documents...")
         self.lang = lang
-        define_objects["leaf"] = []
         for doc in template:
-            leaf = self._create_leaf_object(doc)
+            leaf_id = doc.get("ID") or doc.get("id") or doc.get("leafID")
+            if leaf_id is None:
+                raise ValueError("Required field 'ID' missing in Documents")
+            if self.find_object(define_objects["leaf"], leaf_id) is not None:
+                continue
+            leaf = self._create_leaf_object(leaf_id, doc)
             define_objects["leaf"].append(leaf)
 
-    def _create_leaf_object(self, doc):
+    @staticmethod
+    def _create_leaf_object(leaf_id, doc):
         """
         use the values from the Documents section of the template to create a leaf odmlib template
-        :param doc: define-template metadata dictionary
-        :return: a leaf odmlib template
         """
-        lf = DEFINE.leaf(ID=doc["ID"], href=doc["href"])
-        title = DEFINE.title(_content=doc["title"])
-        lf.title = title
+        lf = DEFINE.leaf(ID=leaf_id, href=doc["href"])
+        lf.title = DEFINE.title(_content=doc["title"])
         return lf

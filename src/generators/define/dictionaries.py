@@ -1,9 +1,8 @@
 import define_object
 
 
-""" Note: Dictionaries have not yet been implemented in the template """
 class Dictionaries(define_object.DefineObject):
-    """ create a Define-XML v2.1 ExternalCodeList element template """
+    """ create Define-XML v2.1 CodeList elements with ExternalCodeList references """
     def __init__(self):
         super().__init__()
 
@@ -15,15 +14,19 @@ class Dictionaries(define_object.DefineObject):
         :param lang: xml:lang setting for TranslatedText
         :param acrf: part of the common interface but not used by this class
         """
-        self.logger.info("in Dictionaries...")
         self.lang = lang
         for codelist in template:
-            cl_oid = self.generate_oid(["CL", codelist["Short Name"]])
+            short_name = codelist.get("shortName") or codelist.get("Short Name")
+            if not short_name:
+                raise ValueError("Required field 'shortName' missing in Dictionaries")
+            cl_oid = self.generate_oid(["CL", short_name])
+            if self.find_object(objects["CodeList"], cl_oid) is not None:
+                continue
             cl = self.create_external_codelist(
                 cl_oid=cl_oid,
-                name=codelist["Name"],
-                data_type=codelist["Data Type"],
-                dictionary=codelist["Dictionary"],
-                version=codelist.get("Version")
+                name=codelist.get("name") or codelist.get("Name"),
+                data_type=codelist.get("dataType") or codelist.get("Data Type"),
+                dictionary=codelist.get("dictionary") or codelist.get("Dictionary"),
+                version=codelist.get("version") or codelist.get("Version"),
             )
             objects["CodeList"].append(cl)

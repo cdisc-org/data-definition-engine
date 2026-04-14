@@ -19,9 +19,12 @@ class SupportingDocuments:
 
     @staticmethod
     def create_supplementaldoc(annotated_crf, leaf_objects):
-        sdoc = DEFINE.SupplementalDoc() if leaf_objects else None
-        for lo in leaf_objects:
-            if leaf_objects and lo.ID != annotated_crf:
-                dr = DEFINE.DocumentRef(leafID=lo.ID)
-                sdoc.DocumentRef.append(dr)
+        if not leaf_objects:
+            return None
+        refs = [lo for lo in leaf_objects if lo.ID != annotated_crf]
+        if not refs:
+            return None
+        sdoc = DEFINE.SupplementalDoc()
+        for lo in refs:
+            sdoc.DocumentRef.append(DEFINE.DocumentRef(leafID=lo.ID))
         return sdoc

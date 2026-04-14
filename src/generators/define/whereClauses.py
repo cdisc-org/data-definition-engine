@@ -16,32 +16,38 @@ class WhereClauses(define_object.DefineObject):
         :param acrf: part of the common interface but not used by this class
         """
         self.lang = lang
-        # read conditions from define_objects (stored by conditions.py)
         range_checks = define_objects.get("_conditions", [])
         for wc_obj in template:
+            wc_oid = self.require_key(wc_obj, "OID", "WhereClauseDef")
+            if self.find_object(define_objects["WhereClauseDef"], wc_oid) is not None:
+                continue
             wc = self._create_whereclausedef_object(wc_obj, range_checks)
             define_objects["WhereClauseDef"].append(wc)
 
     def _create_whereclausedef_object(self, wc_obj, range_checks):
-        attr = {"OID": wc_obj["OID"]}
-        where_clause = DEFINE.WhereClauseDef(**attr)
-        for condition_oid in wc_obj["conditions"]:
+        where_clause = DEFINE.WhereClauseDef(OID=wc_obj["OID"])
+        for condition_oid in wc_obj.get("conditions", []):
             stashed_rc = self._get_range_checks(range_checks, condition_oid)
+            if stashed_rc is None:
+                raise ValueError(
+                    f"WhereClauseDef {wc_obj['OID']} references unknown condition {condition_oid}"
+                )
             cond = stashed_rc[condition_oid]
-            rc_list = cond["RangeCheck"]
-            for rc_obj in rc_list:
-                rc_attr = {"SoftHard": "Soft", "ItemOID": rc_obj["ItemOID"], "Comparator": rc_obj["Comparator"]}
-                rc = DEFINE.RangeCheck(**rc_attr)
+            for rc_obj in cond["RangeCheck"]:
+                rc = DEFINE.RangeCheck(
+                    SoftHard=rc_obj.get("SoftHard", "Soft"),
+                    ItemOID=rc_obj["ItemOID"],
+                    Comparator=rc_obj["Comparator"],
+                )
                 for value in rc_obj["CheckValue"]:
-                    cv = DEFINE.CheckValue(_content=value)
-                    rc.CheckValue.append(cv)
+                    rc.CheckValue.append(DEFINE.CheckValue(_content=value))
                 where_clause.RangeCheck.append(rc)
         return where_clause
 
     @staticmethod
     def _get_range_checks(range_checks, condition_oid):
         for rc in range_checks:
-            oid = list(rc.keys())[0]
+            oid = next(iter(rc.keys()))
             if oid == condition_oid:
                 return rc
         return None

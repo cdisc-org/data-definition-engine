@@ -2,26 +2,27 @@ import define_object
 
 
 class ConceptProperties(define_object.DefineObject):
-    """ create a Define-XML v2.1 ExternalCodeList element template """
+    """Create Define-XML v2.1 CodeList elements for concept properties."""
     def __init__(self):
         super().__init__()
 
     def create_define_objects(self, template, objects, lang, acrf):
         """
         parse the define-template and create odmlib define_objects to return in the define_objects dictionary
-        :param template: DDS template dictionary section
-        :param objects: dictionary of odmlib define_objects updated by this method
-        :param lang: xml:lang setting for TranslatedText
-        :param acrf: part of the common interface but not used by this class
         """
         self.lang = lang
         for concept in template:
-            cl_oid = self.generate_oid(["CL", concept["Short Name"]])
+            short_name = concept.get("shortName") or concept.get("Short Name")
+            if not short_name:
+                raise ValueError("Required field 'shortName' missing in ConceptProperties")
+            cl_oid = self.generate_oid(["CL", short_name])
+            if self.find_object(objects["CodeList"], cl_oid) is not None:
+                continue
             cl = self.create_external_codelist(
                 cl_oid=cl_oid,
-                name=concept["Name"],
-                data_type=concept["Data Type"],
-                dictionary=concept["Dictionary"],
-                version=concept.get("Version")
+                name=concept.get("name") or concept.get("Name"),
+                data_type=concept.get("dataType") or concept.get("Data Type"),
+                dictionary=concept.get("dictionary") or concept.get("Dictionary"),
+                version=concept.get("version") or concept.get("Version"),
             )
             objects["CodeList"].append(cl)
