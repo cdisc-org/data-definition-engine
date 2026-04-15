@@ -192,8 +192,6 @@ class USDMDefineJSONProcessor:
         # Extract study design data once
         self.studyDesignData = jmespath.search(f'studyDesigns[{self.studydesign}]', self.study_version_data if self.study_version_data else {})
 
-
-
     def process_biomedical_concepts(self):
         """
         Process all biomedical concepts from USDM.
@@ -2171,14 +2169,16 @@ class USDMDefineJSONProcessor:
             var_data = self.datasets_dict[dataset].get(var['name'], {})
 
             if 'dataType' in var_data:
-                item_dict["dataType"] = var_data['dataType']
+                data_type = var_data['dataType']
             else:
-                item_dict["dataType"] = self._convert_data_type(var)
-                            
-            if 'length' in var_data:
-                item_dict['length'] = var_data['length']
-            else:
-                item_dict['length'] = None
+                data_type = self._convert_data_type(var)
+            item_dict["dataType"] = data_type
+              
+            if data_type in ['text', 'integer', 'float']:               
+                if 'length' in var_data:
+                    item_dict['length'] = var_data['length']
+                else:
+                    item_dict['length'] = None
             
             if 'format' in var_data:
                 item_dict['displayFormat'] = var_data['format']
@@ -2294,16 +2294,19 @@ class USDMDefineJSONProcessor:
                                 break
                         
                         # Create VLM item with optional fields
+                        data_type = vlm_data.get('dataType', self._convert_data_type(var))
                         vlm_item = {
                             "OID": f"IT.{dataset}.{var['name']}.{param}" if param else f"IT.{dataset}.{var['name']}",
                             "mandatory": False,
                             "name": var['name'],
-                            "dataType": vlm_data.get('dataType', self._convert_data_type(var))
+                            "dataType": data_type
                         }
-                        
                         # Add optional fields
-                        if 'length' in vlm_data:
-                            vlm_item['length'] = vlm_data['length']
+                        if data_type in ['text', 'integer', 'float']:
+                            if 'length' in vlm_data:
+                                vlm_item['length'] = vlm_data['length']
+                            else:
+                                vlm_item['length'] = None
                         if 'format' in vlm_data:
                             vlm_item['displayFormat'] = vlm_data['format']
                         if 'significantDigits' in vlm_data:
