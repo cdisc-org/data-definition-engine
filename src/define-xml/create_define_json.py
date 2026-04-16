@@ -445,13 +445,6 @@ class USDMDefineJSONProcessor:
                 variable_dict = {variable_name: vlm_data}
                 self.bc_dict[bc['id']].append(variable_dict)
 
-
-
-
-
-
-
-
     def build_vlm_lookup(self):
         """
         Build VLM lookup dictionary for quick variable metadata access.
@@ -1583,6 +1576,18 @@ class USDMDefineJSONProcessor:
                 )
                 if slice_has_codelist:
                     del item['codeList']
+
+        # Remove origin from parent items when at least one VLM slice carries
+        # an origin (the origin then belongs on the slices, not the parent).
+        for item in item_group['items']:
+            vlm_key = f"{dataset}.{item['name']}"
+            if vlm_key in self.vlm_items_by_variable and 'origin' in item:
+                slice_has_origin = any(
+                    'origin' in vi
+                    for vi in self.vlm_items_by_variable[vlm_key]
+                )
+                if slice_has_origin:
+                    del item['origin']
 
         # Create slices from VLM items grouped by variable
         slices = []
