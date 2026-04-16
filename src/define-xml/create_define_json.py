@@ -479,6 +479,7 @@ class USDMDefineJSONProcessor:
                     "role": "Qualifier",
                     "dataType": "text",
                     "length": 1,
+                    "codeList": "CL.NY_NY",
                     "originType": "Collected",
                     "originSource": "Investigator",
                     "WhereClause": [
@@ -509,7 +510,7 @@ class USDMDefineJSONProcessor:
             tsparmcd_entry = {
                 "dataType": "text",
                 "length": 1,
-                "codeList": "CL.NY",
+                "codeList": "CL.NY_NY",
                 "originType": "Protocol",
                 "originSource": "Sponsor",
                 "WhereClause": [{"Clause": [{"Dataset": "TS", "Variable": "TSPARMCD", "item": "IT.TS.TSPARMCD", "Comparator": "EQ", "Values": ["ADAPT"]}]}]
@@ -658,7 +659,7 @@ class USDMDefineJSONProcessor:
         # EXTTIND
         if any(code.get('code') == 'C207613' for code in self.studyDesignData.get('characteristics', [])):
             tsparmcd_entry = {
-                "dataType": "text", "length": 1, "codeList": "CL.NY", "originType": "Protocol", "originSource": "Sponsor",
+                "dataType": "text", "length": 1, "codeList": "CL.NY_NY", "originType": "Protocol", "originSource": "Sponsor",
                 "WhereClause": [{"Clause": [{"Dataset": "TS", "Variable": "TSPARMCD", "item": "IT.TS.TSPARMCD", "Comparator": "EQ", "Values": ["EXTTIND"]}]}]
             }
             self.vlm_lookup["TSPARMCD"].append(tsparmcd_entry)
@@ -667,7 +668,7 @@ class USDMDefineJSONProcessor:
         if self.studyDesignData.get('population', {}).get("includesHealthySubjects") is True or \
            any(cohort.get('includesHealthySubjects') is True for cohort in self.studyDesignData.get('population', {}).get('cohorts', [])):
             tsparmcd_entry = {
-                "dataType": "text", "length": 1, "codeList": "CL.NY", "originType": "Protocol", "originSource": "Sponsor",
+                "dataType": "text", "length": 1, "codeList": "CL.NY_NY", "originType": "Protocol", "originSource": "Sponsor",
                 "WhereClause": [{"Clause": [{"Dataset": "TS", "Variable": "TSPARMCD", "item": "IT.TS.TSPARMCD", "Comparator": "EQ", "Values": ["HLTSUBJI"]}]}]
             }
             self.vlm_lookup["TSPARMCD"].append(tsparmcd_entry)
@@ -880,7 +881,7 @@ class USDMDefineJSONProcessor:
             for characteristic in self.studyDesignData.get('characteristics', [])
         ):
             tsparmcd_entry = {
-                "dataType": "text", "length": 1, "codeList": "CL.NY", "originType": "Protocol", "originSource": "Sponsor",
+                "dataType": "text", "length": 1, "codeList": "CL.NY_NY", "originType": "Protocol", "originSource": "Sponsor",
                 "WhereClause": [{"Clause": [{"Dataset": "TS", "Variable": "TSPARMCD", "item": "IT.TS.TSPARMCD", "Comparator": "EQ", "Values": ["RANDOM"]}]}]
             }
             self.vlm_lookup["TSPARMCD"].append(tsparmcd_entry)
@@ -888,7 +889,7 @@ class USDMDefineJSONProcessor:
         # RDIND
         if any(indication.get('isRareDisease') is True for indication in self.studyDesignData.get('indications', [])):
             tsparmcd_entry = {
-                "dataType": "text", "length": 1, "codeList": "CL.NY", "originType": "Protocol", "originSource": "Sponsor",
+                "dataType": "text", "length": 1, "codeList": "CL.NY_NY", "originType": "Protocol", "originSource": "Sponsor",
                 "WhereClause": [{"Clause": [{"Dataset": "TS", "Variable": "TSPARMCD", "item": "IT.TS.TSPARMCD", "Comparator": "EQ", "Values": ["RDIND"]}]}]
             }
             self.vlm_lookup["TSPARMCD"].append(tsparmcd_entry)
