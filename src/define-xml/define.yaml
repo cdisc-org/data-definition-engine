@@ -601,7 +601,6 @@ classes:
           These are allowed to be null, unlike stricter dataset dimensions or primary keys.
         range: Item
         multivalued: true
-        inlined: true
         close_mappings:
           - odm:ItemRef.KeySequence
           - sdmx:DimensionDescriptor
