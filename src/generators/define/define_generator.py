@@ -4,17 +4,51 @@ import logging
 import sys
 from pathlib import Path
 from typing import Any
+import os.path
+
+from defineutils.validate import DefineSchemaValidator, DefineSchemaValidationError
+from odmlib.define_2_1 import model as DEFINE
+
 import odm as ODM
 import supporting_docs as SD
-import os.path
-from defineutils.validate import DefineSchemaValidator, DefineSchemaValidationError
-import study, standards, itemGroups, itemRefs, items, conditions, standards, annotatedCRF, concepts, conceptProperties
-import whereClauses, codeLists, dictionaries, methods, comments, documents, valueLevel
+import post_processing as PP
+import study
+import standards
+import itemGroups
+import items
+import conditions
+import annotatedCRF
+import concepts
+import conceptProperties
+import whereClauses
+import codeLists
+import dictionaries
+import methods
+import comments
+import documents
 from constants import DEFAULT_LANGUAGE, ACRF_LEAF_ID, DEFAULT_OUTPUT_FILE
 
 ELEMENTS = ["ValueListDef", "WhereClauseDef", "ItemGroupDef", "ItemDef", "CodeList", "MethodDef", "CommentDef", "leaf"]
 
-# Loader classes for each section in the DDS JSON file
+# Loader classes for each section in the DDS JSON file.
+# Ordering is significant — conditions must run before whereClauses (whereClauses reads
+# the condition cache), itemGroups populates ItemDef/ValueListDef/WhereClauseDef entries,
+# and post-processing depends on ItemDef being fully materialized.
+SECTION_ORDER = [
+    "standards",
+    "annotatedCRF",
+    "codeLists",
+    "concepts",
+    "conceptProperties",
+    "dictionaries",
+    "documents",
+    "comments",
+    "conditions",
+    "methods",
+    "itemGroups",
+    "whereClauses",
+]
+
 LOADERS = {
     "itemGroups": itemGroups.ItemGroups,
     "conditions": conditions.Conditions,
@@ -25,9 +59,9 @@ LOADERS = {
     "annotatedCRF": annotatedCRF.AnnotatedCRF,
     "concepts": concepts.Concepts,
     "conceptProperties": conceptProperties.ConceptProperties,
-    "Dictionaries": dictionaries.Dictionaries,
-    "Comments": comments.Comments,
-    "Documents": documents.Documents,
+    "dictionaries": dictionaries.Dictionaries,
+    "comments": comments.Comments,
+    "documents": documents.Documents,
 }
 
 """
@@ -57,8 +91,7 @@ class DefineGenerator:
         self._check_file_existence()
         self.lang: str = DEFAULT_LANGUAGE
         self.acrf: str = ACRF_LEAF_ID
-        self.define_attributes: dict[str, Any] = {}
-        self.define_objects: dict[str, list[Any]] = {}
+        self.define_objects: dict[str, Any] = {}
 
     def create(self) -> None:
         """Create the Define-XML v2.1 file from the DDS JSON input file."""
@@ -71,20 +104,39 @@ class DefineGenerator:
             sys.exit(1)
         self._init_define_objects()
         self._load_study(template_objects)
-        for section, object in template_objects.items():
-            if type(object) is list:
-                logging.info(f"processing {section}")
-                self._load(section, object)
-            else:
-                self.define_attributes[section] = object
+        # Explicit dispatch order — no dependency on JSON key order.
+        for section in SECTION_ORDER:
+            if section not in template_objects:
+                continue
+            value = template_objects[section]
+            if not isinstance(value, list):
+                continue
+            logging.info(f"processing {section}")
+            self._load(section, value)
 
+        self._post_process_elements()
         odm = self._build_doc()
         self._write_define(odm)
 
+
+    def _post_process_elements(self) -> None:
+        """
+        Post-processing adds content determined after all elements are created.
+        :return: None
+        """
+        pp = PP.PostProcessing(self.define_objects, self.lang)
+        pp.process_define_objects()
+
     def _init_define_objects(self) -> None:
-        """Initialize empty lists for each Define-XML element type."""
+        """Initialize empty containers for each Define-XML element type."""
         for elem in ELEMENTS:
             self.define_objects[elem] = []
+        # Containers populated by non-ELEMENTS loaders. Initializing here prevents
+        # KeyErrors when a DDS JSON file omits these sections entirely.
+        self.define_objects["AnnotatedCRF"] = []
+        self.define_objects["Standards"] = DEFINE.Standards()
+        # Internal caches written by one loader and read by another.
+        self.define_objects["_conditions"] = []
 
     def _load(self, section: str, data: list[dict[str, Any]]) -> None:
         """
@@ -111,20 +163,32 @@ class DefineGenerator:
         :return: instantiated odmlib Define-XML v2.1 model
         """
         odm_elem = ODM.ODM()
-        odm = odm_elem.create_define_objects()
+        odm = odm_elem.create_root()
         odm.Study = self.define_objects["Study"]
         odm.Study.MetaDataVersion = self.define_objects["MetaDataVersion"]
         odm.Study.MetaDataVersion.Standards = self.define_objects["Standards"]
         supp_docs = SD.SupportingDocuments()
-        odm.Study.MetaDataVersion.AnnotatedCRF = supp_docs.create_annotatedcrf(self.acrf)
-        # create leaf object for aCRF as there are no documents in template
-        self.define_objects["leaf"].append(supp_docs.create_leaf_object(leaf_id="LF.acrf", href="acrf.pdf", title="Annotated CRF"))
-        # TODO no supplemental docs in template
-        # if "leaf" in self.define_objects and len(self.define_objects["leaf"]) > 0:
-        #     odm.Study.MetaDataVersion.SupplementalDoc = supp_docs.create_supplementaldoc(self.acrf, self.define_objects["leaf"])
+        # Prefer an AnnotatedCRF materialized by the annotatedCRF loader; fall back
+        # to a synthesized stub when the DDS JSON has no annotatedCRF section.
+        acrf_list = self.define_objects.get("AnnotatedCRF") or []
+        if acrf_list:
+            odm.Study.MetaDataVersion.AnnotatedCRF = acrf_list[0]
+        else:
+            odm.Study.MetaDataVersion.AnnotatedCRF = supp_docs.create_annotatedcrf(self.acrf)
+        # Only add a fallback acrf leaf if the annotatedCRF loader didn't produce one.
+        if self._find_leaf(ACRF_LEAF_ID) is None:
+            self.define_objects["leaf"].append(
+                supp_docs.create_leaf_object(leaf_id=ACRF_LEAF_ID, href="acrf.pdf", title="Annotated CRF")
+            )
         for elem in ELEMENTS:
             self._load_elements(odm, elem)
         return odm
+
+    def _find_leaf(self, leaf_id: str) -> Any | None:
+        for leaf in self.define_objects["leaf"]:
+            if getattr(leaf, "ID", None) == leaf_id:
+                return leaf
+        return None
 
 
     def _load_elements(self, odm: Any, elem_name: str) -> None:
@@ -151,11 +215,12 @@ class DefineGenerator:
         if not os.path.isfile(self.dds_file):
             raise ValueError("The template file specified on the command-line cannot be found.")
 
-def validate_defile_file(define_file: str) -> None:
+def validate_define_file(define_file: str) -> bool:
     """
     Validate the Define-XML file against the schema.
 
     :param define_file: path to the Define-XML file to validate
+    :return: True when the file is valid, False otherwise
     """
     validator = DefineSchemaValidator(Path(define_file))
     try:
@@ -163,8 +228,9 @@ def validate_defile_file(define_file: str) -> None:
     except DefineSchemaValidationError as e:
         logging.error(f"Define-XML schema validation failed: {e}")
         print(f"ERROR: Schema validation failed: {e}", file=sys.stderr)
-    else:
-        logging.info("Define-XML file is valid.")
+        return False
+    logging.info("Define-XML file is valid.")
+    return True
 
 
 def set_cmd_line_args() -> argparse.Namespace:
@@ -194,7 +260,8 @@ def main() -> None:
     dg = DefineGenerator(dds_file=args.dds_file, define_file=args.define_file, log_level=args.log_level)
     dg.create()
     if args.is_validate:
-        validate_defile_file(args.define_file)
+        if not validate_define_file(args.define_file):
+            sys.exit(1)
 
 
 if __name__ == "__main__":

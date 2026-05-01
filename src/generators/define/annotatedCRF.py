@@ -3,7 +3,7 @@ import define_object
 
 
 class AnnotatedCRF(define_object.DefineObject):
-    """ create a Define-XML v2.1 leaf element template """
+    """ create Define-XML v2.1 AnnotatedCRF and leaf element objects """
     def __init__(self):
         super().__init__()
 
@@ -15,15 +15,13 @@ class AnnotatedCRF(define_object.DefineObject):
         :param lang: xml:lang setting for TranslatedText
         :param acrf: part of the common interface but not used by this class
         """
-        self.logger.info("in annotatedCRF...")
         self.lang = lang
-        define_objects["AnnotatedCRF"] = []
-        define_objects["leaf"] = []
         for doc in template:
             a_crf = self._create_acrf_object(doc)
             define_objects["AnnotatedCRF"].append(a_crf)
             leaf = self._create_leaf_object(doc)
-            define_objects["leaf"].append(leaf)
+            if self.find_object(define_objects["leaf"], leaf.ID) is None:
+                define_objects["leaf"].append(leaf)
 
     @staticmethod
     def _create_acrf_object(doc):
@@ -33,7 +31,7 @@ class AnnotatedCRF(define_object.DefineObject):
         :return: a leaf odmlib template
         """
         acrf = DEFINE.AnnotatedCRF()
-        doc_ref = DEFINE.DocumentRef(leafID=doc["leafID"])
+        doc_ref = DEFINE.DocumentRef(leafID=doc.get("leafID", "LF.acrf"))
         acrf.DocumentRef = doc_ref
         return acrf
 
@@ -45,9 +43,7 @@ class AnnotatedCRF(define_object.DefineObject):
         :return: a leaf odmlib template
         """
         href = doc.get("href", "acrf.pdf")
-        id = "LF.acrf"
-        # TODO how generate the ID correctly?
-        lf = DEFINE.leaf(ID=id, href=href)
-        title = DEFINE.title(_content=doc["title"])
-        lf.title = title
+        leaf_id = doc.get("leafID", "LF.acrf")
+        lf = DEFINE.leaf(ID=leaf_id, href=href)
+        lf.title = DEFINE.title(_content=doc.get("title", "Annotated CRF"))
         return lf
