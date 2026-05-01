@@ -32,9 +32,11 @@ class DDSExcel:
             'codeLists': [],
             'methods': [],
             'standards': [],
-            'annotatedCRF': [],
+            'annotatedCRFs': [],
             'concepts': [],
-            'conceptProperties': []
+            'conceptProperties': [],
+            'items': [],
+            'comments':[]
         }        
 
     def execute(self):

@@ -1,0 +1,2675 @@
+{
+  "OID": "MDV.360i CDISC PILOT - LZZT",
+  "name": "MDV 360i CDISC PILOT - LZZT",
+  "description": "Data Definitions for 360i CDISC PILOT - LZZT",
+  "fileOID": "ODM.DEFINE-360I.360i CDISC PILOT - LZZT",
+  "creationDateTime": "2026-04-21T10:42:03.319823+00:00",
+  "odmVersion": "1.3.2",
+  "fileType": "Snapshot",
+  "originator": "Define-360i Processor",
+  "context": "Other",
+  "defineVersion": "2.1.0",
+  "studyOID": "",
+  "studyName": "360i CDISC PILOT - LZZT",
+  "studyDescription": "Safety and Efficacy of the Xanomeline Transdermal Therapeutic System (TTS) in Patients with Mild to Moderate Alzheimer's Disease",
+  "protocolName": "360i LZZT Xanomeline (LY246708)",
+  "itemGroups": [
+    {
+      "OID": "IG.SC",
+      "name": "SC",
+      "description": "Subject Characteristics",
+      "structure": "One record per vital sign measurement per visit per subject",
+      "purpose": "Tabulation",
+      "standard": "STD.1",
+      "items": [
+        "IT.SC.STUDYID",
+        "IT.SC.DOMAIN",
+        "IT.SC.USUBJID",
+        "IT.SC.SCSEQ",
+        "IT.SC.SCTESTCD",
+        "IT.SC.SCTEST",
+        "IT.SC.SCCAT",
+        "IT.SC.SCORRES",
+        "IT.SC.SCORRESU",
+        "IT.SC.SCSTRESC",
+        "IT.SC.SCSTRESN",
+        "IT.SC.SCSTRESU",
+        "IT.SC.SCDTC",
+        "IT.SC.SCDY"
+      ],
+      "keySequence": [
+        "IT.SC.STUDYID",
+        "IT.SC.USUBJID"
+      ],
+      "domain": "SC"
+    },
+    {
+      "OID": "IG.LB",
+      "name": "LB",
+      "description": "Laboratory Test Findings",
+      "structure": "One record per vital sign measurement per visit per subject",
+      "purpose": "Tabulation",
+      "standard": "STD.1",
+      "items": [
+        "IT.LB.STUDYID",
+        "IT.LB.DOMAIN",
+        "IT.LB.USUBJID",
+        "IT.LB.LBSEQ",
+        "IT.LB.LBTESTCD",
+        "IT.LB.LBTEST",
+        "IT.LB.LBCAT",
+        "IT.LB.LBORRES",
+        "IT.LB.LBORRESU",
+        "IT.LB.LBORNRLO",
+        "IT.LB.LBORNRHI",
+        "IT.LB.LBSTRESC",
+        "IT.LB.LBSTRESN",
+        "IT.LB.LBSTRESU",
+        "IT.LB.LBSTNRLO",
+        "IT.LB.LBSTNRHI",
+        "IT.LB.LBNRIND",
+        "IT.LB.LBBLFL",
+        "IT.LB.VISITNUM",
+        "IT.LB.VISIT",
+        "IT.LB.VISITDY",
+        "IT.LB.LBDTC",
+        "IT.LB.LBDY"
+      ],
+      "keySequence": [
+        "IT.LB.STUDYID",
+        "IT.LB.USUBJID"
+      ],
+      "domain": "LB"
+    },
+    {
+      "OID": "IG.AE",
+      "name": "AE",
+      "description": "Adverse Events",
+      "structure": "One record per vital sign measurement per visit per subject",
+      "purpose": "Tabulation",
+      "standard": "STD.1",
+      "items": [
+        "IT.AE.STUDYID",
+        "IT.AE.DOMAIN",
+        "IT.AE.USUBJID",
+        "IT.AE.AESEQ",
+        "IT.AE.AESPID",
+        "IT.AE.AETERM",
+        "IT.AE.AELLT",
+        "IT.AE.AELLTCD",
+        "IT.AE.AEDECOD",
+        "IT.AE.AEPTCD",
+        "IT.AE.AEHLT",
+        "IT.AE.AEHLTCD",
+        "IT.AE.AEHLGT",
+        "IT.AE.AEHLGTCD",
+        "IT.AE.AEBODSYS",
+        "IT.AE.AEBDSYCD",
+        "IT.AE.AESOC",
+        "IT.AE.AESOCCD",
+        "IT.AE.AESEV",
+        "IT.AE.AESER",
+        "IT.AE.AEACN",
+        "IT.AE.AEREL",
+        "IT.AE.AEOUT",
+        "IT.AE.AESCAN",
+        "IT.AE.AESCONG",
+        "IT.AE.AESDISAB",
+        "IT.AE.AESDTH",
+        "IT.AE.AESHOSP",
+        "IT.AE.AESLIFE",
+        "IT.AE.AESOD",
+        "IT.AE.AEDTC",
+        "IT.AE.AESTDTC",
+        "IT.AE.AEENDTC",
+        "IT.AE.AESTDY",
+        "IT.AE.AEENDY"
+      ],
+      "keySequence": [
+        "IT.AE.STUDYID",
+        "IT.AE.USUBJID"
+      ],
+      "domain": "AE"
+    },
+    {
+      "OID": "IG.QS",
+      "name": "QS",
+      "description": "Questionnaires",
+      "structure": "One record per vital sign measurement per visit per subject",
+      "purpose": "Tabulation",
+      "standard": "STD.1",
+      "items": [
+        "IT.QS.STUDYID",
+        "IT.QS.DOMAIN",
+        "IT.QS.USUBJID",
+        "IT.QS.QSSEQ",
+        "IT.QS.QSTESTCD",
+        "IT.QS.QSTEST",
+        "IT.QS.QSCAT",
+        "IT.QS.QSSCAT",
+        "IT.QS.QSORRES",
+        "IT.QS.QSORRESU",
+        "IT.QS.QSSTRESC",
+        "IT.QS.QSSTRESN",
+        "IT.QS.QSSTRESU",
+        "IT.QS.QSBLFL",
+        "IT.QS.QSDRVFL",
+        "IT.QS.VISITNUM",
+        "IT.QS.VISIT",
+        "IT.QS.VISITDY",
+        "IT.QS.QSDTC",
+        "IT.QS.QSDY"
+      ],
+      "keySequence": [
+        "IT.QS.STUDYID",
+        "IT.QS.USUBJID"
+      ],
+      "domain": "QS"
+    },
+    {
+      "OID": "IG.DM",
+      "name": "DM",
+      "description": "Demographics",
+      "structure": "One record per vital sign measurement per visit per subject",
+      "purpose": "Tabulation",
+      "standard": "STD.1",
+      "items": [
+        "IT.DM.STUDYID",
+        "IT.DM.SITEID",
+        "IT.DM.DOMAIN",
+        "IT.DM.USUBJID",
+        "IT.DM.SUBJID",
+        "IT.DM.RFSTDTC",
+        "IT.DM.RFENDTC",
+        "IT.DM.RFXSTDTC",
+        "IT.DM.RFXENDTC",
+        "IT.DM.RFICDTC",
+        "IT.DM.RFPENDTC",
+        "IT.DM.DTHDTC",
+        "IT.DM.DTHFL",
+        "IT.DM.AGE",
+        "IT.DM.AGEU",
+        "IT.DM.SEX",
+        "IT.DM.RACE",
+        "IT.DM.ETHNIC",
+        "IT.DM.COUNTRY",
+        "IT.DM.ARM",
+        "IT.DM.ARMCD",
+        "IT.DM.ACTARM",
+        "IT.DM.ACTARMCD",
+        "IT.DM.DMDTC",
+        "IT.DM.DMDY"
+      ],
+      "keySequence": [
+        "IT.DM.STUDYID",
+        "IT.DM.USUBJID"
+      ],
+      "domain": "DM"
+    },
+    {
+      "OID": "IG.CM",
+      "name": "CM",
+      "description": "Concomitant Medications",
+      "structure": "One record per vital sign measurement per visit per subject",
+      "purpose": "Tabulation",
+      "standard": "STD.1",
+      "items": [
+        "IT.CM.STUDYID",
+        "IT.CM.DOMAIN",
+        "IT.CM.USUBJID",
+        "IT.CM.CMSEQ",
+        "IT.CM.CMSPID",
+        "IT.CM.CMTRT",
+        "IT.CM.CMDECOD",
+        "IT.CM.CMINDC",
+        "IT.CM.CMCLAS",
+        "IT.CM.CMDOSE",
+        "IT.CM.CMDOSU",
+        "IT.CM.CMDOSFRQ",
+        "IT.CM.CMROUTE",
+        "IT.CM.VISITNUM",
+        "IT.CM.VISIT",
+        "IT.CM.VISITDY",
+        "IT.CM.CMDTC",
+        "IT.CM.CMSTDTC",
+        "IT.CM.CMENDTC",
+        "IT.CM.CMSTDY",
+        "IT.CM.CMENDY"
+      ],
+      "keySequence": [
+        "IT.CM.STUDYID",
+        "IT.CM.USUBJID"
+      ],
+      "domain": "CM"
+    },
+    {
+      "OID": "IG.SUPPDS",
+      "name": "SUPPDS",
+      "description": "Supplemental Qualifiers for DS",
+      "structure": "One record per vital sign measurement per visit per subject",
+      "purpose": "Tabulation",
+      "standard": "STD.1",
+      "items": [
+        "IT.SUPPDS.STUDYID",
+        "IT.SUPPDS.RDOMAIN",
+        "IT.SUPPDS.USUBJID",
+        "IT.SUPPDS.IDVAR",
+        "IT.SUPPDS.IDVARVAL",
+        "IT.SUPPDS.QNAM",
+        "IT.SUPPDS.QLABEL",
+        "IT.SUPPDS.QVAL",
+        "IT.SUPPDS.QORIG",
+        "IT.SUPPDS.QEVAL"
+      ],
+      "keySequence": [
+        "IT.SUPPDS.STUDYID",
+        "IT.SUPPDS.USUBJID"
+      ],
+      "domain": "DS"
+    },
+    {
+      "OID": "IG.EX",
+      "name": "EX",
+      "description": "Exposure",
+      "structure": "One record per vital sign measurement per visit per subject",
+      "purpose": "Tabulation",
+      "standard": "STD.1",
+      "items": [
+        "IT.EX.STUDYID",
+        "IT.EX.DOMAIN",
+        "IT.EX.USUBJID",
+        "IT.EX.EXSEQ",
+        "IT.EX.EXTRT",
+        "IT.EX.EXDOSE",
+        "IT.EX.EXDOSU",
+        "IT.EX.EXDOSFRM",
+        "IT.EX.EXDOSFRQ",
+        "IT.EX.EXROUTE",
+        "IT.EX.VISITNUM",
+        "IT.EX.VISIT",
+        "IT.EX.VISITDY",
+        "IT.EX.EXSTDTC",
+        "IT.EX.EXENDTC",
+        "IT.EX.EXSTDY",
+        "IT.EX.EXENDY"
+      ],
+      "keySequence": [
+        "IT.EX.STUDYID",
+        "IT.EX.USUBJID"
+      ],
+      "domain": "EX"
+    },
+    {
+      "OID": "IG.VS",
+      "name": "VS",
+      "description": "Vital Signs",
+      "structure": "One record per vital sign measurement per visit per subject",
+      "purpose": "Tabulation",
+      "standard": "STD.1",
+      "items": [
+        "IT.VS.STUDYID",
+        "IT.VS.DOMAIN",
+        "IT.VS.USUBJID",
+        "IT.VS.VSSEQ",
+        "IT.VS.VSTESTCD",
+        "IT.VS.VSTEST",
+        "IT.VS.VSPOS",
+        "IT.VS.VSORRES",
+        "IT.VS.VSORRESU",
+        "IT.VS.VSSTRESC",
+        "IT.VS.VSSTRESN",
+        "IT.VS.VSSTRESU",
+        "IT.VS.VSSTAT",
+        "IT.VS.VSLOC",
+        "IT.VS.VSBLFL",
+        "IT.VS.VISITNUM",
+        "IT.VS.VISIT",
+        "IT.VS.VISITDY",
+        "IT.VS.VSDTC",
+        "IT.VS.VSDY",
+        "IT.VS.VSTPT",
+        "IT.VS.VSTPTNUM",
+        "IT.VS.VSELTM",
+        "IT.VS.VSTPTREF"
+      ],
+      "keySequence": [
+        "IT.VS.STUDYID",
+        "IT.VS.USUBJID"
+      ],
+      "domain": "VS",
+      "slices": [
+        {
+          "OID": "VL.VS.VSORRES",
+          "name": "VL_VS_VSORRES",
+          "type": "ValueList",
+          "items": [
+            "IT.VS.VSTESTCD.TEMP",
+            "IT.VS.VSTESTCD.WEIGHT",
+            "IT.VS.VSTESTCD.HEIGHT",
+            "IT.VS.VSTESTCD.SYSBP",
+            "IT.VS.VSTESTCD.DIABP",
+            "IT.VS.VSTESTCD.HR",
+            "IT.VS.VSTESTCD.SYSBP",
+            "IT.VS.VSTESTCD.DIABP",
+            "IT.VS.VSTESTCD.HR"
+          ]
+        },
+        {
+          "OID": "VL.VS.VSORRESU",
+          "name": "VL_VS_VSORRESU",
+          "type": "ValueList",
+          "items": [
+            "IT.VS.VSTESTCD.TEMP",
+            "IT.VS.VSTESTCD.WEIGHT",
+            "IT.VS.VSTESTCD.HEIGHT",
+            "IT.VS.VSTESTCD.SYSBP",
+            "IT.VS.VSTESTCD.DIABP",
+            "IT.VS.VSTESTCD.HR",
+            "IT.VS.VSTESTCD.SYSBP",
+            "IT.VS.VSTESTCD.DIABP",
+            "IT.VS.VSTESTCD.HR"
+          ]
+        },
+        {
+          "OID": "VL.VS.VSSTRESC",
+          "name": "VL_VS_VSSTRESC",
+          "type": "ValueList",
+          "items": [
+            "IT.VS.VSTESTCD.TEMP",
+            "IT.VS.VSTESTCD.WEIGHT",
+            "IT.VS.VSTESTCD.HEIGHT",
+            "IT.VS.VSTESTCD.SYSBP",
+            "IT.VS.VSTESTCD.DIABP",
+            "IT.VS.VSTESTCD.HR",
+            "IT.VS.VSTESTCD.SYSBP",
+            "IT.VS.VSTESTCD.DIABP",
+            "IT.VS.VSTESTCD.HR"
+          ]
+        },
+        {
+          "OID": "VL.VS.VSSTRESN",
+          "name": "VL_VS_VSSTRESN",
+          "type": "ValueList",
+          "items": [
+            "IT.VS.VSTESTCD.TEMP",
+            "IT.VS.VSTESTCD.WEIGHT",
+            "IT.VS.VSTESTCD.HEIGHT",
+            "IT.VS.VSTESTCD.SYSBP",
+            "IT.VS.VSTESTCD.DIABP",
+            "IT.VS.VSTESTCD.HR",
+            "IT.VS.VSTESTCD.SYSBP",
+            "IT.VS.VSTESTCD.DIABP",
+            "IT.VS.VSTESTCD.HR"
+          ]
+        },
+        {
+          "OID": "VL.VS.VSSTRESU",
+          "name": "VL_VS_VSSTRESU",
+          "type": "ValueList",
+          "items": [
+            "IT.VS.VSTESTCD.TEMP",
+            "IT.VS.VSTESTCD.WEIGHT",
+            "IT.VS.VSTESTCD.HEIGHT",
+            "IT.VS.VSTESTCD.SYSBP",
+            "IT.VS.VSTESTCD.DIABP",
+            "IT.VS.VSTESTCD.HR",
+            "IT.VS.VSTESTCD.SYSBP",
+            "IT.VS.VSTESTCD.DIABP",
+            "IT.VS.VSTESTCD.HR"
+          ]
+        }
+      ]
+    },
+    {
+      "OID": "IG.MH",
+      "name": "MH",
+      "description": "Medical History",
+      "structure": "One record per vital sign measurement per visit per subject",
+      "purpose": "Tabulation",
+      "standard": "STD.1",
+      "items": [
+        "IT.MH.STUDYID",
+        "IT.MH.DOMAIN",
+        "IT.MH.USUBJID",
+        "IT.MH.MHSEQ",
+        "IT.MH.MHSPID",
+        "IT.MH.MHTERM",
+        "IT.MH.MHLLT",
+        "IT.MH.MHDECOD",
+        "IT.MH.MHHLT",
+        "IT.MH.MHHLGT",
+        "IT.MH.MHCAT",
+        "IT.MH.MHBODSYS",
+        "IT.MH.MHSEV",
+        "IT.MH.VISITNUM",
+        "IT.MH.VISIT",
+        "IT.MH.VISITDY",
+        "IT.MH.MHDTC",
+        "IT.MH.MHSTDTC",
+        "IT.MH.MHDY"
+      ],
+      "keySequence": [
+        "IT.MH.STUDYID",
+        "IT.MH.USUBJID"
+      ],
+      "domain": "MH"
+    },
+    {
+      "OID": "IG.DS",
+      "name": "DS",
+      "description": "Disposition",
+      "structure": "One record per vital sign measurement per visit per subject",
+      "purpose": "Tabulation",
+      "standard": "STD.1",
+      "items": [
+        "IT.DS.STUDYID",
+        "IT.DS.DOMAIN",
+        "IT.DS.USUBJID",
+        "IT.DS.DSSEQ",
+        "IT.DS.DSSPID",
+        "IT.DS.DSTERM",
+        "IT.DS.DSDECOD",
+        "IT.DS.DSCAT",
+        "IT.DS.VISITNUM",
+        "IT.DS.VISIT",
+        "IT.DS.DSDTC",
+        "IT.DS.DSSTDTC",
+        "IT.DS.DSSTDY"
+      ],
+      "keySequence": [
+        "IT.DS.STUDYID",
+        "IT.DS.USUBJID"
+      ],
+      "domain": "DS"
+    }
+  ],
+  "conditions": [
+    {
+      "OID": "COND.WC.VS.VSTESTCD.DIABP",
+      "rangeChecks": [
+        {
+          "comparator": "EQ",
+          "checkValues": [
+            "DIABP"
+          ]
+        }
+      ]
+    },
+    {
+      "OID": "COND.WC.VS.VSTESTCD.HEIGHT",
+      "rangeChecks": [
+        {
+          "comparator": "EQ",
+          "checkValues": [
+            "HEIGHT"
+          ]
+        }
+      ]
+    },
+    {
+      "OID": "COND.WC.VS.VSTESTCD.HR",
+      "rangeChecks": [
+        {
+          "comparator": "EQ",
+          "checkValues": [
+            "HR"
+          ]
+        }
+      ]
+    },
+    {
+      "OID": "COND.WC.VS.VSTESTCD.SYSBP",
+      "rangeChecks": [
+        {
+          "comparator": "EQ",
+          "checkValues": [
+            "SYSBP"
+          ]
+        }
+      ]
+    },
+    {
+      "OID": "COND.WC.VS.VSTESTCD.TEMP",
+      "rangeChecks": [
+        {
+          "comparator": "EQ",
+          "checkValues": [
+            "TEMP"
+          ]
+        }
+      ]
+    },
+    {
+      "OID": "COND.WC.VS.VSTESTCD.WEIGHT",
+      "rangeChecks": [
+        {
+          "comparator": "EQ",
+          "checkValues": [
+            "WEIGHT"
+          ]
+        }
+      ]
+    }
+  ],
+  "whereClauses": [
+    {
+      "OID": "WC.VS.VSTESTCD.DIABP",
+      "conditions": [
+        "COND.WC.VS.VSTESTCD.DIABP"
+      ]
+    },
+    {
+      "OID": "WC.VS.VSTESTCD.HEIGHT",
+      "conditions": [
+        "COND.WC.VS.VSTESTCD.HEIGHT"
+      ]
+    },
+    {
+      "OID": "WC.VS.VSTESTCD.HR",
+      "conditions": [
+        "COND.WC.VS.VSTESTCD.HR"
+      ]
+    },
+    {
+      "OID": "WC.VS.VSTESTCD.SYSBP",
+      "conditions": [
+        "COND.WC.VS.VSTESTCD.SYSBP"
+      ]
+    },
+    {
+      "OID": "WC.VS.VSTESTCD.TEMP",
+      "conditions": [
+        "COND.WC.VS.VSTESTCD.TEMP"
+      ]
+    },
+    {
+      "OID": "WC.VS.VSTESTCD.WEIGHT",
+      "conditions": [
+        "COND.WC.VS.VSTESTCD.WEIGHT"
+      ]
+    }
+  ],
+  "codeLists": [],
+  "methods": [],
+  "standards": [
+    {
+      "OID": "STD.1",
+      "name": "SDTMIG",
+      "type": "IG",
+      "version": "3.4",
+      "status": "Final"
+    },
+    {
+      "OID": "STD.2",
+      "name": "CDISC/NCI",
+      "type": "CT",
+      "version": "2024-09-27",
+      "status": "Final"
+    }
+  ],
+  "annotatedCRFs": [],
+  "concepts": [],
+  "conceptProperties": [],
+  "items": [
+    {
+      "OID": "IT.SC.STUDYID",
+      "name": "STUDYID",
+      "description": "Study Identifier",
+      "dataType": "text",
+      "length": 12
+    },
+    {
+      "OID": "IT.SC.DOMAIN",
+      "name": "DOMAIN",
+      "description": "Domain Abbreviation",
+      "dataType": "text",
+      "length": 2
+    },
+    {
+      "OID": "IT.SC.USUBJID",
+      "name": "USUBJID",
+      "description": "Unique Subject Identifier",
+      "dataType": "text",
+      "length": 11
+    },
+    {
+      "OID": "IT.SC.SCSEQ",
+      "name": "SCSEQ",
+      "description": "Sequence Number",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.SC.SCTESTCD",
+      "name": "SCTESTCD",
+      "description": "Subject Characteristic Short Name",
+      "dataType": "text",
+      "length": 8,
+      "codeList": "CL.C74559"
+    },
+    {
+      "OID": "IT.SC.SCTEST",
+      "name": "SCTEST",
+      "description": "Subject Characteristic",
+      "dataType": "text",
+      "length": 18,
+      "codeList": "CL.C103330"
+    },
+    {
+      "OID": "IT.SC.SCCAT",
+      "name": "SCCAT",
+      "description": "Category for Subject Characteristic",
+      "dataType": "text",
+      "length": 9
+    },
+    {
+      "OID": "IT.SC.SCORRES",
+      "name": "SCORRES",
+      "description": "Result or Finding in Original Units",
+      "dataType": "text",
+      "length": 2
+    },
+    {
+      "OID": "IT.SC.SCORRESU",
+      "name": "SCORRESU",
+      "description": "Original Units",
+      "dataType": "text",
+      "length": 5,
+      "codeList": "CL.C71620"
+    },
+    {
+      "OID": "IT.SC.SCSTRESC",
+      "name": "SCSTRESC",
+      "description": "Character Result/Finding in Std Format",
+      "dataType": "text",
+      "length": 2
+    },
+    {
+      "OID": "IT.SC.SCSTRESN",
+      "name": "SCSTRESN",
+      "description": "Numeric Result/Finding in Standard Units",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.SC.SCSTRESU",
+      "name": "SCSTRESU",
+      "description": "Standard Units",
+      "dataType": "text",
+      "length": 5,
+      "codeList": "CL.C71620"
+    },
+    {
+      "OID": "IT.SC.SCDTC",
+      "name": "SCDTC",
+      "description": "Date/Time of Collection",
+      "dataType": "text",
+      "length": 10
+    },
+    {
+      "OID": "IT.SC.SCDY",
+      "name": "SCDY",
+      "description": "Study Day of Examination",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.LB.STUDYID",
+      "name": "STUDYID",
+      "description": "Study Identifier",
+      "dataType": "text",
+      "length": 12
+    },
+    {
+      "OID": "IT.LB.DOMAIN",
+      "name": "DOMAIN",
+      "description": "Domain Abbreviation",
+      "dataType": "text",
+      "length": 2
+    },
+    {
+      "OID": "IT.LB.USUBJID",
+      "name": "USUBJID",
+      "description": "Unique Subject Identifier",
+      "dataType": "text",
+      "length": 11
+    },
+    {
+      "OID": "IT.LB.LBSEQ",
+      "name": "LBSEQ",
+      "description": "Sequence Number",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.LB.LBTESTCD",
+      "name": "LBTESTCD",
+      "description": "Lab Test or Examination Short Name",
+      "dataType": "text",
+      "length": 7,
+      "codeList": "CL.C65047"
+    },
+    {
+      "OID": "IT.LB.LBTEST",
+      "name": "LBTEST",
+      "description": "Lab Test or Examination Name",
+      "dataType": "text",
+      "length": 200,
+      "codeList": "CL.C67154"
+    },
+    {
+      "OID": "IT.LB.LBCAT",
+      "name": "LBCAT",
+      "description": "Category for Lab Test",
+      "dataType": "text",
+      "length": 10
+    },
+    {
+      "OID": "IT.LB.LBORRES",
+      "name": "LBORRES",
+      "description": "Result or Finding in Original Units",
+      "dataType": "text",
+      "length": 5
+    },
+    {
+      "OID": "IT.LB.LBORRESU",
+      "name": "LBORRESU",
+      "description": "Original Units",
+      "dataType": "text",
+      "length": 8,
+      "codeList": "CL.C71620"
+    },
+    {
+      "OID": "IT.LB.LBORNRLO",
+      "name": "LBORNRLO",
+      "description": "Reference Range Lower Limit in Orig Unit",
+      "dataType": "text",
+      "length": 5
+    },
+    {
+      "OID": "IT.LB.LBORNRHI",
+      "name": "LBORNRHI",
+      "description": "Reference Range Upper Limit in Orig Unit",
+      "dataType": "text",
+      "length": 7
+    },
+    {
+      "OID": "IT.LB.LBSTRESC",
+      "name": "LBSTRESC",
+      "description": "Character Result/Finding in Std Format",
+      "dataType": "text",
+      "length": 8,
+      "codeList": "CL.C102580"
+    },
+    {
+      "OID": "IT.LB.LBSTRESN",
+      "name": "LBSTRESN",
+      "description": "Numeric Result/Finding in Standard Units",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.LB.LBSTRESU",
+      "name": "LBSTRESU",
+      "description": "Standard Units",
+      "dataType": "text",
+      "length": 8,
+      "codeList": "CL.C71620"
+    },
+    {
+      "OID": "IT.LB.LBSTNRLO",
+      "name": "LBSTNRLO",
+      "description": "Reference Range Lower Limit-Std Units",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.LB.LBSTNRHI",
+      "name": "LBSTNRHI",
+      "description": "Reference Range Upper Limit-Std Units",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.LB.LBNRIND",
+      "name": "LBNRIND",
+      "description": "Reference Range Indicator",
+      "dataType": "text",
+      "length": 200,
+      "codeList": "CL.C78736"
+    },
+    {
+      "OID": "IT.LB.LBBLFL",
+      "name": "LBBLFL",
+      "description": "Baseline Flag",
+      "dataType": "text",
+      "length": 1,
+      "codeList": "CL.C66742"
+    },
+    {
+      "OID": "IT.LB.VISITNUM",
+      "name": "VISITNUM",
+      "description": "Visit Number",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.LB.VISIT",
+      "name": "VISIT",
+      "description": "Visit Name",
+      "dataType": "text",
+      "length": 19
+    },
+    {
+      "OID": "IT.LB.VISITDY",
+      "name": "VISITDY",
+      "description": "Planned Study Day of Visit",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.LB.LBDTC",
+      "name": "LBDTC",
+      "description": "Date/Time of Specimen Collection",
+      "dataType": "text",
+      "length": 16
+    },
+    {
+      "OID": "IT.LB.LBDY",
+      "name": "LBDY",
+      "description": "Study Day of Specimen Collection",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.AE.STUDYID",
+      "name": "STUDYID",
+      "description": "Study Identifier",
+      "dataType": "text",
+      "length": 12
+    },
+    {
+      "OID": "IT.AE.DOMAIN",
+      "name": "DOMAIN",
+      "description": "Domain Abbreviation",
+      "dataType": "text",
+      "length": 2
+    },
+    {
+      "OID": "IT.AE.USUBJID",
+      "name": "USUBJID",
+      "description": "Unique Subject Identifier",
+      "dataType": "text",
+      "length": 11
+    },
+    {
+      "OID": "IT.AE.AESEQ",
+      "name": "AESEQ",
+      "description": "Sequence Number",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.AE.AESPID",
+      "name": "AESPID",
+      "description": "Sponsor-Defined Identifier",
+      "dataType": "text",
+      "length": 3
+    },
+    {
+      "OID": "IT.AE.AETERM",
+      "name": "AETERM",
+      "description": "Reported Term for the Adverse Event",
+      "dataType": "text",
+      "length": 200
+    },
+    {
+      "OID": "IT.AE.AELLT",
+      "name": "AELLT",
+      "description": "Lowest Level Term",
+      "dataType": "text",
+      "length": 100
+    },
+    {
+      "OID": "IT.AE.AELLTCD",
+      "name": "AELLTCD",
+      "description": "Lowest Level Term Code",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.AE.AEDECOD",
+      "name": "AEDECOD",
+      "description": "Dictionary-Derived Term",
+      "dataType": "text",
+      "length": 200
+    },
+    {
+      "OID": "IT.AE.AEPTCD",
+      "name": "AEPTCD",
+      "description": "Preferred Term Code",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.AE.AEHLT",
+      "name": "AEHLT",
+      "description": "High Level Term",
+      "dataType": "text",
+      "length": 100
+    },
+    {
+      "OID": "IT.AE.AEHLTCD",
+      "name": "AEHLTCD",
+      "description": "High Level Term Code",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.AE.AEHLGT",
+      "name": "AEHLGT",
+      "description": "High Level Group Term",
+      "dataType": "text",
+      "length": 100
+    },
+    {
+      "OID": "IT.AE.AEHLGTCD",
+      "name": "AEHLGTCD",
+      "description": "High Level Group Term Code",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.AE.AEBODSYS",
+      "name": "AEBODSYS",
+      "description": "Body System or Organ Class",
+      "dataType": "text",
+      "length": 67
+    },
+    {
+      "OID": "IT.AE.AEBDSYCD",
+      "name": "AEBDSYCD",
+      "description": "Body System or Organ Class Code",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.AE.AESOC",
+      "name": "AESOC",
+      "description": "Primary System Organ Class",
+      "dataType": "text",
+      "length": 100
+    },
+    {
+      "OID": "IT.AE.AESOCCD",
+      "name": "AESOCCD",
+      "description": "Primary System Organ Class Code",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.AE.AESEV",
+      "name": "AESEV",
+      "description": "Severity/Intensity",
+      "dataType": "text",
+      "length": 8,
+      "codeList": "CL.C66769"
+    },
+    {
+      "OID": "IT.AE.AESER",
+      "name": "AESER",
+      "description": "Serious Event",
+      "dataType": "text",
+      "length": 1,
+      "codeList": "CL.C66742"
+    },
+    {
+      "OID": "IT.AE.AEACN",
+      "name": "AEACN",
+      "description": "Action Taken with Study Treatment",
+      "dataType": "text",
+      "length": 30,
+      "codeList": "CL.C66767"
+    },
+    {
+      "OID": "IT.AE.AEREL",
+      "name": "AEREL",
+      "description": "Causality",
+      "dataType": "text",
+      "length": 8
+    },
+    {
+      "OID": "IT.AE.AEOUT",
+      "name": "AEOUT",
+      "description": "Outcome of Adverse Event",
+      "dataType": "text",
+      "length": 200,
+      "codeList": "CL.C66768"
+    },
+    {
+      "OID": "IT.AE.AESCAN",
+      "name": "AESCAN",
+      "description": "Involves Cancer",
+      "dataType": "text",
+      "length": 1,
+      "codeList": "CL.C66742"
+    },
+    {
+      "OID": "IT.AE.AESCONG",
+      "name": "AESCONG",
+      "description": "Congenital Anomaly or Birth Defect",
+      "dataType": "text",
+      "length": 1,
+      "codeList": "CL.C66742"
+    },
+    {
+      "OID": "IT.AE.AESDISAB",
+      "name": "AESDISAB",
+      "description": "Persist or Signif Disability/Incapacity",
+      "dataType": "text",
+      "length": 1,
+      "codeList": "CL.C66742"
+    },
+    {
+      "OID": "IT.AE.AESDTH",
+      "name": "AESDTH",
+      "description": "Results in Death",
+      "dataType": "text",
+      "length": 1,
+      "codeList": "CL.C66742"
+    },
+    {
+      "OID": "IT.AE.AESHOSP",
+      "name": "AESHOSP",
+      "description": "Requires or Prolongs Hospitalization",
+      "dataType": "text",
+      "length": 1,
+      "codeList": "CL.C66742"
+    },
+    {
+      "OID": "IT.AE.AESLIFE",
+      "name": "AESLIFE",
+      "description": "Is Life Threatening",
+      "dataType": "text",
+      "length": 1,
+      "codeList": "CL.C66742"
+    },
+    {
+      "OID": "IT.AE.AESOD",
+      "name": "AESOD",
+      "description": "Occurred with Overdose",
+      "dataType": "text",
+      "length": 1,
+      "codeList": "CL.C66742"
+    },
+    {
+      "OID": "IT.AE.AEDTC",
+      "name": "AEDTC",
+      "description": "Date/Time of Collection",
+      "dataType": "text",
+      "length": 10
+    },
+    {
+      "OID": "IT.AE.AESTDTC",
+      "name": "AESTDTC",
+      "description": "Start Date/Time of Adverse Event",
+      "dataType": "text",
+      "length": 10
+    },
+    {
+      "OID": "IT.AE.AEENDTC",
+      "name": "AEENDTC",
+      "description": "End Date/Time of Adverse Event",
+      "dataType": "text",
+      "length": 10
+    },
+    {
+      "OID": "IT.AE.AESTDY",
+      "name": "AESTDY",
+      "description": "Study Day of Start of Adverse Event",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.AE.AEENDY",
+      "name": "AEENDY",
+      "description": "Study Day of End of Adverse Event",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.QS.STUDYID",
+      "name": "STUDYID",
+      "description": "Study Identifier",
+      "dataType": "text",
+      "length": 12
+    },
+    {
+      "OID": "IT.QS.DOMAIN",
+      "name": "DOMAIN",
+      "description": "Domain Abbreviation",
+      "dataType": "text",
+      "length": 2
+    },
+    {
+      "OID": "IT.QS.USUBJID",
+      "name": "USUBJID",
+      "description": "Unique Subject Identifier",
+      "dataType": "text",
+      "length": 11
+    },
+    {
+      "OID": "IT.QS.QSSEQ",
+      "name": "QSSEQ",
+      "description": "Sequence Number",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.QS.QSTESTCD",
+      "name": "QSTESTCD",
+      "description": "Question Short Name",
+      "dataType": "text",
+      "length": 8
+    },
+    {
+      "OID": "IT.QS.QSTEST",
+      "name": "QSTEST",
+      "description": "Question Name",
+      "dataType": "text",
+      "length": 40
+    },
+    {
+      "OID": "IT.QS.QSCAT",
+      "name": "QSCAT",
+      "description": "Category of Question",
+      "dataType": "text",
+      "length": 70,
+      "codeList": "CL.C100129"
+    },
+    {
+      "OID": "IT.QS.QSSCAT",
+      "name": "QSSCAT",
+      "description": "Subcategory for Question",
+      "dataType": "text",
+      "length": 26
+    },
+    {
+      "OID": "IT.QS.QSORRES",
+      "name": "QSORRES",
+      "description": "Finding in Original Units",
+      "dataType": "text",
+      "length": 20
+    },
+    {
+      "OID": "IT.QS.QSORRESU",
+      "name": "QSORRESU",
+      "description": "Original Units",
+      "dataType": "text",
+      "length": 7,
+      "codeList": "CL.C71620"
+    },
+    {
+      "OID": "IT.QS.QSSTRESC",
+      "name": "QSSTRESC",
+      "description": "Character Result/Finding in Std Format",
+      "dataType": "text",
+      "length": 4
+    },
+    {
+      "OID": "IT.QS.QSSTRESN",
+      "name": "QSSTRESN",
+      "description": "Numeric Finding in Standard Units",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.QS.QSSTRESU",
+      "name": "QSSTRESU",
+      "description": "Standard Units",
+      "dataType": "text",
+      "length": 7,
+      "codeList": "CL.C71620"
+    },
+    {
+      "OID": "IT.QS.QSBLFL",
+      "name": "QSBLFL",
+      "description": "Baseline Flag",
+      "dataType": "text",
+      "length": 1,
+      "codeList": "CL.C66742"
+    },
+    {
+      "OID": "IT.QS.QSDRVFL",
+      "name": "QSDRVFL",
+      "description": "Derived Flag",
+      "dataType": "text",
+      "length": 1,
+      "codeList": "CL.C66742"
+    },
+    {
+      "OID": "IT.QS.VISITNUM",
+      "name": "VISITNUM",
+      "description": "Visit Number",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.QS.VISIT",
+      "name": "VISIT",
+      "description": "Visit Name",
+      "dataType": "text",
+      "length": 19
+    },
+    {
+      "OID": "IT.QS.VISITDY",
+      "name": "VISITDY",
+      "description": "Planned Study Day of Visit",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.QS.QSDTC",
+      "name": "QSDTC",
+      "description": "Date/Time of Finding",
+      "dataType": "text",
+      "length": 10
+    },
+    {
+      "OID": "IT.QS.QSDY",
+      "name": "QSDY",
+      "description": "Study Day of Finding",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.DM.STUDYID",
+      "name": "STUDYID",
+      "description": "Study Identifier",
+      "dataType": "text",
+      "length": 12
+    },
+    {
+      "OID": "IT.DM.SITEID",
+      "name": "SITEID",
+      "description": "Study Site Identifier",
+      "dataType": "text",
+      "length": 3
+    },
+    {
+      "OID": "IT.DM.DOMAIN",
+      "name": "DOMAIN",
+      "description": "Domain Abbreviation",
+      "dataType": "text",
+      "length": 2
+    },
+    {
+      "OID": "IT.DM.USUBJID",
+      "name": "USUBJID",
+      "description": "Unique Subject Identifier",
+      "dataType": "text",
+      "length": 11
+    },
+    {
+      "OID": "IT.DM.SUBJID",
+      "name": "SUBJID",
+      "description": "Subject Identifier for the Study",
+      "dataType": "text",
+      "length": 4
+    },
+    {
+      "OID": "IT.DM.RFSTDTC",
+      "name": "RFSTDTC",
+      "description": "Subject Reference Start Date/Time",
+      "dataType": "text",
+      "length": 10
+    },
+    {
+      "OID": "IT.DM.RFENDTC",
+      "name": "RFENDTC",
+      "description": "Subject Reference End Date/Time",
+      "dataType": "text",
+      "length": 10
+    },
+    {
+      "OID": "IT.DM.RFXSTDTC",
+      "name": "RFXSTDTC",
+      "description": "Date/Time of First Study Treatment",
+      "dataType": "text",
+      "length": 20
+    },
+    {
+      "OID": "IT.DM.RFXENDTC",
+      "name": "RFXENDTC",
+      "description": "Date/Time of Last Study Treatment",
+      "dataType": "text",
+      "length": 20
+    },
+    {
+      "OID": "IT.DM.RFICDTC",
+      "name": "RFICDTC",
+      "description": "Date/Time of Informed Consent",
+      "dataType": "text",
+      "length": 20
+    },
+    {
+      "OID": "IT.DM.RFPENDTC",
+      "name": "RFPENDTC",
+      "description": "Date/Time of End of Participation",
+      "dataType": "text",
+      "length": 20
+    },
+    {
+      "OID": "IT.DM.DTHDTC",
+      "name": "DTHDTC",
+      "description": "Date/Time of Death",
+      "dataType": "text",
+      "length": 20
+    },
+    {
+      "OID": "IT.DM.DTHFL",
+      "name": "DTHFL",
+      "description": "Subject Death Flag",
+      "dataType": "text",
+      "length": 1,
+      "codeList": "CL.C66742"
+    },
+    {
+      "OID": "IT.DM.AGE",
+      "name": "AGE",
+      "description": "Age",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.DM.AGEU",
+      "name": "AGEU",
+      "description": "Age Units",
+      "dataType": "text",
+      "length": 6,
+      "codeList": "CL.C66781"
+    },
+    {
+      "OID": "IT.DM.SEX",
+      "name": "SEX",
+      "description": "Sex",
+      "dataType": "text",
+      "length": 1,
+      "codeList": "CL.C66731",
+      "origin": {
+        "type": "Collected",
+        "source": "Investigator"
+      }
+    },
+    {
+      "OID": "IT.DM.RACE",
+      "name": "RACE",
+      "description": "Race",
+      "dataType": "text",
+      "length": 78,
+      "codeList": "CL.C74457",
+      "origin": {
+        "type": "Collected",
+        "source": "Investigator"
+      }
+    },
+    {
+      "OID": "IT.DM.ETHNIC",
+      "name": "ETHNIC",
+      "description": "Ethnicity",
+      "dataType": "text",
+      "length": 25,
+      "codeList": "CL.C66790"
+    },
+    {
+      "OID": "IT.DM.COUNTRY",
+      "name": "COUNTRY",
+      "description": "Country",
+      "dataType": "text",
+      "length": 3
+    },
+    {
+      "OID": "IT.DM.ARM",
+      "name": "ARM",
+      "description": "Description of Planned Arm",
+      "dataType": "text",
+      "length": 20
+    },
+    {
+      "OID": "IT.DM.ARMCD",
+      "name": "ARMCD",
+      "description": "Planned Arm Code",
+      "dataType": "text",
+      "length": 8
+    },
+    {
+      "OID": "IT.DM.ACTARM",
+      "name": "ACTARM",
+      "description": "Description of Actual Arm",
+      "dataType": "text",
+      "length": 20
+    },
+    {
+      "OID": "IT.DM.ACTARMCD",
+      "name": "ACTARMCD",
+      "description": "Actual Arm Code",
+      "dataType": "text",
+      "length": 8
+    },
+    {
+      "OID": "IT.DM.DMDTC",
+      "name": "DMDTC",
+      "description": "Date/Time of Collection",
+      "dataType": "text",
+      "length": 10
+    },
+    {
+      "OID": "IT.DM.DMDY",
+      "name": "DMDY",
+      "description": "Study Day of Collection",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.CM.STUDYID",
+      "name": "STUDYID",
+      "description": "Study Identifier",
+      "dataType": "text",
+      "length": 12
+    },
+    {
+      "OID": "IT.CM.DOMAIN",
+      "name": "DOMAIN",
+      "description": "Domain Abbreviation",
+      "dataType": "text",
+      "length": 2
+    },
+    {
+      "OID": "IT.CM.USUBJID",
+      "name": "USUBJID",
+      "description": "Unique Subject Identifier",
+      "dataType": "text",
+      "length": 11
+    },
+    {
+      "OID": "IT.CM.CMSEQ",
+      "name": "CMSEQ",
+      "description": "Sequence Number",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.CM.CMSPID",
+      "name": "CMSPID",
+      "description": "Sponsor-Defined Identifier",
+      "dataType": "text",
+      "length": 2
+    },
+    {
+      "OID": "IT.CM.CMTRT",
+      "name": "CMTRT",
+      "description": "Reported Name of Drug, Med, or Therapy",
+      "dataType": "text",
+      "length": 44
+    },
+    {
+      "OID": "IT.CM.CMDECOD",
+      "name": "CMDECOD",
+      "description": "Standardized Medication Name",
+      "dataType": "text",
+      "length": 24
+    },
+    {
+      "OID": "IT.CM.CMINDC",
+      "name": "CMINDC",
+      "description": "Indication",
+      "dataType": "text",
+      "length": 34
+    },
+    {
+      "OID": "IT.CM.CMCLAS",
+      "name": "CMCLAS",
+      "description": "Medication Class",
+      "dataType": "text",
+      "length": 42
+    },
+    {
+      "OID": "IT.CM.CMDOSE",
+      "name": "CMDOSE",
+      "description": "Dose per Administration",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.CM.CMDOSU",
+      "name": "CMDOSU",
+      "description": "Dose Units",
+      "dataType": "text",
+      "length": 17,
+      "codeList": "CL.C71620"
+    },
+    {
+      "OID": "IT.CM.CMDOSFRQ",
+      "name": "CMDOSFRQ",
+      "description": "Dosing Frequency per Interval",
+      "dataType": "text",
+      "length": 15,
+      "codeList": "CL.C71113"
+    },
+    {
+      "OID": "IT.CM.CMROUTE",
+      "name": "CMROUTE",
+      "description": "Route of Administration",
+      "dataType": "text",
+      "length": 200,
+      "codeList": "CL.C66729"
+    },
+    {
+      "OID": "IT.CM.VISITNUM",
+      "name": "VISITNUM",
+      "description": "Visit Number",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.CM.VISIT",
+      "name": "VISIT",
+      "description": "Visit Name",
+      "dataType": "text",
+      "length": 19
+    },
+    {
+      "OID": "IT.CM.VISITDY",
+      "name": "VISITDY",
+      "description": "Planned Study Day of Visit",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.CM.CMDTC",
+      "name": "CMDTC",
+      "description": "Date/Time of Collection",
+      "dataType": "text",
+      "length": 10
+    },
+    {
+      "OID": "IT.CM.CMSTDTC",
+      "name": "CMSTDTC",
+      "description": "Start Date/Time of Medication",
+      "dataType": "text",
+      "length": 10
+    },
+    {
+      "OID": "IT.CM.CMENDTC",
+      "name": "CMENDTC",
+      "description": "End Date/Time of Medication",
+      "dataType": "text",
+      "length": 10
+    },
+    {
+      "OID": "IT.CM.CMSTDY",
+      "name": "CMSTDY",
+      "description": "Study Day of Start of Medication",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.CM.CMENDY",
+      "name": "CMENDY",
+      "description": "Study Day of End of Medication",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.SUPPDS.STUDYID",
+      "name": "STUDYID",
+      "description": "Study Identifier",
+      "dataType": "text",
+      "length": 12
+    },
+    {
+      "OID": "IT.SUPPDS.RDOMAIN",
+      "name": "RDOMAIN",
+      "description": "Related Domain Abbreviation",
+      "dataType": "text",
+      "length": 2
+    },
+    {
+      "OID": "IT.SUPPDS.USUBJID",
+      "name": "USUBJID",
+      "description": "Unique Subject Identifier",
+      "dataType": "text",
+      "length": 11
+    },
+    {
+      "OID": "IT.SUPPDS.IDVAR",
+      "name": "IDVAR",
+      "description": "Identifying Variable",
+      "dataType": "text",
+      "length": 8
+    },
+    {
+      "OID": "IT.SUPPDS.IDVARVAL",
+      "name": "IDVARVAL",
+      "description": "Identifying Variable Value",
+      "dataType": "text",
+      "length": 200
+    },
+    {
+      "OID": "IT.SUPPDS.QNAM",
+      "name": "QNAM",
+      "description": "Qualifier Variable Name",
+      "dataType": "text",
+      "length": 8
+    },
+    {
+      "OID": "IT.SUPPDS.QLABEL",
+      "name": "QLABEL",
+      "description": "Qualifier Variable Label",
+      "dataType": "text",
+      "length": 40
+    },
+    {
+      "OID": "IT.SUPPDS.QVAL",
+      "name": "QVAL",
+      "description": "Data Value",
+      "dataType": "text",
+      "length": 200
+    },
+    {
+      "OID": "IT.SUPPDS.QORIG",
+      "name": "QORIG",
+      "description": "Origin",
+      "dataType": "text",
+      "length": 200
+    },
+    {
+      "OID": "IT.SUPPDS.QEVAL",
+      "name": "QEVAL",
+      "description": "Evaluator",
+      "dataType": "text",
+      "length": 200
+    },
+    {
+      "OID": "IT.EX.STUDYID",
+      "name": "STUDYID",
+      "description": "Study Identifier",
+      "dataType": "text",
+      "length": 12
+    },
+    {
+      "OID": "IT.EX.DOMAIN",
+      "name": "DOMAIN",
+      "description": "Domain Abbreviation",
+      "dataType": "text",
+      "length": 2
+    },
+    {
+      "OID": "IT.EX.USUBJID",
+      "name": "USUBJID",
+      "description": "Unique Subject Identifier",
+      "dataType": "text",
+      "length": 11
+    },
+    {
+      "OID": "IT.EX.EXSEQ",
+      "name": "EXSEQ",
+      "description": "Sequence Number",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.EX.EXTRT",
+      "name": "EXTRT",
+      "description": "Name of Actual Treatment",
+      "dataType": "text",
+      "length": 10
+    },
+    {
+      "OID": "IT.EX.EXDOSE",
+      "name": "EXDOSE",
+      "description": "Dose per Administration",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.EX.EXDOSU",
+      "name": "EXDOSU",
+      "description": "Dose Units",
+      "dataType": "text",
+      "length": 2,
+      "codeList": "CL.C71620"
+    },
+    {
+      "OID": "IT.EX.EXDOSFRM",
+      "name": "EXDOSFRM",
+      "description": "Dose Form",
+      "dataType": "text",
+      "length": 5,
+      "codeList": "CL.C66726"
+    },
+    {
+      "OID": "IT.EX.EXDOSFRQ",
+      "name": "EXDOSFRQ",
+      "description": "Dosing Frequency per Interval",
+      "dataType": "text",
+      "length": 2,
+      "codeList": "CL.C71113"
+    },
+    {
+      "OID": "IT.EX.EXROUTE",
+      "name": "EXROUTE",
+      "description": "Route of Administration",
+      "dataType": "text",
+      "length": 11,
+      "codeList": "CL.C66729"
+    },
+    {
+      "OID": "IT.EX.VISITNUM",
+      "name": "VISITNUM",
+      "description": "Visit Number",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.EX.VISIT",
+      "name": "VISIT",
+      "description": "Visit Name",
+      "dataType": "text",
+      "length": 19
+    },
+    {
+      "OID": "IT.EX.VISITDY",
+      "name": "VISITDY",
+      "description": "Planned Study Day of Visit",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.EX.EXSTDTC",
+      "name": "EXSTDTC",
+      "description": "Start Date/Time of Treatment",
+      "dataType": "text",
+      "length": 10
+    },
+    {
+      "OID": "IT.EX.EXENDTC",
+      "name": "EXENDTC",
+      "description": "End Date/Time of Treatment",
+      "dataType": "text",
+      "length": 10
+    },
+    {
+      "OID": "IT.EX.EXSTDY",
+      "name": "EXSTDY",
+      "description": "Study Day of Start of Treatment",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.EX.EXENDY",
+      "name": "EXENDY",
+      "description": "Study Day of End of Treatment",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.VS.STUDYID",
+      "name": "STUDYID",
+      "description": "Study Identifier",
+      "dataType": "text",
+      "length": 12
+    },
+    {
+      "OID": "IT.VS.DOMAIN",
+      "name": "DOMAIN",
+      "description": "Domain Abbreviation",
+      "dataType": "text",
+      "length": 2
+    },
+    {
+      "OID": "IT.VS.USUBJID",
+      "name": "USUBJID",
+      "description": "Unique Subject Identifier",
+      "dataType": "text",
+      "length": 11
+    },
+    {
+      "OID": "IT.VS.VSSEQ",
+      "name": "VSSEQ",
+      "description": "Sequence Number",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.VS.VSTESTCD",
+      "name": "VSTESTCD",
+      "description": "Vital Signs Test Short Name",
+      "dataType": "text",
+      "length": 6,
+      "codeList": "CL.C66741",
+      "origin": {
+        "type": "Assigned",
+        "source": "Vendor"
+      }
+    },
+    {
+      "OID": "IT.VS.VSTEST",
+      "name": "VSTEST",
+      "description": "Vital Signs Test Name",
+      "dataType": "text",
+      "length": 24,
+      "codeList": "CL.C67153",
+      "origin": {
+        "type": "Assigned",
+        "source": "Vendor"
+      }
+    },
+    {
+      "OID": "IT.VS.VSPOS",
+      "name": "VSPOS",
+      "description": "Vital Signs Position of Subject",
+      "dataType": "text",
+      "length": 8,
+      "codeList": "CL.C71148",
+      "origin": {
+        "type": "Collected",
+        "source": "Investigator"
+      }
+    },
+    {
+      "OID": "IT.VS.VSORRES",
+      "name": "VSORRES",
+      "description": "Result or Finding in Original Units",
+      "dataType": "text",
+      "length": 5,
+      "significantDigits": 3.0
+    },
+    {
+      "OID": "VL.VS.VSORRES",
+      "dataType": "float",
+      "length": 8.0,
+      "significantDigits": 3.0,
+      "displayFormat": 8.3,
+      "mandatory": true,
+      "origin": {
+        "type": "Collected",
+        "source": "Investigator"
+      },
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.TEMP"
+      ]
+    },
+    {
+      "OID": "VL.VS.VSORRES",
+      "dataType": "float",
+      "length": 8.0,
+      "significantDigits": 3.0,
+      "displayFormat": 8.3,
+      "mandatory": true,
+      "origin": {
+        "type": "Collected",
+        "source": "Investigator"
+      },
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.WEIGHT"
+      ]
+    },
+    {
+      "OID": "VL.VS.VSORRES",
+      "dataType": "float",
+      "length": 8.0,
+      "significantDigits": 3.0,
+      "displayFormat": 8.3,
+      "mandatory": true,
+      "origin": {
+        "type": "Collected",
+        "source": "Investigator"
+      },
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.HEIGHT"
+      ]
+    },
+    {
+      "OID": "VL.VS.VSORRES",
+      "dataType": "integer",
+      "length": 3.0,
+      "mandatory": true,
+      "origin": {
+        "type": "Collected",
+        "source": "Investigator"
+      },
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.SYSBP"
+      ]
+    },
+    {
+      "OID": "VL.VS.VSORRES",
+      "dataType": "integer",
+      "length": 3.0,
+      "mandatory": true,
+      "origin": {
+        "type": "Collected",
+        "source": "Investigator"
+      },
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.DIABP"
+      ]
+    },
+    {
+      "OID": "VL.VS.VSORRES",
+      "dataType": "integer",
+      "length": 3.0,
+      "mandatory": true,
+      "origin": {
+        "type": "Collected",
+        "source": "Investigator"
+      },
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.HR"
+      ]
+    },
+    {
+      "OID": "VL.VS.VSORRES",
+      "dataType": "integer",
+      "length": 3.0,
+      "mandatory": true,
+      "origin": {
+        "type": "Collected",
+        "source": "Investigator"
+      },
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.SYSBP"
+      ]
+    },
+    {
+      "OID": "VL.VS.VSORRES",
+      "dataType": "integer",
+      "length": 3.0,
+      "mandatory": true,
+      "origin": {
+        "type": "Collected",
+        "source": "Investigator"
+      },
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.DIABP"
+      ]
+    },
+    {
+      "OID": "VL.VS.VSORRES",
+      "dataType": "integer",
+      "length": 3.0,
+      "mandatory": true,
+      "origin": {
+        "type": "Collected",
+        "source": "Investigator"
+      },
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.HR"
+      ]
+    },
+    {
+      "OID": "IT.VS.VSORRESU",
+      "name": "VSORRESU",
+      "description": "Original Units",
+      "dataType": "text",
+      "length": 200,
+      "codeList": "CL.C66770"
+    },
+    {
+      "OID": "VL.VS.VSORRESU",
+      "dataType": "text",
+      "codeList": "CL.C66770",
+      "mandatory": true,
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.TEMP"
+      ]
+    },
+    {
+      "OID": "VL.VS.VSORRESU",
+      "dataType": "text",
+      "codeList": "CL.C66770",
+      "mandatory": true,
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.WEIGHT"
+      ]
+    },
+    {
+      "OID": "VL.VS.VSORRESU",
+      "dataType": "text",
+      "codeList": "CL.C66770",
+      "mandatory": true,
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.HEIGHT"
+      ]
+    },
+    {
+      "OID": "VL.VS.VSORRESU",
+      "dataType": "text",
+      "codeList": "CL.C66770",
+      "mandatory": true,
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.SYSBP"
+      ]
+    },
+    {
+      "OID": "VL.VS.VSORRESU",
+      "dataType": "text",
+      "codeList": "CL.C66770",
+      "mandatory": true,
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.DIABP"
+      ]
+    },
+    {
+      "OID": "VL.VS.VSORRESU",
+      "dataType": "text",
+      "codeList": "CL.C66770",
+      "mandatory": true,
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.HR"
+      ]
+    },
+    {
+      "OID": "VL.VS.VSORRESU",
+      "dataType": "text",
+      "codeList": "CL.C66770",
+      "mandatory": true,
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.SYSBP"
+      ]
+    },
+    {
+      "OID": "VL.VS.VSORRESU",
+      "dataType": "text",
+      "codeList": "CL.C66770",
+      "mandatory": true,
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.DIABP"
+      ]
+    },
+    {
+      "OID": "VL.VS.VSORRESU",
+      "dataType": "text",
+      "codeList": "CL.C66770",
+      "mandatory": true,
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.HR"
+      ]
+    },
+    {
+      "OID": "IT.VS.VSSTRESC",
+      "name": "VSSTRESC",
+      "description": "Character Result/Finding in Std Format",
+      "dataType": "text",
+      "length": 6,
+      "significantDigits": 3.0
+    },
+    {
+      "OID": "VL.VS.VSSTRESC",
+      "dataType": "float",
+      "length": 8.0,
+      "significantDigits": 3.0,
+      "displayFormat": 8.3,
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.TEMP"
+      ]
+    },
+    {
+      "OID": "VL.VS.VSSTRESC",
+      "dataType": "float",
+      "length": 8.0,
+      "significantDigits": 3.0,
+      "displayFormat": 8.3,
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.WEIGHT"
+      ]
+    },
+    {
+      "OID": "VL.VS.VSSTRESC",
+      "dataType": "float",
+      "length": 8.0,
+      "significantDigits": 3.0,
+      "displayFormat": 8.3,
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.HEIGHT"
+      ]
+    },
+    {
+      "OID": "VL.VS.VSSTRESC",
+      "dataType": "integer",
+      "length": 3.0,
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.SYSBP"
+      ]
+    },
+    {
+      "OID": "VL.VS.VSSTRESC",
+      "dataType": "integer",
+      "length": 3.0,
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.DIABP"
+      ]
+    },
+    {
+      "OID": "VL.VS.VSSTRESC",
+      "dataType": "integer",
+      "length": 3.0,
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.HR"
+      ]
+    },
+    {
+      "OID": "VL.VS.VSSTRESC",
+      "dataType": "integer",
+      "length": 3.0,
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.SYSBP"
+      ]
+    },
+    {
+      "OID": "VL.VS.VSSTRESC",
+      "dataType": "integer",
+      "length": 3.0,
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.DIABP"
+      ]
+    },
+    {
+      "OID": "VL.VS.VSSTRESC",
+      "dataType": "integer",
+      "length": 3.0,
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.HR"
+      ]
+    },
+    {
+      "OID": "IT.VS.VSSTRESN",
+      "name": "VSSTRESN",
+      "description": "Numeric Result/Finding in Standard Units",
+      "dataType": "float",
+      "length": 8,
+      "significantDigits": 3.0
+    },
+    {
+      "OID": "VL.VS.VSSTRESN",
+      "dataType": "float",
+      "length": 8.0,
+      "significantDigits": 3.0,
+      "displayFormat": 8.3,
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.TEMP"
+      ]
+    },
+    {
+      "OID": "VL.VS.VSSTRESN",
+      "dataType": "float",
+      "length": 8.0,
+      "significantDigits": 3.0,
+      "displayFormat": 8.3,
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.WEIGHT"
+      ]
+    },
+    {
+      "OID": "VL.VS.VSSTRESN",
+      "dataType": "float",
+      "length": 8.0,
+      "significantDigits": 3.0,
+      "displayFormat": 8.3,
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.HEIGHT"
+      ]
+    },
+    {
+      "OID": "VL.VS.VSSTRESN",
+      "dataType": "integer",
+      "length": 3.0,
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.SYSBP"
+      ]
+    },
+    {
+      "OID": "VL.VS.VSSTRESN",
+      "dataType": "integer",
+      "length": 3.0,
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.DIABP"
+      ]
+    },
+    {
+      "OID": "VL.VS.VSSTRESN",
+      "dataType": "integer",
+      "length": 3.0,
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.HR"
+      ]
+    },
+    {
+      "OID": "VL.VS.VSSTRESN",
+      "dataType": "integer",
+      "length": 3.0,
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.SYSBP"
+      ]
+    },
+    {
+      "OID": "VL.VS.VSSTRESN",
+      "dataType": "integer",
+      "length": 3.0,
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.DIABP"
+      ]
+    },
+    {
+      "OID": "VL.VS.VSSTRESN",
+      "dataType": "integer",
+      "length": 3.0,
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.HR"
+      ]
+    },
+    {
+      "OID": "IT.VS.VSSTRESU",
+      "name": "VSSTRESU",
+      "description": "Standard Units",
+      "dataType": "text",
+      "length": 200,
+      "codeList": "CL.C66770"
+    },
+    {
+      "OID": "VL.VS.VSSTRESU",
+      "dataType": "text",
+      "codeList": "CL.C66770",
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.TEMP"
+      ]
+    },
+    {
+      "OID": "VL.VS.VSSTRESU",
+      "dataType": "text",
+      "codeList": "CL.C66770",
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.WEIGHT"
+      ]
+    },
+    {
+      "OID": "VL.VS.VSSTRESU",
+      "dataType": "text",
+      "codeList": "CL.C66770",
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.HEIGHT"
+      ]
+    },
+    {
+      "OID": "VL.VS.VSSTRESU",
+      "dataType": "text",
+      "codeList": "CL.C66770",
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.SYSBP"
+      ]
+    },
+    {
+      "OID": "VL.VS.VSSTRESU",
+      "dataType": "text",
+      "codeList": "CL.C66770",
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.DIABP"
+      ]
+    },
+    {
+      "OID": "VL.VS.VSSTRESU",
+      "dataType": "text",
+      "codeList": "CL.C66770",
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.HR"
+      ]
+    },
+    {
+      "OID": "VL.VS.VSSTRESU",
+      "dataType": "text",
+      "codeList": "CL.C66770",
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.SYSBP"
+      ]
+    },
+    {
+      "OID": "VL.VS.VSSTRESU",
+      "dataType": "text",
+      "codeList": "CL.C66770",
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.DIABP"
+      ]
+    },
+    {
+      "OID": "VL.VS.VSSTRESU",
+      "dataType": "text",
+      "codeList": "CL.C66770",
+      "applicableWhen": [
+        "WC.VS.VSTESTCD.HR"
+      ]
+    },
+    {
+      "OID": "IT.VS.VSSTAT",
+      "name": "VSSTAT",
+      "description": "Completion Status",
+      "dataType": "text",
+      "length": 8,
+      "codeList": "CL.C66789"
+    },
+    {
+      "OID": "IT.VS.VSLOC",
+      "name": "VSLOC",
+      "description": "Location of Vital Signs Measurement",
+      "dataType": "text",
+      "length": 200,
+      "codeList": "CL.C74456",
+      "origin": {
+        "type": "Collected",
+        "source": "Investigator"
+      }
+    },
+    {
+      "OID": "IT.VS.VSBLFL",
+      "name": "VSBLFL",
+      "description": "Baseline Flag",
+      "dataType": "text",
+      "length": 1,
+      "codeList": "CL.C66742"
+    },
+    {
+      "OID": "IT.VS.VISITNUM",
+      "name": "VISITNUM",
+      "description": "Visit Number",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.VS.VISIT",
+      "name": "VISIT",
+      "description": "Visit Name",
+      "dataType": "text",
+      "length": 19
+    },
+    {
+      "OID": "IT.VS.VISITDY",
+      "name": "VISITDY",
+      "description": "Planned Study Day of Visit",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.VS.VSDTC",
+      "name": "VSDTC",
+      "description": "Date/Time of Measurements",
+      "dataType": "text",
+      "length": 10,
+      "origin": {
+        "type": "Collected",
+        "source": "Investigator"
+      }
+    },
+    {
+      "OID": "IT.VS.VSDY",
+      "name": "VSDY",
+      "description": "Study Day of Vital Signs",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.VS.VSTPT",
+      "name": "VSTPT",
+      "description": "Planned Time Point Name",
+      "dataType": "text",
+      "length": 30
+    },
+    {
+      "OID": "IT.VS.VSTPTNUM",
+      "name": "VSTPTNUM",
+      "description": "Planned Time Point Number",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.VS.VSELTM",
+      "name": "VSELTM",
+      "description": "Planned Elapsed Time from Time Point Ref",
+      "dataType": "text",
+      "length": 4
+    },
+    {
+      "OID": "IT.VS.VSTPTREF",
+      "name": "VSTPTREF",
+      "description": "Time Point Reference",
+      "dataType": "text",
+      "length": 16
+    },
+    {
+      "OID": "IT.MH.STUDYID",
+      "name": "STUDYID",
+      "description": "Study Identifier",
+      "dataType": "text",
+      "length": 12
+    },
+    {
+      "OID": "IT.MH.DOMAIN",
+      "name": "DOMAIN",
+      "description": "Domain Abbreviation",
+      "dataType": "text",
+      "length": 2
+    },
+    {
+      "OID": "IT.MH.USUBJID",
+      "name": "USUBJID",
+      "description": "Unique Subject Identifier",
+      "dataType": "text",
+      "length": 11
+    },
+    {
+      "OID": "IT.MH.MHSEQ",
+      "name": "MHSEQ",
+      "description": "Sequence Number",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.MH.MHSPID",
+      "name": "MHSPID",
+      "description": "Sponsor-Defined Identifier",
+      "dataType": "text",
+      "length": 3
+    },
+    {
+      "OID": "IT.MH.MHTERM",
+      "name": "MHTERM",
+      "description": "Reported Term for the Medical History",
+      "dataType": "text",
+      "length": 19
+    },
+    {
+      "OID": "IT.MH.MHLLT",
+      "name": "MHLLT",
+      "description": "Lowest Level Term",
+      "dataType": "text",
+      "length": 200
+    },
+    {
+      "OID": "IT.MH.MHDECOD",
+      "name": "MHDECOD",
+      "description": "Dictionary-Derived Term",
+      "dataType": "text",
+      "length": 44
+    },
+    {
+      "OID": "IT.MH.MHHLT",
+      "name": "MHHLT",
+      "description": "High Level Term",
+      "dataType": "text",
+      "length": 200
+    },
+    {
+      "OID": "IT.MH.MHHLGT",
+      "name": "MHHLGT",
+      "description": "High Level Group Term",
+      "dataType": "text",
+      "length": 200
+    },
+    {
+      "OID": "IT.MH.MHCAT",
+      "name": "MHCAT",
+      "description": "Category for Medical History",
+      "dataType": "text",
+      "length": 34
+    },
+    {
+      "OID": "IT.MH.MHBODSYS",
+      "name": "MHBODSYS",
+      "description": "Body System or Organ Class",
+      "dataType": "text",
+      "length": 67
+    },
+    {
+      "OID": "IT.MH.MHSEV",
+      "name": "MHSEV",
+      "description": "Severity/Intensity",
+      "dataType": "text",
+      "length": 8
+    },
+    {
+      "OID": "IT.MH.VISITNUM",
+      "name": "VISITNUM",
+      "description": "Visit Number",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.MH.VISIT",
+      "name": "VISIT",
+      "description": "Visit Name",
+      "dataType": "text",
+      "length": 19
+    },
+    {
+      "OID": "IT.MH.VISITDY",
+      "name": "VISITDY",
+      "description": "Planned Study Day of Visit",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.MH.MHDTC",
+      "name": "MHDTC",
+      "description": "Date/Time of History Collection",
+      "dataType": "text",
+      "length": 10
+    },
+    {
+      "OID": "IT.MH.MHSTDTC",
+      "name": "MHSTDTC",
+      "description": "Start Date/Time of Medical History Event",
+      "dataType": "text",
+      "length": 10
+    },
+    {
+      "OID": "IT.MH.MHDY",
+      "name": "MHDY",
+      "description": "Study Day of History Collection",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.DS.STUDYID",
+      "name": "STUDYID",
+      "description": "Study Identifier",
+      "dataType": "text",
+      "length": 12
+    },
+    {
+      "OID": "IT.DS.DOMAIN",
+      "name": "DOMAIN",
+      "description": "Domain Abbreviation",
+      "dataType": "text",
+      "length": 2
+    },
+    {
+      "OID": "IT.DS.USUBJID",
+      "name": "USUBJID",
+      "description": "Unique Subject Identifier",
+      "dataType": "text",
+      "length": 11
+    },
+    {
+      "OID": "IT.DS.DSSEQ",
+      "name": "DSSEQ",
+      "description": "Sequence Number",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.DS.DSSPID",
+      "name": "DSSPID",
+      "description": "Sponsor-Defined Identifier",
+      "dataType": "text",
+      "length": 2
+    },
+    {
+      "OID": "IT.DS.DSTERM",
+      "name": "DSTERM",
+      "description": "Reported Term for the Disposition Event",
+      "dataType": "text",
+      "length": 63
+    },
+    {
+      "OID": "IT.DS.DSDECOD",
+      "name": "DSDECOD",
+      "description": "Standardized Disposition Term",
+      "dataType": "text",
+      "length": 63,
+      "codeList": "CL.C66727"
+    },
+    {
+      "OID": "IT.DS.DSCAT",
+      "name": "DSCAT",
+      "description": "Category for Disposition Event",
+      "dataType": "text",
+      "length": 17,
+      "codeList": "CL.C74558"
+    },
+    {
+      "OID": "IT.DS.VISITNUM",
+      "name": "VISITNUM",
+      "description": "Visit Number",
+      "dataType": "float",
+      "length": 8
+    },
+    {
+      "OID": "IT.DS.VISIT",
+      "name": "VISIT",
+      "description": "Visit Name",
+      "dataType": "text",
+      "length": 19
+    },
+    {
+      "OID": "IT.DS.DSDTC",
+      "name": "DSDTC",
+      "description": "Date/Time of Collection",
+      "dataType": "text",
+      "length": 19
+    },
+    {
+      "OID": "IT.DS.DSSTDTC",
+      "name": "DSSTDTC",
+      "description": "Start Date/Time of Disposition Event",
+      "dataType": "text",
+      "length": 10
+    },
+    {
+      "OID": "IT.DS.DSSTDY",
+      "name": "DSSTDY",
+      "description": "Study Day of Start of Disposition Event",
+      "dataType": "float",
+      "length": 8
+    }
+  ],
+  "comments": []
+}
