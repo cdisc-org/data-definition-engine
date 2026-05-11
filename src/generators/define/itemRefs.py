@@ -20,7 +20,6 @@ class ItemRefs(define_object.DefineObject):
     def _create_itemref_object(self, obj, define_objects, igd, it_oid, order):
         if not it_oid:
             raise ValueError("Required field OID is missing in ItemRef")
-        # TODO fix as this mandatory can also be set in optional attributes
         if "mandatory" not in obj:
             mandatory = "No"
         else:
@@ -46,18 +45,15 @@ class ItemRefs(define_object.DefineObject):
         :param attr: ItemRef template attributes to update with optional values
         :param obj: variable definition dictionary from the DDS JSON
         """
-        # TODO does method exist on items in the DDS?
         if obj.get("method"):
             attr["MethodOID"] = obj["method"]
         if obj.get("order"):
             attr["OrderNumber"] = int(obj["order"])
         else:
             attr["OrderNumber"] = order
-        # KeySequence is not in DDS, so a placeholder is added to the first ItemRef
+        # KeySequence is not in DDS so this will be inserted via the gap YAML content
         if obj.get("keySequence"):
             attr["KeySequence"] = int(obj["keySequence"])
-        elif order == 1:
-            attr["KeySequence"] = "__PLACEHOLDER__"
         if obj.get("role"):
             attr["Role"] = obj["role"]
         if obj.get("isNonStandard"):

@@ -41,8 +41,9 @@ class ValueLevel(define_object.DefineObject):
             attr["MethodOID"] = item["method"]
         attr["Mandatory"] = "Yes" if item.get("mandatory", False) else "No"
         ir = DEFINE.ItemRef(**attr)
-        applicable_when = item.get("applicableWhen") or []
-        if applicable_when:
-            # TODO when there are multiple applicableWhen values only the first is wired up
-            ir.WhereClauseRef.append(DEFINE.WhereClauseRef(WhereClauseOID=applicable_when[0]))
+        applicable_whens = item.get("applicableWhen", [])
+        for applicable_when in applicable_whens:
+            ir.WhereClauseRef.append(DEFINE.WhereClauseRef(WhereClauseOID=applicable_when))
+        # if applicable_when:
+        #    ir.WhereClauseRef.append(DEFINE.WhereClauseRef(WhereClauseOID=applicable_when[0]))
         return ir

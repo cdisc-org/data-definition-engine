@@ -73,13 +73,21 @@ Example Cmd-line Args:
 class DefineGenerator:
     """Generate a Define-XML v2.1 file from the DDS JSON file."""
 
-    def __init__(self, dds_file: str, define_file: str, log_level: str = "INFO") -> None:
+    def __init__(self,
+                 dds_file: str,
+                 define_file: str,
+                 log_level: str = "INFO",
+                 is_submission: bool = False,
+                 is_xpt: bool = False
+                 ) -> None:
         """
         Initialize the Define-XML generator.
 
         :param dds_file: path and filename of the Data Definition Specification (DDS) JSON file
         :param define_file: path and filename for the output Define-XML v2.1 file
         :param log_level: logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+        :param is_submission: set the def:Context to Submission, otherwise set to Other
+        :param is_xpt: set dataset extensions to .xpt instead of .ndjson
         """
         self.dds_file: str = dds_file
         self.define_file: str = define_file
@@ -88,6 +96,8 @@ class DefineGenerator:
             level=getattr(logging, log_level),
             format="%(asctime)s - %(levelname)s - %(message)s",
         )
+        self.context = "Submission" if is_submission else "Other"
+        self.is_xpt = is_xpt
         self._check_file_existence()
         self.lang: str = DEFAULT_LANGUAGE
         self.acrf: str = ACRF_LEAF_ID
@@ -104,7 +114,7 @@ class DefineGenerator:
             sys.exit(1)
         self._init_define_objects()
         self._load_study(template_objects)
-        # Explicit dispatch order — no dependency on JSON key order.
+        # explicit dispatch order — no dependency on JSON key order.
         for section in SECTION_ORDER:
             if section not in template_objects:
                 continue
@@ -124,7 +134,7 @@ class DefineGenerator:
         Post-processing adds content determined after all elements are created.
         :return: None
         """
-        pp = PP.PostProcessing(self.define_objects, self.lang)
+        pp = PP.PostProcessing(self.define_objects, self.is_xpt, self.lang)
         pp.process_define_objects()
 
     def _init_define_objects(self) -> None:
@@ -162,7 +172,7 @@ class DefineGenerator:
         after processing the content in the template input file organize the odmlib define_objects for use as a Define-XML v2.1
         :return: instantiated odmlib Define-XML v2.1 model
         """
-        odm_elem = ODM.ODM()
+        odm_elem = ODM.ODM(self.context)
         odm = odm_elem.create_root()
         odm.Study = self.define_objects["Study"]
         odm.Study.MetaDataVersion = self.define_objects["MetaDataVersion"]
@@ -248,8 +258,12 @@ def set_cmd_line_args() -> argparse.Namespace:
         choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
         help="Set the logging level (default: INFO)",
     )
-    parser.add_argument("-s", "--validate", help="schema validate the define.xml", default=False, const=True,
+    parser.add_argument("-v", "--validate", help="schema validate the define.xml", default=False, const=True,
                         nargs='?', dest="is_validate")
+    parser.add_argument("-s", "--submission", help="set the def:Context to Submission, otherwise set to Other",
+                        default=False, const=True, nargs='?', dest="is_submission")
+    parser.add_argument("-x", "--sas_xpt", help="set dataset extensions to .xpt instead of .ndjson",
+                        default=False, const=True, nargs='?', dest="is_xpt")
     args = parser.parse_args()
     return args
 
@@ -257,7 +271,8 @@ def set_cmd_line_args() -> argparse.Namespace:
 def main() -> None:
     """Main entry point that generates Define-XML v2.1 from a DDS JSON file."""
     args = set_cmd_line_args()
-    dg = DefineGenerator(dds_file=args.dds_file, define_file=args.define_file, log_level=args.log_level)
+    dg = DefineGenerator(dds_file=args.dds_file, define_file=args.define_file, log_level=args.log_level,
+                         is_submission=args.is_submission, is_xpt=args.is_xpt,)
     dg.create()
     if args.is_validate:
         if not validate_define_file(args.define_file):
