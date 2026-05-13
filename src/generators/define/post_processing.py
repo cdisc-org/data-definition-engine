@@ -7,12 +7,28 @@ class PostProcessing:
     """
     Base class for post-processing Define-XML elements.
     """
-    def __init__(self, define_objects: dict[str, list[Any]], lang: str):
+    def __init__(self, define_objects: dict[str, list[Any]], is_xpt: bool, lang: str):
         self.define_objects = define_objects
+        self.is_xpt = is_xpt
         self.lang = lang
 
     def process_define_objects(self) -> None:
         self._add_derived_methods()
+        if self.is_xpt:
+            self._update_dataset_file_type_to_xpt()
+
+
+    def _update_dataset_file_type_to_xpt(self) -> None:
+        """
+        Update the ItemGroupDef dataset extension .xpt if is_xpt is True.
+        <def:leaf ID="LF.SUPPDM" xlink:href="suppdm.xpt">
+          <def:title>suppdm.xpt</def:title>
+        </def:leaf>
+        """
+        for igd in self.define_objects['ItemGroupDef']:
+            if igd.leaf.href.endswith('.ndjson'):
+                igd.leaf.href = igd.leaf.href.replace('.ndjson', '.xpt')
+                igd.leaf.title._content = igd.leaf.title._content.replace('.ndjson', '.xpt')
 
 
     def _add_derived_methods(self) -> None:
@@ -20,7 +36,7 @@ class PostProcessing:
         Add methods to ItemDefs where the def:Origin Type="Derived".
         """
         for item_def in self.define_objects['ItemDef']:
-            # TODO assumes we're only interested in the first origin
+            # assumes we're interested in the first origin; define.json defines origin as an object, not a list
             if  item_def.Origin and item_def.Origin[0].Type == 'Derived':
                 # generate the MethodOID
                 method_oid = self._generate_method_oid(item_def.OID)
@@ -41,7 +57,7 @@ class PostProcessing:
         self.define_objects['MethodDef'].append(method_def)
 
     def _update_item_ref(self, item_def, method_oid) -> bool:
-        # TODO inefficient, but works for now
+        # inefficient, but works for now
         is_new_method = False
         for ir_group in ["ItemGroupDef", "ValueListDef"]:
             # check ItemGroupDefs

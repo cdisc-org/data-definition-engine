@@ -51,13 +51,19 @@ class ItemGroups(define_object.DefineObject):
         slices = dataset.get("slices")
         items.Items().create_define_objects(items_list, define_objects, lang, acrf, slice=slices)
 
-        # TODO review this assumption that we have 1 class per dataset
-        # assumption: 1 class per dataset - many need to expand this for ADaM
+        # assumption: list of subclasses, but no nested subclasses - may need to revisit this for ADaM
         if dataset.get("observationClass", {}).get("name", ""):
             ds_class = dataset["observationClass"]["name"].upper().replace("-", " ")
             itg.Class = DEFINE.Class(Name=ds_class)
+            sub_classes = dataset.get("observationClass").get("subClasses", [])
+            for sub_class in sub_classes:
+                sub_class_name = sub_class.get("name")
+                if sub_class_name.get("parentClass", ""):
+                    itg.Class.SubClass.append(DEFINE.SubClass(Name=sub_class["name"], ParentClass=sub_class["parentClass"]))
+                else:
+                    itg.Class.SubClass.append(DEFINE.SubClass(Name=sub_class["name"]))
 
-        # TODO - where should we set the dataset file extension? (e.g., ndjson, xpt, etc.)
+        # default is Dataset-JSON .ndjson datasets - will be overridden in post-processing if is_xpt CL arg is True
         leaf = DEFINE.leaf(ID="LF." + dataset_name, href=dataset_name.lower() + ".ndjson")
         leaf.title = DEFINE.title(_content=dataset_name.lower() + ".ndjson")
         itg.leaf = leaf

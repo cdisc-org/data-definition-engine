@@ -4,7 +4,8 @@ import uuid
 
 
 class ODM:
-    def __init__(self, file_oid: str | None = None):
+    def __init__(self, context: str = "Other", file_oid: str | None = None):
+        self.context = context
         self.attrs = self._set_attributes(file_oid)
 
     def create_root(self):
@@ -21,7 +22,7 @@ class ODM:
             "Originator": "360i Define-XML Team",
             "SourceSystem": "odmlib",
             "SourceSystemVersion": "0.2",
-            "Context": "Other",
+            "Context": self.context,
         }
 
     @staticmethod
