@@ -6,6 +6,8 @@ import items
 import valueLevel as VL
 from constants import TRIAL_DESIGN_DOMAINS, NON_REPEATING_DOMAINS, DEFAULT_PURPOSE
 
+MAX_SUBCLASS_DEPTH = 4
+
 
 class ItemGroups(define_object.DefineObject):
     """ create a Define-XML v2.1 ItemGroupDef element template """
@@ -51,22 +53,46 @@ class ItemGroups(define_object.DefineObject):
         slices = dataset.get("slices")
         items.Items().create_define_objects(items_list, define_objects, lang, acrf, slice=slices)
 
-        # assumption: list of subclasses, but no nested subclasses - may need to revisit this for ADaM
-        if dataset.get("observationClass", {}).get("name", ""):
-            ds_class = dataset["observationClass"]["name"].upper().replace("-", " ")
+        observation_class = dataset.get("observationClass") or {}
+        if observation_class.get("name"):
+            ds_class = observation_class["name"].upper().replace("-", " ")
             itg.Class = DEFINE.Class(Name=ds_class)
-            sub_classes = dataset.get("observationClass").get("subClasses", [])
-            for sub_class in sub_classes:
-                sub_class_name = sub_class.get("name")
-                if sub_class_name.get("parentClass", ""):
-                    itg.Class.SubClass.append(DEFINE.SubClass(Name=sub_class["name"], ParentClass=sub_class["parentClass"]))
-                else:
-                    itg.Class.SubClass.append(DEFINE.SubClass(Name=sub_class["name"]))
+            self._append_subclasses(
+                itg.Class,
+                observation_class.get("subClasses") or [],
+                parent_name=None,
+                depth=1,
+            )
 
         # default is Dataset-JSON .ndjson datasets - will be overridden in post-processing if is_xpt CL arg is True
         leaf = DEFINE.leaf(ID="LF." + dataset_name, href=dataset_name.lower() + ".ndjson")
         leaf.title = DEFINE.title(_content=dataset_name.lower() + ".ndjson")
         itg.leaf = leaf
+
+    def _append_subclasses(self, class_obj, sub_classes, parent_name, depth):
+        """
+        Flatten a nested subClasses JSON tree into Class.SubClass siblings.
+
+        Define-XML v2.1 represents nested SubClasses as flat siblings under def:Class
+        with the ParentClass attribute referencing the parent SubClass's Name. Depth
+        is capped at MAX_SUBCLASS_DEPTH; deeper levels are silently dropped.
+        """
+        if depth > MAX_SUBCLASS_DEPTH:
+            return
+        for sub_class in sub_classes:
+            name = sub_class.get("name")
+            if not name:
+                continue
+            resolved_parent = sub_class.get("parentClass") or parent_name
+            if resolved_parent:
+                class_obj.SubClass.append(
+                    DEFINE.SubClass(Name=name, ParentClass=resolved_parent)
+                )
+            else:
+                class_obj.SubClass.append(DEFINE.SubClass(Name=name))
+            nested = sub_class.get("subClasses") or []
+            if nested:
+                self._append_subclasses(class_obj, nested, parent_name=name, depth=depth + 1)
 
     def _create_itemgroupdef_object(self, obj):
         name = self.require_key(obj, "name", "ItemGroupDef")
