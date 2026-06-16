@@ -69,6 +69,7 @@ class Items(define_object.DefineObject):
     @staticmethod
     def _new_itemdef(attr: dict[str, Any]) -> Any:
         """Instantiate an ItemDef without triggering descriptor validation."""
+        # TODO replace this with v0.2.0 odmlib permissive mode
         item = object.__new__(DEFINE.ItemDef)
         for key, value in attr.items():
             item.__dict__[key] = value
@@ -131,6 +132,13 @@ class Items(define_object.DefineObject):
             attr["Length"] = "__PLACEHOLDER__"
         if obj.get("significantDigits"):
             attr["SignificantDigits"] = obj["significantDigits"]
+        elif obj.get("displayFormat") and obj.get("dataType") == "float":
+            # TODO hack to work around issue 78 - missing missing significant digits - remove after updated
+            length, significant_digits = obj["displayFormat"].split(".")
+            if significant_digits:
+                attr["SignificantDigits"] = significant_digits
+            if length and attr.get("Length") == "__PLACEHOLDER__":
+                attr["Length"] = length
         if obj.get("displayFormat"):
             attr["DisplayFormat"] = obj["displayFormat"]
         if obj.get("comment"):
