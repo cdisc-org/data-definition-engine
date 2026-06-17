@@ -153,6 +153,8 @@ python create_define_json.py \
 | `--patch_file` | No | — | Generate a YAML patch file listing all placeholder/null fields |
 | `--apply_patch` | No | — | Apply a completed patch file to fill in placeholder values |
 | `--debug` | No | `False` | Save intermediate dictionaries as JSON files for inspection |
+| `--cacert` | No | — | Path to a CA bundle (`.pem`) for SSL verification — use when behind a corporate proxy |
+| `--no_ssl_verify` | No | `False` | Disable SSL certificate verification (use only in trusted environments) |
 
 **Tip:** On the first run, use `--patch_file gaps.yaml` to generate a list of all fields that could not be derived automatically. Fill in the values, then re-run with `--apply_patch gaps.yaml`.
 
