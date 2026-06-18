@@ -126,12 +126,25 @@ Or pass it directly on the command line with `--cdisc_api_key`.
 
 The loader reads a USDM protocol JSON file, enriches it with metadata from the CDISC Library, and writes a DDS JSON file.
 
+> **Windows (PowerShell):** use a backtick `` ` `` for line continuation instead of `\`.
+
 ```bash
+# bash / macOS / Linux
 cd src/define-xml
 
 python create_define_json.py \
   --usdm_file ../../data/protocol/LZZT/usdm/pilot_LLZT_protocol.json \
   --output_template ./output/define.json \
+  --sdtmct 2024-09-27
+```
+
+```powershell
+# Windows PowerShell
+cd src/define-xml
+
+python create_define_json.py `
+  --usdm_file ..\..\data\protocol\LZZT\usdm\pilot_LLZT_protocol.json `
+  --output_template .\output\define.json `
   --sdtmct 2024-09-27
 ```
 
@@ -165,11 +178,21 @@ python create_define_json.py \
 The generator reads the DDS JSON file and produces a Define-XML v2.1 file.
 
 ```bash
+# bash / macOS / Linux
 cd src/generators/define
 
 python define_generator.py \
   --template ../../define-xml/output/define.json \
   --define ./output/define.xml
+```
+
+```powershell
+# Windows PowerShell
+cd src\generators\define
+
+python define_generator.py `
+  --template ..\..\define-xml\output\define.json `
+  --define .\output\define.xml
 ```
 
 **All arguments:**
@@ -188,7 +211,7 @@ Processing is logged to `define_generator.log`.
 ### Full Pipeline Example
 
 ```bash
-# From the repository root
+# bash / macOS / Linux — from the repository root
 
 # 1. Load: USDM → DDS JSON
 cd src/define-xml
@@ -204,6 +227,26 @@ cd ../generators/define
 python define_generator.py \
   --template ../../output/define.json \
   --define ../../output/define.xml \
+  --validate
+```
+
+```powershell
+# Windows PowerShell — from the repository root
+
+# 1. Load: USDM → DDS JSON
+cd src\define-xml
+python create_define_json.py `
+  --usdm_file ..\..\data\protocol\LZZT\usdm\pilot_LLZT_protocol.json `
+  --output_template ..\..\output\define.json `
+  --sdtmct 2024-09-27 `
+  --validate `
+  --validation_report ..\..\output\validation_report.xlsx
+
+# 2. Generate: DDS JSON → Define-XML
+cd ..\generators\define
+python define_generator.py `
+  --template ..\..\output\define.json `
+  --define ..\..\output\define.xml `
   --validate
 ```
 
