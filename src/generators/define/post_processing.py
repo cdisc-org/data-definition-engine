@@ -36,8 +36,7 @@ class PostProcessing:
         Add methods to ItemDefs where the def:Origin Type="Derived".
         """
         for item_def in self.define_objects['ItemDef']:
-            # assumes we're interested in the first origin; define.json defines origin as an object, not a list
-            if  item_def.Origin and item_def.Origin[0].Type == 'Derived':
+            if any(getattr(o, "Type", None) == "Derived" for o in (item_def.Origin or [])):
                 # generate the MethodOID
                 method_oid = self._generate_method_oid(item_def.OID)
                 # find the ItemRef and add a MethodOID attribute
