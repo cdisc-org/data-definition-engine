@@ -218,6 +218,7 @@ class DefineGenerator:
 
         :param odm: the instantiated odmlib Define-XML ODM object
         """
+        Path(self.define_file).parent.mkdir(parents=True, exist_ok=True)
         odm.write_xml(self.define_file)
 
     def _check_file_existence(self) -> None:
