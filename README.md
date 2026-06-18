@@ -34,7 +34,7 @@ The **Data Definition Engine (DDE)** is an open-source tool that automatically g
 
 Clinical trials submitted to regulatory agencies (such as the FDA) must include standardized metadata files that describe the structure, content, and meaning of all datasets. Producing these files — most notably **Define-XML** — has traditionally been a manual, error-prone, and time-consuming process.
 
-The CDISC 360i program aims to automate this process end-to-end: starting from a machine-readable study protocol (**USDM**), the DDE derives all the metadata needed to generate regulatory submission artifacts automatically. It eliminates the gap between protocol design and data submission by using the same source of truth throughout the study lifecycle.
+The CDISC 360i program aims to automate this process end-to-end: starting from a machine-readable study protocol (**USDM**), the DDE derives all the metadata needed to generate regulatory submission artifacts. It eliminates the gap between protocol design and data submission by using the same source of truth throughout the study lifecycle.
 
 ---
 
@@ -321,9 +321,7 @@ The project is in **active development**, currently completing Phase 2 of the CD
 **Phase 2 (in progress):**
 - ADaM Define-XML generator
 - ODM CRF generator
-- Trial Design dataset generator
 - Dataset-JSON shell generator
-- Spreadsheet-based loader (alternative to USDM)
 - Incremental loading with metadata provenance tracking
 - Quality and conformance checks
 
@@ -352,11 +350,7 @@ When re-using content, please cite as:
 
 ## References
 
-- [DDS model (define.json)](https://github.com/TeMeta/define-json) — The Define-JSON data model specification
-- [DDS documentation site](https://temeta.github.io/define-json/)
 - [CDISC 360i Program repository](https://github.com/cdisc-org/360i)
 - [Data Definition Specification project](https://github.com/cdisc-org/DataExchange-DDS)
-- [Define-XML generator (template2define)](https://github.com/swhume/template2define)
 - [CRF generator POCs](https://github.com/lexjansen/cdisc360i-pocs)
 - [Phase 1 metadata gaps](https://wiki.cdisc.org/spaces/360i/pages/319525446/360i+Phase+1+Metadata+Gaps)
-- [DDS project charter](https://wiki.cdisc.org/display/XMLT/define.json+project+charter)
