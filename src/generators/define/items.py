@@ -148,7 +148,7 @@ class Items(define_object.DefineObject):
         if obj.get("significantDigits"):
             attr["SignificantDigits"] = obj["significantDigits"]
         elif obj.get("displayFormat") and obj.get("dataType") == "float":
-            # TODO work around issue 78 - missing missing significant digits - remove after USDM updated
+            # TODO work around issue 78 - missing significant digits - remove after USDM updated
             length_str, sep, sig_str = str(obj["displayFormat"]).partition(".")
             if sep and sig_str.isdigit():
                 attr["SignificantDigits"] = int(sig_str)
