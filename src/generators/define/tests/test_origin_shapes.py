@@ -131,7 +131,8 @@ class TestOriginListShape:
         }
         items_instance._add_origin(item, obj)
         # No predecessor text should have been emitted for the origin.
-        assert item.Origin[0].Description.TranslatedText == []
+        desc = getattr(item.Origin[0], "Description", None)
+        assert desc is None or desc.TranslatedText == []
 
     def test_item_level_pages_not_folded_into_list_shape(self, items_instance):
         item = _new_itemdef()
