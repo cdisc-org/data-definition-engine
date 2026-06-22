@@ -149,11 +149,11 @@ class Items(define_object.DefineObject):
             attr["SignificantDigits"] = obj["significantDigits"]
         elif obj.get("displayFormat") and obj.get("dataType") == "float":
             # TODO work around issue 78 - missing missing significant digits - remove after USDM updated
-            length, significant_digits = obj["displayFormat"].split(".")
-            if significant_digits:
-                attr["SignificantDigits"] = significant_digits
-            if length and attr.get("Length") == "__PLACEHOLDER__":
-                attr["Length"] = length
+            length_str, sep, sig_str = str(obj["displayFormat"]).partition(".")
+            if sep and sig_str.isdigit():
+                attr["SignificantDigits"] = int(sig_str)
+            if length_str.isdigit() and attr.get("Length") == "__PLACEHOLDER__":
+                attr["Length"] = int(length_str)
         if obj.get("displayFormat"):
             attr["DisplayFormat"] = obj["displayFormat"]
         if obj.get("comment"):

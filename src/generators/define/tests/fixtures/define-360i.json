@@ -36635,7 +36635,7 @@
           "decode": "Chemiluminescent Magnetic Microparticle Immunoassay",
           "coding": {
             "code": "C172557",
-            "codeSystem": "nci:ExtCodeID"Class
+            "codeSystem": "nci:ExtCodeID"
           }
         },
         {
