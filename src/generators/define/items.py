@@ -69,6 +69,7 @@ class Items(define_object.DefineObject):
     @staticmethod
     def _new_itemdef(attr: dict[str, Any]) -> Any:
         """Instantiate an ItemDef without triggering descriptor validation."""
+        # TODO replace this with v0.2.0 odmlib permissive mode
         item = object.__new__(DEFINE.ItemDef)
         for key, value in attr.items():
             item.__dict__[key] = value
@@ -88,7 +89,23 @@ class Items(define_object.DefineObject):
             self._add_origin(item, obj)
 
     def _add_origin(self, item, obj):
-        origin_in = obj["origin"]
+        origins_in = obj["origin"]
+        if isinstance(origins_in, dict):
+            # Today's DDS shape: a single origin dict with item-level predecessor/pages siblings.
+            # Future shape: a list of origin dicts, each carrying its own predecessor/pages.
+            # Normalize today's shape by folding the item-level fields into the wrapped dict so
+            # the per-origin builder only ever reads from the origin dict.
+            wrapped = dict(origins_in)
+            if obj.get("predecessor") and "predecessor" not in wrapped:
+                wrapped["predecessor"] = obj["predecessor"]
+            if obj.get("pages") and "pages" not in wrapped:
+                wrapped["pages"] = obj["pages"]
+            origins_in = [wrapped]
+
+        for origin_in in origins_in:
+            item.Origin.append(self._build_origin(origin_in))
+
+    def _build_origin(self, origin_in):
         origin_type = origin_in.get("type")
         origin_source = origin_in.get("source")
         attr: dict[str, Any] = {}
@@ -108,17 +125,16 @@ class Items(define_object.DefineObject):
             dr.PDFPageRef.append(DEFINE.PDFPageRef(PageRefs="__PLACEHOLDER__", Type="PhysicalRef"))
             origin.DocumentRef.append(dr)
 
-        if obj.get("predecessor"):
+        if origin_in.get("predecessor"):
             origin.Description = DEFINE.Description()
             origin.Description.TranslatedText.append(
-                DEFINE.TranslatedText(_content=obj["predecessor"], lang=self.lang)
+                DEFINE.TranslatedText(_content=origin_in["predecessor"], lang=self.lang)
             )
-        if obj.get("pages"):
+        if origin_in.get("pages"):
             dr = DEFINE.DocumentRef(leafID=self.acrf)
-            dr.PDFPageRef.append(DEFINE.PDFPageRef(PageRefs=obj["pages"], Type="PhysicalRef"))
+            dr.PDFPageRef.append(DEFINE.PDFPageRef(PageRefs=origin_in["pages"], Type="PhysicalRef"))
             origin.DocumentRef.append(dr)
-
-        item.Origin.append(origin)
+        return origin
 
     @staticmethod
     def _add_optional_itemdef_attributes(attr, obj):
@@ -131,6 +147,13 @@ class Items(define_object.DefineObject):
             attr["Length"] = "__PLACEHOLDER__"
         if obj.get("significantDigits"):
             attr["SignificantDigits"] = obj["significantDigits"]
+        elif obj.get("displayFormat") and obj.get("dataType") == "float":
+            # TODO work around issue 78 - missing significant digits - remove after USDM updated
+            length_str, sep, sig_str = str(obj["displayFormat"]).partition(".")
+            if sep and sig_str.isdigit():
+                attr["SignificantDigits"] = int(sig_str)
+            if length_str.isdigit() and attr.get("Length") == "__PLACEHOLDER__":
+                attr["Length"] = int(length_str)
         if obj.get("displayFormat"):
             attr["DisplayFormat"] = obj["displayFormat"]
         if obj.get("comment"):
