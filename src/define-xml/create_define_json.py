@@ -1373,16 +1373,16 @@ class USDMDefineJSONProcessor:
 
         item_group = {
             "OID": f"IG.{dataset}",
-            "name": dataset,
-            "description": dataset_data['label'],
-            "domain": dataset,
+            "name": dataset or "__PLACEHOLDER__",
+            "description": dataset_data['label'] or "__PLACEHOLDER__",
+            "domain": dataset or "__PLACEHOLDER__",
             # Here update purpose when we use for ADaM datasets
-            "purpose": "Tabulation",
-            "structure": dataset_data['datasetStructure'],
+            "purpose": "Tabulation" or "__PLACEHOLDER__",
+            "structure": dataset_data['datasetStructure'] or "__PLACEHOLDER__",
             "isReferenceData": (dataset_data.get('_links', {}).get('parentClass', {}).get('title') == "Trial Design") or not any(v.get('name') in ("USUBJID", "POOLID") for v in all_vars),
             "keySequence": ["__PLACEHOLDER__"],
             # Here are we always sure to use STD.SDTMIG?
-            "standard": "STD.SDTMIG",
+            "standard": "STD.SDTMIG" or "__PLACEHOLDER__",
             "observationClass": {
                 "name": dataset_data.get("_links", {}).get("parentClass", {}).get("title", "").upper()
             },
@@ -1395,9 +1395,10 @@ class USDMDefineJSONProcessor:
             item_dict = {
                 "OID": f"IT.{dataset}.{var['name']}",
                 "mandatory": var['core'] == 'Req',
-                "name": var['name'],
-                "description": var['label'],
-                "role": var['role']
+                "name": var['name'] or "__PLACEHOLDER__",
+                "description": var['label'] or "__PLACEHOLDER__",
+                # Here add future code for role as not needed in ADaM 
+                "role": var['role'] or "__PLACEHOLDER__"
             }
 
             # Add optional fields from datasets_dict if they exist
@@ -1407,7 +1408,7 @@ class USDMDefineJSONProcessor:
                 data_type = var_data['dataType']
             else:
                 data_type = self._convert_data_type(var)
-            item_dict["dataType"] = data_type
+            item_dict["dataType"] = data_type or "__PLACEHOLDER__"
 
             if data_type in ['text', 'integer', 'float']:
                 if 'length' in var_data:
@@ -1421,16 +1422,19 @@ class USDMDefineJSONProcessor:
             if 'significantDigits' in var_data:
                 item_dict['significantDigits'] = var_data['significantDigits']
 
+            if data_type == "float" and not 'significantDigits' in var_data:
+                item_dict['significantDigits'] = None
+
             if 'originType' in var_data and 'originSource' in var_data:
-                item_dict['origin'] = {
+                item_dict['origin'] = [{
                     "type": var_data['originType'],
                     "source": var_data['originSource']
-                }
+                }]
             else:
-                item_dict['origin'] = {
+                item_dict['origin'] = [{
                     "type": "__PLACEHOLDER__",
                     "source": "__PLACEHOLDER__"
-                }
+                }]
 
             # Add codelist references for TA variables
             if dataset == "TA":
@@ -1532,8 +1536,8 @@ class USDMDefineJSONProcessor:
                         vlm_item = {
                             "OID": f"IT.{dataset}.{var['name']}.{param}" if param else f"IT.{dataset}.{var['name']}",
                             "mandatory": False,
-                            "name": var['name'],
-                            "dataType": data_type
+                            "name": var['name'] or "__PLACEHOLDER__",
+                            "dataType": data_type or "__PLACEHOLDER__",
                         }
                         # Add optional fields
                         if data_type in ['text', 'integer', 'float']:
@@ -1545,15 +1549,23 @@ class USDMDefineJSONProcessor:
                             vlm_item['displayFormat'] = vlm_data['format']
                         if 'significantDigits' in vlm_data:
                             vlm_item['significantDigits'] = vlm_data['significantDigits']
+    
+                        if data_type == "float" and not 'significantDigits' in vlm_data:
+                            vlm_item['significantDigits'] = None
                         if 'codelist' in vlm_data and vlm_data['codelist']:
                             vlm_codelist_oid = self._process_vlm_codelist(vlm_data['codelist'])
                             if vlm_codelist_oid:
                                 vlm_item['codeList'] = vlm_codelist_oid
-                        if 'originSource' in vlm_data:
-                            vlm_item['origin'] = {
-                                'type': vlm_data['originType'],
-                                'source': vlm_data['originSource']
-                            }
+                        if 'originType' in vlm_data and 'originSource' in vlm_data:
+                            vlm_item['origin'] = [{
+                                "type": vlm_data['originType'],
+                                "source": vlm_data['originSource']
+                            }]
+                        else:
+                            vlm_item['origin'] = [{
+                                "type": "__PLACEHOLDER__",
+                                "source": "__PLACEHOLDER__"
+                            }]
 
                         # Add applicableWhen as the last attribute
                         vlm_item['applicableWhen'] = where_clause_oids
@@ -2576,18 +2588,77 @@ class USDMDefineJSONProcessor:
     # Patch-file helpers
     # ------------------------------------------------------------------
 
+    def _collect_itemgroup_placeholders(self, item_group, ig_section):
+        """Collect placeholder / null fields from a single itemGroup dict into ig_section."""
+        patches = {}
+
+        for field in ('name', 'description', 'domain', 'purpose', 'structure', 'standard'):
+            value = item_group.get(field)
+            if value is None or value == '__PLACEHOLDER__':
+                patches[field] = value if value is not None else None
+
+        key_sequence = item_group.get('keySequence', [])
+        if isinstance(key_sequence, list) and '__PLACEHOLDER__' in key_sequence:
+            patches['keySequence'] = key_sequence
+
+        if patches:
+            ig_section[item_group['OID']] = patches
+
     def _collect_item_placeholders(self, item, item_section):
         """Collect placeholder / null fields from a single item dict into item_section."""
         patches = {}
+
+        for field in ('name', 'description', 'role', 'dataType'):
+            if field not in item:
+                continue
+            value = item.get(field)
+            if value is None or value == '__PLACEHOLDER__':
+                patches[field] = value if value is not None else None
+
         if item.get('length') is None:
             patches['length'] = None
-        origin = item.get('origin', {})
-        if origin.get('type') == '__PLACEHOLDER__':
-            patches['originType'] = '__PLACEHOLDER__'
-        if origin.get('source') == '__PLACEHOLDER__':
-            patches['originSource'] = '__PLACEHOLDER__'
+
+        if 'significantDigits' in item and item.get('significantDigits') is None:
+            patches['significantDigits'] = None
+
+        origin = item.get('origin', [])
+        # Backward compatible: normalize legacy dict form to list form.
+        if isinstance(origin, dict):
+            origin = [origin]
+        if isinstance(origin, list) and origin:
+            origin_patch = []
+            has_placeholder = False
+            for origin_entry in origin:
+                if not isinstance(origin_entry, dict):
+                    continue
+                type_val = origin_entry.get('type')
+                source_val = origin_entry.get('source')
+                if type_val == '__PLACEHOLDER__' or source_val == '__PLACEHOLDER__':
+                    has_placeholder = True
+                origin_patch.append({
+                    'type': type_val if type_val is not None else '__PLACEHOLDER__',
+                    'source': source_val if source_val is not None else '__PLACEHOLDER__'
+                })
+            if has_placeholder and origin_patch:
+                patches['origin'] = origin_patch
         if patches:
             item_section[item['OID']] = patches
+
+    def _apply_itemgroup_patch(self, item_group, itemgroup_patches):
+        """Apply patch fields to a single itemGroup dict in-place."""
+        oid = item_group.get('OID')
+        if oid not in itemgroup_patches:
+            return
+
+        patch_fields = itemgroup_patches[oid]
+        for field in ('name', 'description', 'domain', 'purpose', 'structure', 'standard'):
+            if field in patch_fields and patch_fields[field] not in (None, '__PLACEHOLDER__'):
+                item_group[field] = patch_fields[field]
+
+        if 'keySequence' in patch_fields:
+            key_sequence = patch_fields.get('keySequence', [])
+            if isinstance(key_sequence, list) and '__PLACEHOLDER__' not in key_sequence:
+                item_group['keySequence'] = key_sequence
 
     def _find_item_by_oid(self, oid):
         """Return the first item dict in the assembled template matching *oid*, or None."""
@@ -2607,12 +2678,36 @@ class USDMDefineJSONProcessor:
         if oid not in item_patches:
             return
         ip = item_patches[oid]
+
+        for field in ('name', 'description', 'role', 'dataType'):
+            if field in item and field in ip and ip[field] not in (None, '__PLACEHOLDER__'):
+                item[field] = ip[field]
+
         if 'length' in ip and ip['length'] is not None:
             item['length'] = ip['length']
-        if 'originType' in ip and ip['originType'] != '__PLACEHOLDER__':
-            item.setdefault('origin', {})['type'] = ip['originType']
-        if 'originSource' in ip and ip['originSource'] != '__PLACEHOLDER__':
-            item.setdefault('origin', {})['source'] = ip['originSource']
+
+        if 'significantDigits' in ip and ip['significantDigits'] is not None:
+            item['significantDigits'] = ip['significantDigits']
+
+        # Preferred patch format: origin list with one or more entries.
+        if 'origin' in ip:
+            patch_origin = ip.get('origin', [])
+            if isinstance(patch_origin, dict):
+                patch_origin = [patch_origin]
+
+            resolved_origin = []
+            for entry in patch_origin:
+                if not isinstance(entry, dict):
+                    continue
+                type_val = entry.get('type')
+                source_val = entry.get('source')
+                if type_val in (None, '__PLACEHOLDER__') or source_val in (None, '__PLACEHOLDER__'):
+                    continue
+                resolved_origin.append({'type': type_val, 'source': source_val})
+
+            # Replace origin only when at least one fully specified entry was provided.
+            if resolved_origin:
+                item['origin'] = resolved_origin
 
     def generate_patch_file(self, patch_output_path):
         """
@@ -2623,8 +2718,9 @@ class USDMDefineJSONProcessor:
         back with --apply_patch.
 
         Sections produced:
-        - itemGroups: datasets whose keySequence still contains __PLACEHOLDER__
-        - items: variables with null length or __PLACEHOLDER__ origin type/source
+        - itemGroups: datasets with placeholder / null top-level fields or keySequence
+        - items: variables with placeholder text fields, null numeric fields,
+             or __PLACEHOLDER__ origin type/source
         - codeLists: codelists with at least one __PLACEHOLDER__ coded value
 
         Args:
@@ -2635,11 +2731,7 @@ class USDMDefineJSONProcessor:
         cl_section = {}
 
         for ig in self.template.get('itemGroups', []):
-            if '__PLACEHOLDER__' in ig.get('keySequence', []):
-                ig_section[ig['OID']] = {
-                    'name': ig.get('name', ''),
-                    'description': ig.get('description', ''),
-                }
+            self._collect_itemgroup_placeholders(ig, ig_section)
 
         for ig in self.template.get('itemGroups', []):
             for item in ig.get('items', []):
@@ -2667,26 +2759,39 @@ class USDMDefineJSONProcessor:
             "#   2. Fill every null with an appropriate number",
             "#   3. Apply with: --apply_patch <this_file> on your next run",
             "#",
-            "# Valid values for originType:",
+            "# Valid values for origin[].type:",
             "#   Collected | Derived | Assigned | Protocol | eDT | Predecessor | Not Available",
-            "# Valid values for originSource:",
+            "# Valid values for origin[].source:",
             "#   Investigator | Sponsor | Subject | Vendor",
             "# " + "=" * 68,
             "",
         ]
 
         if ig_section:
+            lines.append("# itemGroup fields may also be placeholder values when source data is missing")
             lines.append("# keySequence: ordered list of variable names that form the sort / primary key")
             lines.append("# Example:  keySequence: [STUDYID, USUBJID, DSSEQ]")
             lines.append("itemGroups:")
             for oid, meta in ig_section.items():
-                lines.append(f"  {oid}:  # {meta['name']} - {meta['description']}")
-                lines.append(f"    keySequence: [__PLACEHOLDER__]")
+                item_group = self._find_item_by_oid(oid)
+                comment_name = item_group.get('name', '') if item_group else ''
+                comment_desc = item_group.get('description', '') if item_group else ''
+                lines.append(f"  {oid}:  # {comment_name} - {comment_desc}")
+                for field, value in meta.items():
+                    if field == 'keySequence' and isinstance(value, list):
+                        lines.append(f"    keySequence: {value}")
+                    else:
+                        yaml_val = "null" if value is None else f'\"{value}\"'
+                        lines.append(f"    {field}: {yaml_val}")
             lines.append("")
 
         if item_section:
+            lines.append("# Applies to both standard items and VLM slice items")
+            lines.append("# name/description/role/dataType: replace __PLACEHOLDER__ with valid text")
             lines.append("# length: integer (number of characters / digits for the variable)")
-            lines.append("# originType and originSource: see valid values in the header above")
+            lines.append("# significantDigits: integer for float variables")
+            lines.append("# origin: list of one or more origin entries")
+            lines.append("# each entry requires type and source; add multiple entries when needed")
             lines.append("items:")
             for oid, fields in item_section.items():
                 item_obj = self._find_item_by_oid(oid)
@@ -2696,8 +2801,18 @@ class USDMDefineJSONProcessor:
                 )
                 lines.append(f"  {oid}:{comment}")
                 for field, value in fields.items():
-                    yaml_val = "null" if value is None else f'"{value}"'
-                    lines.append(f"    {field}: {yaml_val}")
+                    if field == 'origin' and isinstance(value, list):
+                        lines.append("    origin:")
+                        for origin_entry in value:
+                            if not isinstance(origin_entry, dict):
+                                continue
+                            origin_type = origin_entry.get('type', '__PLACEHOLDER__')
+                            origin_source = origin_entry.get('source', '__PLACEHOLDER__')
+                            lines.append("      - type: \"{}\"".format(origin_type))
+                            lines.append("        source: \"{}\"".format(origin_source))
+                    else:
+                        yaml_val = "null" if value is None else f'"{value}"'
+                        lines.append(f"    {field}: {yaml_val}")
             lines.append("")
 
         if cl_section:
@@ -2717,8 +2832,8 @@ class USDMDefineJSONProcessor:
             f.write(content)
 
         print(f"\n📋 Patch file written: {patch_output_path}")
-        print(f"   {len(ig_section)} dataset(s) need keySequence, "
-              f"{len(item_section)} item(s) need origin/length, "
+        print(f"   {len(ig_section)} dataset(s) need itemGroup field patches, "
+              f"{len(item_section)} item(s) need field patches, "
               f"{len(cl_section)} codelist(s) need terms")
 
     def apply_patch(self, patch_file):
@@ -2740,15 +2855,11 @@ class USDMDefineJSONProcessor:
             print("⚠️  Patch file is empty — nothing to apply")
             return
 
-        # itemGroups — update keySequence when fully filled
+        # itemGroups — update any fully filled placeholder fields
         for ig in self.template.get('itemGroups', []):
-            oid = ig['OID']
-            ip = patch.get('itemGroups', {}).get(oid, {})
-            ks = ip.get('keySequence', [])
-            if ks and '__PLACEHOLDER__' not in ks:
-                ig['keySequence'] = ks
+            self._apply_itemgroup_patch(ig, patch.get('itemGroups', {}))
 
-        # items — update length and origin fields
+        # items — update placeholder / null fields and origin
         item_patches = patch.get('items', {})
         if item_patches:
             for ig in self.template.get('itemGroups', []):

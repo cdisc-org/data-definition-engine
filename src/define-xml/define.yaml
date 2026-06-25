@@ -532,7 +532,9 @@ classes:
         description: >-
           The origin of the data
         range: Origin
+        multivalued: true
         inlined: true
+        inlined_as_list: true
       conceptProperty:
         description: >-
           Reference to a abstract concept property that this item is a specialization / instance of.
