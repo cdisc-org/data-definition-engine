@@ -1,0 +1,296 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Mock LAB Transmission payload — CDISC Pilot study H2Q-MC-LZZT
+# Validates against dta.linkml.yaml (root class: Transmission).
+#
+# Values are taken verbatim from the project's generated pilot output
+# (out/dta/lab_dta.csv) for two real subjects at their first collection (E1):
+#   * STUDY-0001 (site 701, M, age 75)
+#   * STUDY-0002 (site 702, F, age 75)
+# Each subject carries a HEMATOLOGY panel (HGB, RBC, WBC, PLAT) and a CHEMISTRY
+# panel (GLUC, CREAT, CHOL, ALT). HGB is linked to the vendored COSMoS
+# specialization (HGBBLD); the others are intentionally UNLINKED (no
+# specialization) to exercise the gap report. GLUC carries a character result
+# (AMBER) to exercise charResult; CREAT/CHOL/GLUC show SI unit conversion.
+#
+# Validate:
+#   linkml-validate -s dta.linkml.yaml -C Transmission transmission.example.yaml
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Transmission (GTP header)
+ltvrsn: LAB-MODEL-2.0
+igvrsn: SDTMIG 3.4
+fcrdtc: "2025-01-01T00:00:00"
+trssid: CENTRALLAB-001
+trstyp: I
+
+subjects:
+
+  # ════════════════════════ Subject STUDY-0001 ════════════════════════
+  - studyid: H2Q-MC-LZZT
+    siteid: "701"
+    scrnid: SCR-0001
+    asubjid: STUDY-0001
+    adsex: M
+    collections:
+      - accsnid: ACC-0001-V1
+        kitid: KIT-0001-V1
+        kitdsc: Standard collection kit
+        visit: E1
+        visitnum: 1
+        specimens:
+          - lddom: LB
+            specid: SPEC-0001-V1
+            rcvdtc: "2025-01-02"
+            spcoml: Specimen received in good condition.
+            spcomi: Fasting sample per protocol.
+            agespc: 75
+            panels:
+
+              # ── HEMATOLOGY ──
+              - pnlid: HEM
+                tstpnl: HEMATOLOGY
+                plbid: PLAB-01
+                plbnam: Central Laboratory Services
+                plbtyp: CENTRAL
+                labTestResults:
+                  - plbtid: HGB
+                    plbtnm: Hemoglobin
+                    plbtct: HEMATOLOGY
+                    dtrtid: HGB
+                    dtrtnm: Hemoglobin
+                    dtrtct: HEMATOLOGY
+                    plbtin: Automated hematology analyzer.
+                    plbtts: RESULTS REPORTED
+                    plbttc: RESULTS REPORTED
+                    plrtrc: Within reference range.
+                    asydtc: "2025-01-03"
+                    rrdtc: "2025-01-04"
+                    rtrtyp: I
+                    specialization: HGBBLD          # linked -> BC C64848
+                    results:
+                      - { unitSystem: ORIGINAL,     numResult: 16.98, unit: g/dL, refRangeLow: "12",    refRangeHigh: "18",    refRangeDesc: "12-18",       refRangeType: NORMAL RANGE }
+                      - { unitSystem: CONVENTIONAL, numResult: 16.98, unit: g/dL, refRangeLow: "12.0",  refRangeHigh: "18.0",  refRangeDesc: "12.0-18.0" }
+                      - { unitSystem: SI,           numResult: 169.8, unit: g/L,  refRangeLow: "120.0", refRangeHigh: "180.0", refRangeDesc: "120.0-180.0" }
+                  - plbtid: RBC
+                    plbtnm: Erythrocytes
+                    plbtct: HEMATOLOGY
+                    dtrtid: RBC
+                    dtrtnm: Erythrocytes
+                    plbtts: RESULTS REPORTED
+                    asydtc: "2025-01-03"
+                    rrdtc: "2025-01-04"
+                    rtrtyp: I
+                    results:
+                      - { unitSystem: ORIGINAL,     numResult: 5.29, unit: "10^6/uL",  refRangeLow: "4.0", refRangeHigh: "6.0", refRangeType: NORMAL RANGE }
+                      - { unitSystem: SI,           numResult: 5.29, unit: "10^12/L",  refRangeLow: "4.0", refRangeHigh: "6.0" }
+                  - plbtid: WBC
+                    plbtnm: Leukocytes
+                    plbtct: HEMATOLOGY
+                    dtrtid: WBC
+                    dtrtnm: Leukocytes
+                    plbtts: RESULTS REPORTED
+                    asydtc: "2025-01-03"
+                    rrdtc: "2025-01-04"
+                    rtrtyp: I
+                    results:
+                      - { unitSystem: ORIGINAL,     numResult: 9.44, unit: "10^3/uL",  refRangeLow: "4.0", refRangeHigh: "11.0", refRangeType: NORMAL RANGE }
+                      - { unitSystem: SI,           numResult: 9.44, unit: "10^9/L",   refRangeLow: "4.0", refRangeHigh: "11.0" }
+                  - plbtid: PLAT
+                    plbtnm: Platelet
+                    plbtct: HEMATOLOGY
+                    dtrtid: PLAT
+                    dtrtnm: Platelet
+                    plbtts: RESULTS REPORTED
+                    asydtc: "2025-01-03"
+                    rrdtc: "2025-01-04"
+                    rtrtyp: I
+                    results:
+                      - { unitSystem: ORIGINAL,     numResult: 356.17, unit: "10^3/uL", refRangeLow: "150",   refRangeHigh: "400",   refRangeType: NORMAL RANGE }
+                      - { unitSystem: SI,           numResult: 356.17, unit: "10^9/L",  refRangeLow: "150.0", refRangeHigh: "400.0" }
+
+              # ── CHEMISTRY ──
+              - pnlid: CHEM
+                tstpnl: CHEMISTRY
+                plbid: PLAB-01
+                plbnam: Central Laboratory Services
+                plbtyp: CENTRAL
+                labTestResults:
+                  - plbtid: GLUC
+                    plbtnm: Glucose
+                    plbtct: CHEMISTRY
+                    dtrtid: GLUC
+                    dtrtnm: Glucose
+                    plbtts: RESULTS REPORTED
+                    asydtc: "2025-01-03"
+                    rrdtc: "2025-01-04"
+                    rtrtyp: I
+                    alrtlv: AMBER
+                    results:
+                      - { unitSystem: ORIGINAL,     charResult: AMBER, unit: mg/dL,  refRangeLow: "70",    refRangeHigh: "100",  refRangeType: NORMAL RANGE }
+                      - { unitSystem: SI,           charResult: AMBER, unit: mmol/L, refRangeLow: "3.885", refRangeHigh: "5.55" }
+                  - plbtid: CREAT
+                    plbtnm: Creatinine
+                    plbtct: CHEMISTRY
+                    dtrtid: CREAT
+                    dtrtnm: Creatinine
+                    plbtts: RESULTS REPORTED
+                    asydtc: "2025-01-03"
+                    rrdtc: "2025-01-04"
+                    rtrtyp: I
+                    results:
+                      - { unitSystem: ORIGINAL,     numResult: 0.78,   unit: mg/dL,  refRangeLow: "0.7",   refRangeHigh: "1.3",    refRangeType: NORMAL RANGE }
+                      - { unitSystem: SI,           numResult: 68.952, unit: umol/L, refRangeLow: "61.88", refRangeHigh: "114.92" }
+                  - plbtid: CHOL
+                    plbtnm: Cholesterol
+                    plbtct: CHEMISTRY
+                    dtrtid: CHOL
+                    dtrtnm: Cholesterol
+                    plbtts: RESULTS REPORTED
+                    asydtc: "2025-01-03"
+                    rrdtc: "2025-01-04"
+                    rtrtyp: I
+                    results:
+                      - { unitSystem: ORIGINAL,     numResult: 197.22, unit: mg/dL,  refRangeLow: "125",     refRangeHigh: "200",  refRangeType: NORMAL RANGE }
+                      - { unitSystem: SI,           numResult: 5.108,  unit: mmol/L, refRangeLow: "3.2375",  refRangeHigh: "5.18" }
+                  - plbtid: ALT
+                    plbtnm: Alanine Aminotransferase
+                    plbtct: CHEMISTRY
+                    dtrtid: ALT
+                    dtrtnm: Alanine Aminotransferase
+                    plbtts: RESULTS REPORTED
+                    asydtc: "2025-01-03"
+                    rrdtc: "2025-01-04"
+                    rtrtyp: I
+                    results:
+                      - { unitSystem: ORIGINAL,     numResult: 33.3, unit: U/L, refRangeLow: "7",   refRangeHigh: "56",   refRangeType: NORMAL RANGE }
+                      - { unitSystem: SI,           numResult: 33.3, unit: U/L, refRangeLow: "7.0", refRangeHigh: "56.0" }
+
+  # ════════════════════════ Subject STUDY-0002 ════════════════════════
+  - studyid: H2Q-MC-LZZT
+    siteid: "702"
+    scrnid: SCR-0002
+    asubjid: STUDY-0002
+    adsex: F
+    collections:
+      - accsnid: ACC-0002-V1
+        kitid: KIT-0002-V1
+        kitdsc: Standard collection kit
+        visit: E1
+        visitnum: 1
+        specimens:
+          - lddom: LB
+            specid: SPEC-0002-V1
+            rcvdtc: "2025-01-02"
+            agespc: 75
+            panels:
+              - pnlid: HEM
+                tstpnl: HEMATOLOGY
+                plbid: PLAB-01
+                plbnam: Central Laboratory Services
+                plbtyp: CENTRAL
+                labTestResults:
+                  - plbtid: HGB
+                    plbtnm: Hemoglobin
+                    plbtct: HEMATOLOGY
+                    dtrtid: HGB
+                    dtrtnm: Hemoglobin
+                    plbtts: RESULTS REPORTED
+                    asydtc: "2025-01-03"
+                    rrdtc: "2025-01-04"
+                    rtrtyp: I
+                    specialization: HGBBLD
+                    results:
+                      - { unitSystem: ORIGINAL,     numResult: 16.38, unit: g/dL, refRangeLow: "12",    refRangeHigh: "18",    refRangeType: NORMAL RANGE }
+                      - { unitSystem: SI,           numResult: 163.8, unit: g/L,  refRangeLow: "120.0", refRangeHigh: "180.0" }
+                  - plbtid: RBC
+                    plbtnm: Erythrocytes
+                    plbtct: HEMATOLOGY
+                    dtrtid: RBC
+                    dtrtnm: Erythrocytes
+                    plbtts: RESULTS REPORTED
+                    asydtc: "2025-01-03"
+                    rrdtc: "2025-01-04"
+                    rtrtyp: I
+                    results:
+                      - { unitSystem: ORIGINAL,     numResult: 4.13, unit: "10^6/uL", refRangeLow: "4.0", refRangeHigh: "6.0", refRangeType: NORMAL RANGE }
+                      - { unitSystem: SI,           numResult: 4.13, unit: "10^12/L", refRangeLow: "4.0", refRangeHigh: "6.0" }
+                  - plbtid: WBC
+                    plbtnm: Leukocytes
+                    plbtct: HEMATOLOGY
+                    dtrtid: WBC
+                    dtrtnm: Leukocytes
+                    plbtts: RESULTS REPORTED
+                    asydtc: "2025-01-03"
+                    rrdtc: "2025-01-04"
+                    rtrtyp: I
+                    results:
+                      - { unitSystem: ORIGINAL,     numResult: 6.93, unit: "10^3/uL", refRangeLow: "4.0", refRangeHigh: "11.0", refRangeType: NORMAL RANGE }
+                      - { unitSystem: SI,           numResult: 6.93, unit: "10^9/L",  refRangeLow: "4.0", refRangeHigh: "11.0" }
+                  - plbtid: PLAT
+                    plbtnm: Platelet
+                    plbtct: HEMATOLOGY
+                    dtrtid: PLAT
+                    dtrtnm: Platelet
+                    plbtts: RESULTS REPORTED
+                    asydtc: "2025-01-03"
+                    rrdtc: "2025-01-04"
+                    rtrtyp: I
+                    results:
+                      - { unitSystem: ORIGINAL,     numResult: 161.71, unit: "10^3/uL", refRangeLow: "150",   refRangeHigh: "400",   refRangeType: NORMAL RANGE }
+                      - { unitSystem: SI,           numResult: 161.71, unit: "10^9/L",  refRangeLow: "150.0", refRangeHigh: "400.0" }
+
+              - pnlid: CHEM
+                tstpnl: CHEMISTRY
+                plbid: PLAB-01
+                plbnam: Central Laboratory Services
+                plbtyp: CENTRAL
+                labTestResults:
+                  - plbtid: GLUC
+                    plbtnm: Glucose
+                    plbtct: CHEMISTRY
+                    dtrtid: GLUC
+                    dtrtnm: Glucose
+                    plbtts: RESULTS REPORTED
+                    asydtc: "2025-01-03"
+                    rrdtc: "2025-01-04"
+                    rtrtyp: I
+                    alrtlv: AMBER
+                    results:
+                      - { unitSystem: ORIGINAL,     charResult: AMBER, unit: mg/dL,  refRangeLow: "70",    refRangeHigh: "100",  refRangeType: NORMAL RANGE }
+                      - { unitSystem: SI,           charResult: AMBER, unit: mmol/L, refRangeLow: "3.885", refRangeHigh: "5.55" }
+                  - plbtid: CREAT
+                    plbtnm: Creatinine
+                    plbtct: CHEMISTRY
+                    dtrtid: CREAT
+                    dtrtnm: Creatinine
+                    plbtts: RESULTS REPORTED
+                    asydtc: "2025-01-03"
+                    rrdtc: "2025-01-04"
+                    rtrtyp: I
+                    results:
+                      - { unitSystem: ORIGINAL,     numResult: 0.83,   unit: mg/dL,  refRangeLow: "0.7",   refRangeHigh: "1.3",    refRangeType: NORMAL RANGE }
+                      - { unitSystem: SI,           numResult: 73.372, unit: umol/L, refRangeLow: "61.88", refRangeHigh: "114.92" }
+                  - plbtid: CHOL
+                    plbtnm: Cholesterol
+                    plbtct: CHEMISTRY
+                    dtrtid: CHOL
+                    dtrtnm: Cholesterol
+                    plbtts: RESULTS REPORTED
+                    asydtc: "2025-01-03"
+                    rrdtc: "2025-01-04"
+                    rtrtyp: I
+                    results:
+                      - { unitSystem: ORIGINAL,     numResult: 179.31, unit: mg/dL,  refRangeLow: "125",    refRangeHigh: "200",  refRangeType: NORMAL RANGE }
+                      - { unitSystem: SI,           numResult: 4.6441, unit: mmol/L, refRangeLow: "3.2375", refRangeHigh: "5.18" }
+                  - plbtid: ALT
+                    plbtnm: Alanine Aminotransferase
+                    plbtct: CHEMISTRY
+                    dtrtid: ALT
+                    dtrtnm: Alanine Aminotransferase
+                    plbtts: RESULTS REPORTED
+                    asydtc: "2025-01-03"
+                    rrdtc: "2025-01-04"
+                    rtrtyp: I
+                    results:
+                      - { unitSystem: ORIGINAL,     numResult: 11.55, unit: U/L, refRangeLow: "7",   refRangeHigh: "56",   refRangeType: NORMAL RANGE }
+                      - { unitSystem: SI,           numResult: 11.55, unit: U/L, refRangeLow: "7.0", refRangeHigh: "56.0" }

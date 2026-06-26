@@ -1,0 +1,1108 @@
+id: https://cdisc.org/dta2sdtm
+name: dta_lab_transmission_model
+title: DTA Logical Data Model
+description: >-
+  A logical data model (LDM) covering BOTH senses of "DTA" in the CDISC 360i lab
+  flow. The token "DTA" is overloaded: the Data Transfer **Agreement** (the
+  governance contract) vs. the lab Data **Transmission** payload (the data that
+  fulfils it). This schema models both as related layers — contract vs.
+  fulfilment — joined through the shared BiomedicalConcept hub. Three layers:
+
+    * AGREEMENT LAYER — DataTransferAgreement > Study, DtaVersion, BcSelection,
+      Party, TransferRequirements, VisitMapping, TimepointMapping, Source. The
+      Data Transfer Agreement document, prepopulated from an upstream USDM
+      protocol: WHAT data is promised, by whom, in what format, mapped to which
+      visits. Slot names use snake_case so a serialized agreement payload
+      validates directly with `-C DataTransferAgreement`.
+
+    * SEMANTIC LAYER — BiomedicalConcept, DatasetSpecialization,
+      VariableSpecialization. This is the linkage that connects an upstream USDM
+      protocol (which references Biomedical Concepts on its Activities) to the
+      downstream SDTM-LB dataset (which a Dataset Specialization projects each BC
+      into). BiomedicalConcept now also carries a faceted `classifications` block
+      (category / disease_area / is_used_by_form / is_used_by_dta), making the
+      BC<->DTA membership an explicit, queryable edge.
+
+    * INSTANCE LAYER — Transmission > Subject > Collection > Specimen > Panel >
+      LabTestResult > Result. The actual nested transmission payload, normalized
+      so the three parallel unit blocks (PLR*/CVU*/SIU*) collapse to one `Result`
+      keyed by `unitSystem`.
+
+  BiomedicalConcept is the hub joining all three layers: USDM references it
+  (Activity.biomedicalConceptIds), the Agreement scopes it in (is_used_by_dta +
+  BcSelection), and the payload delivers it
+  (LabTestResult.specialization.biomedicalConcept) en route to SDTM-LB.
+
+  Primary purpose: a typed *transformation source* for DTA -> SDTM-LB, kept
+  traceable in both directions (USDM upstream, SDTM-LB downstream). Each instance
+  slot carries `exact_mappings` to its LAB Transmission Model variable (identity)
+  and `annotations.sdtm_lb_target` to its SDTM-LB variable (transformation
+  target — deliberately NOT modeled as identity).
+
+license: MIT
+version: 0.1.0
+
+# ──────────────────────────────────────────────────────────────────────────────
+# PREFIXES — so every CURIE used below resolves to a real URI:
+#   ncit:  enum `meaning` codelist bindings (NCI Thesaurus, e.g. ncit:C64848)
+#   labtx: `exact_mappings` to LAB Transmission Model v2.0 variables (identity)
+#   dta:   this schema's own namespace (default_prefix)
+# ──────────────────────────────────────────────────────────────────────────────
+prefixes:
+  linkml: https://w3id.org/linkml/
+  dta: https://cdisc.org/dta2sdtm/
+  ncit: http://purl.obolibrary.org/obo/NCIT_
+  labtx: https://wiki.cdisc.org/spaces/LAB2DOT0/pages/351701120/LAB+Transmission+Model+Metadata+Table#
+default_prefix: dta
+default_range: string
+imports:
+  - linkml:types
+
+# ──────────────────────────────────────────────────────────────────────────────
+# CLASSES
+# ──────────────────────────────────────────────────────────────────────────────
+classes:
+
+  # ═══════════════════ AGREEMENT LAYER (the governance contract) ═══════════════════
+  # The Data Transfer AGREEMENT document. Validate a serialized agreement with:
+  #   linkml-validate -s dta.linkml.yaml -C DataTransferAgreement <agreement>.yaml
+
+  DataTransferAgreement:
+    description: >-
+      The Data Transfer Agreement document: the governance contract that declares
+      WHAT lab data will be transferred, by WHOM, in what FORMAT, mapped to which
+      VISITS. Root of the agreement graph; the contract that a Transmission (the
+      instance layer) later fulfils.
+    slots:
+      - app_name
+      - source
+      - study
+      - dta_version
+      - data_types
+      - data_type_details
+      - parties
+      - transfer
+      - visit_mapping
+      - timepoint_mapping
+    slot_usage:
+      source:
+        description: Provenance of the inputs the agreement was generated from.
+        range: Source
+        inlined: true
+    annotations:
+      fulfilled_by: "Transmission (instance layer) — agreement (promised) vs transmission (delivered)"
+
+  Study:
+    description: >-
+      USDM-sourced study context prepopulated into the agreement. Read-only
+      projection of the upstream USDM protocol.
+    slots:
+      - study_name
+      - study_identifier
+      - study_title
+      - version_identifier
+      - version_id
+      - design_id
+      - description
+      - summary
+    annotations:
+      usdm_source: "Study / StudyVersion / StudyDesign"
+
+  StudySummary:
+    description: Roll-up counts of the USDM source the agreement was derived from.
+    slots:
+      - organizations
+      - roles
+      - assigned_persons
+      - encounters
+      - biomedical_concepts
+      - bc_surrogates
+
+  DtaVersion:
+    description: One row of the DTA version history (document version number + date).
+    slots:
+      - version_number
+      - version_date
+
+  BcSelection:
+    description: >-
+      A biomedical concept SELECTED into the agreement scope (the `data_type_details`
+      of an agreement). The agreement-side projection of a BiomedicalConcept: carries
+      the NCI C-code, short name, and the faceted classification rows that backed the
+      selection. Join to the canonical BiomedicalConcept on
+      `bc_id` == BiomedicalConcept.nciCode.
+    slots:
+      - key
+      - bc_id
+      - short_name
+      - facets
+    annotations:
+      joins_to: "BiomedicalConcept (bc_id -> nciCode) — agreement-scoped BC selection"
+
+  Party:
+    description: >-
+      A party in the DTA signature table. Each carries its data-exchange role
+      (Data Provider vs Data Recipient) and organization type.
+    slots:
+      - id
+      - name
+      - role
+      - organization
+      - organization_type
+      - data_exchange_role
+      - email
+      - signature_date
+      - source
+    slot_usage:
+      source:
+        description: Field-level provenance of this party's data (USDM / UI / both).
+        range: ProvenanceEnum
+
+  TransferRequirements:
+    description: >-
+      The file-transfer mechanics agreed for the transmission: format, encoding,
+      delimiter, method, cumulative/incremental, environment, blinding, and the
+      provider/recipient folder names.
+    slots:
+      - file_name
+      - file_format
+      - encoding_system
+      - delimiter
+      - transmission_method
+      - transmission_type
+      - transfer_environment
+      - transfer_blinding
+      - folder_name_provider
+      - folder_name_recipient
+
+  VisitMapping:
+    description: >-
+      One row of the protocol<->data-provider visit crosswalk. Protocol visit
+      number/name are USDM-locked; the data-provider values are authored by the lab.
+      This crosswalk is what the DTA->SDTM transform uses to recover VISIT / VISITNUM
+      (cf. Collection.visit / Collection.visitnum).
+    slots:
+      - protocol_visit_number
+      - protocol_visit_name
+      - data_provider_visit_number
+      - data_provider_visit_name
+      - source
+    slot_usage:
+      source:
+        description: >-
+          Field-level provenance of the row: protocol columns are USDM-locked and the
+          data-provider columns are lab-authored, so a populated row is typically
+          "USDM + UI".
+        range: ProvenanceEnum
+    annotations:
+      sdtm_use: "recovers VISIT / VISITNUM; pairs with instance-layer Collection.visit/visitnum"
+
+  TimepointMapping:
+    description: >-
+      One row of the optional protocol<->data-provider timepoint crosswalk. Omitted
+      from the agreement when left blank.
+    slots:
+      - protocol_timepoint_number
+      - protocol_timepoint_name
+      - data_provider_timepoint_number
+      - data_provider_timepoint_name
+      - source
+    slot_usage:
+      source:
+        description: Field-level provenance of the row (USDM / UI / both).
+        range: ProvenanceEnum
+
+  Source:
+    description: >-
+      Provenance of the inputs the agreement was generated from (source-control
+      indication): the USDM protocol, the MVP metadata, and any DTA template.
+    slots:
+      - usdm
+      - mvp
+      - template
+
+  # ════════════════════════ SEMANTIC LAYER (the linkage) ════════════════════════
+
+  BiomedicalConcept:
+    description: >-
+      A CDISC Biomedical Concept (BC): a machine-readable definition of a clinical
+      idea (e.g. "Hemoglobin Concentration in Blood"), independent of any dataset.
+      USDM v4 references BCs from study Activities via `biomedicalConceptIds`; this
+      class is the join target for that reference.
+    slots:
+      - conceptId
+      - conceptName
+      - nciCode
+      - loincCodes
+      - usdmReference
+      - classifications
+    annotations:
+      usdm_entity: BiomedicalConcept
+      usdm_link: "Activity.biomedicalConceptIds -> BiomedicalConcept.id"
+
+  BcClassification:
+    description: >-
+      One faceted classification row for a BiomedicalConcept (from the MVP metadata
+      lookup): a `group_name` (the facet dimension — category, disease_area,
+      is_used_by_form, is_used_by_dta) plus its `value`. The `is_used_by_dta` facet
+      is the explicit, queryable BC->DTA membership edge. Shared by
+      BiomedicalConcept.classifications and BcSelection.facets.
+    slots:
+      - group_name
+      - value
+    annotations:
+      mvp_source: "MVP metadata lookup rows (bc_id, group_name, value)"
+
+  DatasetSpecialization:
+    description: >-
+      A CDISC SDTM Dataset Specialization (COSMoS): the projection of one
+      BiomedicalConcept into a specific SDTM domain (here, LB), expressed as
+      value-level metadata over a set of VariableSpecializations. This is the
+      authoritative bridge: BC concept -> concrete SDTM-LB variables/codelists.
+      System of record: cdisc-org/COSMoS export.
+    slots:
+      - specializationId
+      - biomedicalConcept
+      - vlmGroupId
+      - domain
+      - sdtmigStartVersion
+      - packageDate
+      - source
+      - variableSpecializations
+    annotations:
+      cdisc_artifact: SDTM Dataset Specialization
+      system_of_record: "cdisc-org/COSMoS export/cdisc_sdtm_dataset_specializations_latest.csv"
+
+  VariableSpecialization:
+    description: >-
+      One value-level-metadata row of a DatasetSpecialization: how a single SDTM-LB
+      variable is constrained for this concept (assigned term, codelist, value list,
+      role, type, origin).
+    slots:
+      - sdtmVariable
+      - role
+      - assignedValue
+      - codelistCode
+      - codelistName
+      - valueList
+      - decId
+      - dataType
+      - mandatoryVariable
+      - originType
+
+  # ════════════════════════ INSTANCE LAYER (the DTA payload) ════════════════════
+
+  Transmission:
+    tree_root: true
+    description: >-
+      File-level / Good Transmission Practice (GTP) header. One per transmitted
+      DTA file. Root of the instance graph.
+    slots:
+      - ltvrsn
+      - igvrsn
+      - fcrdtc
+      - trssid
+      - trstyp
+      - subjects
+
+  Subject:
+    description: A trial subject within a transmission (study/site/subject identity).
+    slots:
+      - studyid
+      - siteid
+      - scrnid
+      - asubjid
+      - adsex
+      - collections
+
+  Collection:
+    description: >-
+      A specimen-collection event (LAB Tx "Visit Level": accession + kit). Groups
+      the specimens drawn at one accession. `visit`/`visitnum` are derived
+      conveniences, not part of the 60 LAB Tx variables.
+    slots:
+      - accsnid
+      - kitid
+      - kitdsc
+      - visit
+      - visitnum
+      - specimens
+
+  Specimen:
+    description: A biological specimen received and tested by the performing lab.
+    slots:
+      - lddom
+      - specid
+      - rcvdtc
+      - spcoml
+      - spcomi
+      - agespc
+      - panels
+
+  Panel:
+    description: >-
+      A test panel (e.g. HEMATOLOGY) plus the performing laboratory that ran it.
+      Groups the individual analyte results.
+    slots:
+      - pnlid
+      - tstpnl
+      - plbid
+      - plbnam
+      - plbtyp
+      - labTestResults
+
+  LabTestResult:
+    description: >-
+      THE GRAIN: one measured analyte for one specimen. Carries the link to its
+      DatasetSpecialization (`specialization`) — the join that closes the
+      USDM<->DTA loop — plus 1..3 unit-system Results.
+    slots:
+      - plbtid
+      - plbtnm
+      - plbtds
+      - plbtin
+      - plbtct
+      - dtrtid
+      - dtrtnm
+      - dtrtct
+      - plbtts
+      - plbttc
+      - asydtc
+      - plrtrc
+      - alrtlv
+      - rrdtc
+      - rtrtyp
+      - specialization
+      - results
+
+  Result:
+    description: >-
+      A result expressed in one unit system. The three parallel LAB Tx blocks
+      (PLR* original / CVU* conventional / SIU* SI) are normalized here into ONE
+      class keyed by `unitSystem`; the original variable names survive as aliases
+      and exact_mappings on each slot.
+    slots:
+      - unitSystem
+      - charResult
+      - numResult
+      - unit
+      - refRangeLow
+      - refRangeHigh
+      - refRangeDesc
+      - refRangeType
+
+# ──────────────────────────────────────────────────────────────────────────────
+# SLOTS
+# ──────────────────────────────────────────────────────────────────────────────
+slots:
+
+  # ── agreement layer (DataTransferAgreement; slot names == agreement JSON keys) ──
+  app_name:
+    description: Identifier of the application/build that produced the agreement payload.
+  study:
+    description: USDM-sourced study context for the agreement.
+    range: Study
+    inlined: true
+  dta_version:
+    description: DTA document version (number + date).
+    range: DtaVersion
+    inlined: true
+  data_types:
+    description: Human-readable labels of the biomedical concepts selected into scope.
+    multivalued: true
+  data_type_details:
+    description: The biomedical concepts selected into the agreement scope, with facets.
+    range: BcSelection
+    multivalued: true
+    inlined_as_list: true
+  parties:
+    description: Parties included in the DTA signature table.
+    range: Party
+    multivalued: true
+    inlined_as_list: true
+  transfer:
+    description: Agreed file-transfer mechanics.
+    range: TransferRequirements
+    inlined: true
+  visit_mapping:
+    description: Protocol<->data-provider visit crosswalk rows.
+    range: VisitMapping
+    multivalued: true
+    inlined_as_list: true
+  timepoint_mapping:
+    description: Optional protocol<->data-provider timepoint crosswalk rows.
+    range: TimepointMapping
+    multivalued: true
+    inlined_as_list: true
+
+  # ── Study (agreement-side, USDM projection) ──
+  study_name:
+    description: USDM study name (e.g. NCT number).
+  study_identifier:
+    description: Study identifier (USDM StudyIdentifier).
+  study_title:
+    description: Study / protocol title.
+  version_identifier:
+    description: USDM study version identifier.
+  version_id:
+    description: USDM StudyVersion id.
+  design_id:
+    description: USDM StudyDesign id.
+  description:
+    description: Study description / synopsis.
+  summary:
+    description: Roll-up counts of the USDM source.
+    range: StudySummary
+    inlined: true
+
+  # ── StudySummary ──
+  organizations:    { description: Count of USDM organizations., range: integer }
+  roles:            { description: Count of USDM study roles., range: integer }
+  assigned_persons: { description: Count of assigned persons across roles., range: integer }
+  encounters:       { description: Count of USDM encounters (visits)., range: integer }
+  biomedical_concepts: { description: Count of USDM biomedical concepts., range: integer }
+  bc_surrogates:    { description: Count of BC surrogates., range: integer }
+
+  # ── DtaVersion ──
+  version_number: { description: DTA document version number (e.g. 1.0). }
+  version_date:   { description: DTA document version date (ISO 8601). }
+
+  # ── BcSelection (data_type_details) ──
+  key:
+    description: Stable selection key ("<bc_id>||<short_name>") from the lookup.
+  bc_id:
+    description: NCI Thesaurus C-code of the concept (joins to BiomedicalConcept.nciCode).
+  short_name:
+    description: Concept short name (e.g. "Leukocyte Count").
+  facets:
+    description: The faceted classification rows backing this selection.
+    range: BcClassification
+    multivalued: true
+    inlined_as_list: true
+
+  # ── Party ──
+  id:
+    description: Stable party id (e.g. StudyRole_11_Person_8).
+  name:
+    description: Party person name (blank for organization-only rows).
+  organization:
+    description: Party organization name.
+  organization_type:
+    description: Type of the party organization.
+    range: OrganizationTypeEnum
+  data_exchange_role:
+    description: Whether the party sends (Data Provider) or receives (Data Recipient).
+    range: DataExchangeRoleEnum
+  email:
+    description: Party contact email.
+  signature_date:
+    description: Signature date for the party (ISO 8601).
+
+  # ── TransferRequirements ──
+  file_name:        { description: Transferred file base name. }
+  file_format:      { description: File format., range: FileFormatEnum }
+  encoding_system:  { description: Character encoding., range: EncodingEnum }
+  delimiter:        { description: Field delimiter., range: DelimiterEnum }
+  transmission_method: { description: Transmission method., range: TransmissionMethodEnum }
+  transmission_type:   { description: Cumulative vs incremental transfer., range: TransferModeEnum }
+  transfer_environment: { description: Target environment., range: TransferEnvironmentEnum }
+  transfer_blinding:    { description: Blinding status of the transfer., range: BlindingEnum }
+  folder_name_provider:  { description: Data Provider folder name. }
+  folder_name_recipient: { description: Data Recipient folder name. }
+
+  # ── VisitMapping / TimepointMapping ──
+  protocol_visit_number:       { description: Protocol visit number (USDM-locked). }
+  protocol_visit_name:         { description: Protocol visit name (USDM-locked). }
+  data_provider_visit_number:  { description: Data-provider visit number (lab-authored). }
+  data_provider_visit_name:    { description: Data-provider visit name (lab-authored). }
+  protocol_timepoint_number:      { description: Protocol timepoint number. }
+  protocol_timepoint_name:        { description: Protocol timepoint name. }
+  data_provider_timepoint_number: { description: Data-provider timepoint number. }
+  data_provider_timepoint_name:   { description: Data-provider timepoint name. }
+
+  # ── Source ──
+  usdm:     { description: USDM source label/filename. }
+  mvp:      { description: MVP metadata source label/filename. }
+  template: { description: DTA template source label/filename. }
+
+  # ── BcClassification (shared facet row) ──
+  group_name:
+    description: Facet dimension of the classification.
+    range: BcFacetGroupEnum
+  value:
+    description: Facet value within the group (e.g. "Complete Blood Count (CBC)").
+  classifications:
+    description: Faceted classification rows for this concept (incl. is_used_by_dta).
+    range: BcClassification
+    multivalued: true
+    inlined_as_list: true
+
+  # ── semantic layer ──
+  conceptId:
+    identifier: true
+    description: BC identifier (e.g. USDM BiomedicalConcept_152, or COSMoS bc_id).
+  conceptName:
+    description: Human-readable concept name.
+    required: true
+  nciCode:
+    description: NCI Thesaurus C-code for the concept.
+  loincCodes:
+    description: LOINC code(s) the concept may be identified by.
+    multivalued: true
+  usdmReference:
+    description: The USDM BiomedicalConcept id this BC corresponds to in the source protocol.
+    annotations:
+      usdm_property: "Study.versions[].biomedicalConcepts[].id"
+
+  specializationId:
+    identifier: true
+    description: Dataset specialization id (COSMoS vlm_group_id, e.g. HGBBLD).
+  biomedicalConcept:
+    description: The BiomedicalConcept this specialization projects into SDTM-LB.
+    range: BiomedicalConcept
+    inlined: true
+    required: true
+  vlmGroupId:
+    description: COSMoS VLM group id.
+  domain:
+    description: SDTM domain the specialization targets.
+    ifabsent: string(LB)
+  sdtmigStartVersion:
+    description: First SDTMIG version this specialization applies to (e.g. 3-2).
+  packageDate:
+    description: COSMoS package date of the vendored specialization.
+  source:
+    description: >-
+      Source/provenance. On a DatasetSpecialization this is the system-of-record
+      URL/citation; on a Party it is the field-provenance label (e.g. "USDM + UI").
+      DataTransferAgreement overrides the range to the Source class via slot_usage.
+  variableSpecializations:
+    description: The value-level-metadata rows of this specialization.
+    range: VariableSpecialization
+    multivalued: true
+    inlined_as_list: true
+
+  sdtmVariable:
+    description: SDTM-LB variable name constrained by this row (e.g. LBORRESU).
+    required: true
+  role:
+    description: >-
+      Role label. On a VariableSpecialization this is the SDTM role (Topic,
+      Qualifier, Timing, ...); on a Party this is the study role (e.g. "Study Chair").
+  assignedValue:
+    description: Fixed/assigned value, if the specialization pins one (e.g. LBTESTCD=HGB).
+  codelistCode:
+    description: NCI C-code of the bound codelist (e.g. C71620 for UNIT).
+  codelistName:
+    description: Codelist submission name (e.g. UNIT, LBTESTCD).
+  valueList:
+    description: Permitted value list for this variable in this specialization.
+    multivalued: true
+  decId:
+    description: COSMoS data element concept id (dec_id).
+  dataType:
+    description: Declared SDTM data type (text, float, ...).
+  mandatoryVariable:
+    description: Whether the specialization marks the variable mandatory.
+    range: boolean
+  originType:
+    description: SDTM origin (Assigned, Collected, Derived, ...).
+
+  # ── Transmission (GTP) ──
+  ltvrsn:
+    description: LAB Transmission Model Version.
+    required: true
+    aliases: [LTVRSN]
+    exact_mappings: [labtx:LTVRSN]
+    annotations: { lab_tx_var: LTVRSN, lab_tx_group: "Good Transmission Practice (GTP)", cdisc_core: Req, sdtm_lb_target: "(none — file metadata)" }
+  igvrsn:
+    description: SDTMIG Version.
+    aliases: [IGVRSN]
+    exact_mappings: [labtx:IGVRSN]
+    annotations: { lab_tx_var: IGVRSN, cdisc_core: Perm, sdtm_lb_target: "(define-xml metadata)" }
+  fcrdtc:
+    description: File Creation Date/Time (ISO 8601).
+    required: true
+    aliases: [FCRDTC]
+    exact_mappings: [labtx:FCRDTC]
+    annotations: { lab_tx_var: FCRDTC, cdisc_core: Req, sdtm_lb_target: "(none)" }
+  trssid:
+    description: Transmission Source ID (the sending organization).
+    required: true
+    aliases: [TRSSID]
+    exact_mappings: [labtx:TRSSID]
+    annotations: { lab_tx_var: TRSSID, cdisc_core: Req, sdtm_lb_target: "(provenance)" }
+  trstyp:
+    description: Transmission Type.
+    range: TransmissionTypeEnum
+    aliases: [TRSTYP]
+    exact_mappings: [labtx:TRSTYP]
+    annotations: { lab_tx_var: TRSTYP, cdisc_core: Perm }
+  subjects:
+    description: The trial subjects carried in this transmission.
+    range: Subject
+    multivalued: true
+    inlined_as_list: true
+
+  # ── Subject ──
+  studyid:
+    description: Study Identifier.
+    required: true
+    aliases: [STUDYID]
+    exact_mappings: [labtx:STUDYID]
+    annotations: { lab_tx_var: STUDYID, lab_tx_group: "Study Level", sdtm_lb_target: STUDYID, usdm_property: "Study.versions[].studyIdentifiers", cdisc_core: Req }
+  siteid:
+    description: Study Site Identifier.
+    aliases: [SITEID]
+    exact_mappings: [labtx:SITEID]
+    annotations: { lab_tx_var: SITEID, lab_tx_group: "Site Level", sdtm_lb_target: SITEID }
+  scrnid:
+    description: Screening ID.
+    aliases: [SCRNID]
+    exact_mappings: [labtx:SCRNID]
+    annotations: { lab_tx_var: SCRNID, lab_tx_group: "Subject Level", cdisc_core: Perm }
+  asubjid:
+    description: Alternate Subject ID for the Study.
+    aliases: [ASUBJID]
+    exact_mappings: [labtx:ASUBJID]
+    annotations: { lab_tx_var: ASUBJID, sdtm_lb_target: "USUBJID/SUBJID (after harmonization)", cdisc_core: Perm }
+  adsex:
+    description: Administrative Sex.
+    range: AdministrativeSexEnum
+    aliases: [ADSEX]
+    exact_mappings: [labtx:ADSEX]
+    annotations: { lab_tx_var: ADSEX, sdtm_lb_target: "(DM.SEX)", cdisc_core: Exp }
+  collections:
+    description: The specimen-collection events for this subject.
+    range: Collection
+    multivalued: true
+    inlined_as_list: true
+
+  # ── Collection (Visit Level) ──
+  accsnid:
+    description: Accession ID (the lab's identifier for the collection event).
+    required: true
+    aliases: [ACCSNID]
+    exact_mappings: [labtx:ACCSNID]
+    annotations: { lab_tx_var: ACCSNID, lab_tx_group: "Visit Level", sdtm_lb_target: "LBREFID/LBSPID", cdisc_core: Req }
+  kitid:
+    description: Kit ID.
+    aliases: [KITID]
+    exact_mappings: [labtx:KITID]
+    annotations: { lab_tx_var: KITID, cdisc_core: Perm }
+  kitdsc:
+    description: Kit Description.
+    aliases: [KITDSC]
+    exact_mappings: [labtx:KITDSC]
+    annotations: { lab_tx_var: KITDSC, cdisc_core: Exp }
+  visit:
+    description: Derived visit name (not a LAB Tx variable; SDTM convenience).
+    annotations: { lab_tx_var: "(derived)", sdtm_lb_target: VISIT }
+  visitnum:
+    description: Derived visit number (not a LAB Tx variable; SDTM convenience).
+    range: integer
+    annotations: { lab_tx_var: "(derived)", sdtm_lb_target: VISITNUM }
+  specimens:
+    description: The biological specimens drawn at this collection event.
+    range: Specimen
+    multivalued: true
+    inlined_as_list: true
+
+  # ── Specimen ──
+  lddom:
+    description: Laboratory Data Domain.
+    ifabsent: string(LB)
+    aliases: [LDDOM]
+    exact_mappings: [labtx:LDDOM]
+    annotations: { lab_tx_var: LDDOM, lab_tx_group: "Record Type Level", sdtm_lb_target: DOMAIN, cdisc_core: Perm }
+  specid:
+    description: Specimen ID.
+    required: true
+    aliases: [SPECID]
+    exact_mappings: [labtx:SPECID]
+    annotations: { lab_tx_var: SPECID, lab_tx_group: "Specimen Level", sdtm_lb_target: "LBREFID/LBSPID", cdisc_core: Req }
+  rcvdtc:
+    description: Specimen Receipt Date/Time.
+    aliases: [RCVDTC]
+    exact_mappings: [labtx:RCVDTC]
+    annotations: { lab_tx_var: RCVDTC, sdtm_lb_target: "(supp/LBDTC context)", cdisc_core: Perm }
+  spcoml:
+    description: Specimen Comment From Lab.
+    aliases: [SPCOML]
+    exact_mappings: [labtx:SPCOML]
+    annotations: { lab_tx_var: SPCOML, sdtm_lb_target: "CO/SUPPLB", cdisc_core: Perm }
+  spcomi:
+    description: Specimen Comment From Investigator.
+    aliases: [SPCOMI]
+    exact_mappings: [labtx:SPCOMI]
+    annotations: { lab_tx_var: SPCOMI, sdtm_lb_target: "CO/SUPPLB", cdisc_core: Perm }
+  agespc:
+    description: Subject Age at Specimen Collection.
+    range: integer
+    aliases: [AGESPC]
+    exact_mappings: [labtx:AGESPC]
+    annotations: { lab_tx_var: AGESPC, sdtm_lb_target: "(DM.AGE context)", cdisc_core: Exp }
+  panels:
+    description: The test panels run on this specimen.
+    range: Panel
+    multivalued: true
+    inlined_as_list: true
+
+  # ── Panel + performing lab ──
+  pnlid:
+    description: Test Panel ID.
+    aliases: [PNLID]
+    exact_mappings: [labtx:PNLID]
+    annotations: { lab_tx_var: PNLID, lab_tx_group: "Panel Level", cdisc_core: Exp }
+  tstpnl:
+    description: Test Panel Name.
+    aliases: [TSTPNL]
+    exact_mappings: [labtx:TSTPNL]
+    annotations: { lab_tx_var: TSTPNL, sdtm_lb_target: "LBCAT/LBSCAT", cdisc_core: Exp }
+  plbid:
+    description: Performing Laboratory ID.
+    aliases: [PLBID]
+    exact_mappings: [labtx:PLBID]
+    annotations: { lab_tx_var: PLBID, lab_tx_group: "Test Level", sdtm_lb_target: "LBNAM (id)", cdisc_core: Perm }
+  plbnam:
+    description: Performing Laboratory Name.
+    aliases: [PLBNAM]
+    exact_mappings: [labtx:PLBNAM]
+    annotations: { lab_tx_var: PLBNAM, sdtm_lb_target: LBNAM, cdisc_core: Exp }
+  plbtyp:
+    description: Performing Laboratory Type.
+    aliases: [PLBTYP]
+    exact_mappings: [labtx:PLBTYP]
+    annotations: { lab_tx_var: PLBTYP, cdisc_core: Perm }
+  labTestResults:
+    description: The individual analyte results measured for this panel.
+    range: LabTestResult
+    multivalued: true
+    inlined_as_list: true
+
+  # ── LabTestResult (grain) ──
+  plbtid:
+    description: Performing Laboratory Test ID (vendor test code).
+    aliases: [PLBTID]
+    exact_mappings: [labtx:PLBTID]
+    annotations: { lab_tx_var: PLBTID, lab_tx_group: "Test Level", sdtm_lb_target: "LBTESTCD (after mapping)", cdisc_core: Perm }
+  plbtnm:
+    description: Performing Laboratory Test Name.
+    required: true
+    aliases: [PLBTNM]
+    exact_mappings: [labtx:PLBTNM]
+    annotations: { lab_tx_var: PLBTNM, sdtm_lb_target: "LBTEST (after mapping)", cdisc_core: Req }
+  plbtds:
+    description: Performing Laboratory Test Description.
+    aliases: [PLBTDS]
+    exact_mappings: [labtx:PLBTDS]
+    annotations: { lab_tx_var: PLBTDS, cdisc_core: Exp }
+  plbtin:
+    description: Performing Laboratory Test Information.
+    aliases: [PLBTIN]
+    exact_mappings: [labtx:PLBTIN]
+    annotations: { lab_tx_var: PLBTIN, cdisc_core: Perm }
+  plbtct:
+    description: Performing Laboratory Test Category.
+    aliases: [PLBTCT]
+    exact_mappings: [labtx:PLBTCT]
+    annotations: { lab_tx_var: PLBTCT, sdtm_lb_target: LBCAT, cdisc_core: Perm }
+  dtrtid:
+    description: Data Recipient Test ID.
+    aliases: [DTRTID]
+    exact_mappings: [labtx:DTRTID]
+    annotations: { lab_tx_var: DTRTID, sdtm_lb_target: LBTESTCD, cdisc_core: Perm }
+  dtrtnm:
+    description: Data Recipient Test Name.
+    aliases: [DTRTNM]
+    exact_mappings: [labtx:DTRTNM]
+    annotations: { lab_tx_var: DTRTNM, sdtm_lb_target: LBTEST, cdisc_core: Perm }
+  dtrtct:
+    description: Data Recipient Test Category.
+    aliases: [DTRTCT]
+    exact_mappings: [labtx:DTRTCT]
+    annotations: { lab_tx_var: DTRTCT, sdtm_lb_target: LBCAT, cdisc_core: Perm }
+  plbtts:
+    description: Performing Laboratory Test Tracking Status.
+    aliases: [PLBTTS]
+    exact_mappings: [labtx:PLBTTS]
+    annotations: { lab_tx_var: PLBTTS, sdtm_lb_target: LBSTAT, cdisc_core: Exp }
+  plbttc:
+    description: Performing Laboratory Test Tracking Status Code.
+    range: ResultStatusEnum
+    aliases: [PLBTTC]
+    exact_mappings: [labtx:PLBTTC]
+    annotations: { lab_tx_var: PLBTTC, sdtm_lb_target: "LBSTAT/LBREASND", cdisc_core: Perm }
+  asydtc:
+    description: Assay Date/Time.
+    aliases: [ASYDTC]
+    exact_mappings: [labtx:ASYDTC]
+    annotations: { lab_tx_var: ASYDTC, sdtm_lb_target: "(LBDTC context)", cdisc_core: Exp }
+  plrtrc:
+    description: Perf Lab Reported Test Result Comment.
+    aliases: [PLRTRC]
+    exact_mappings: [labtx:PLRTRC]
+    annotations: { lab_tx_var: PLRTRC, sdtm_lb_target: "CO/SUPPLB", cdisc_core: Perm }
+  alrtlv:
+    description: Alert Level (flag for clinically significant / out-of-range results).
+    aliases: [ALRTLV]
+    exact_mappings: [labtx:ALRTLV]
+    annotations: { lab_tx_var: ALRTLV, sdtm_lb_target: "LBNRIND (informs)", cdisc_core: Exp }
+  rrdtc:
+    description: Reported Result Date/Time.
+    aliases: [RRDTC]
+    exact_mappings: [labtx:RRDTC]
+    annotations: { lab_tx_var: RRDTC, cdisc_core: Perm }
+  rtrtyp:
+    description: Record Transaction Type.
+    range: RecordTransactionTypeEnum
+    aliases: [RTRTYP]
+    exact_mappings: [labtx:RTRTYP]
+    annotations: { lab_tx_var: RTRTYP, cdisc_core: Perm }
+  specialization:
+    description: >-
+      The DatasetSpecialization this result instantiates. THIS REFERENCE IS THE
+      USDM<->DTA LINKAGE: specialization.biomedicalConcept is the BC that a USDM
+      Activity referenced via biomedicalConceptIds.
+    range: DatasetSpecialization
+    annotations: { linkage: "LabTestResult.specialization -> DatasetSpecialization.biomedicalConcept -> USDM Activity.biomedicalConceptIds" }
+  results:
+    description: 1..3 unit-system representations of this analyte's result.
+    range: Result
+    multivalued: true
+    inlined_as_list: true
+    required: true
+
+  # ── Result (normalized unit block) ──
+  unitSystem:
+    description: Which unit system this Result is expressed in.
+    range: UnitSystemEnum
+    required: true
+  charResult:
+    description: Character result in this unit system.
+    aliases: [PLRCRS, CVUCRS, SIUCRS]
+    exact_mappings: [labtx:PLRCRS, labtx:CVUCRS, labtx:SIUCRS]
+    annotations:
+      lab_tx_var: "PLRCRS (ORIGINAL) / CVUCRS (CONVENTIONAL) / SIUCRS (SI)"
+      lab_tx_group: "Result Level"
+      sdtm_lb_target: "LBORRES (ORIGINAL) / LBSTRESC (CONVENTIONAL|SI)"
+  numResult:
+    description: Numeric result in this unit system.
+    range: float
+    aliases: [PLRNRS, CVUNRS, SIUNRS]
+    exact_mappings: [labtx:PLRNRS, labtx:CVUNRS, labtx:SIUNRS]
+    annotations:
+      lab_tx_var: "PLRNRS / CVUNRS / SIUNRS"
+      sdtm_lb_target: "LBORRES (ORIGINAL, char) / LBSTRESN (CONVENTIONAL|SI)"
+  unit:
+    description: Unit of measure for this Result.
+    range: UnitEnum
+    aliases: [PLRU, CVU, SIU]
+    exact_mappings: [labtx:PLRU, labtx:CVU, labtx:SIU]
+    annotations:
+      lab_tx_var: "PLRU / CVU / SIU"
+      sdtm_lb_target: "LBORRESU (ORIGINAL) / LBSTRESU (CONVENTIONAL|SI)"
+  refRangeLow:
+    description: Reference range lower limit in this unit system.
+    aliases: [PLRRLO, CVURLO, SIURLO]
+    exact_mappings: [labtx:PLRRLO, labtx:CVURLO, labtx:SIURLO]
+    annotations:
+      lab_tx_var: "PLRRLO / CVURLO / SIURLO"
+      sdtm_lb_target: "LBORNRLO (ORIGINAL) / LBSTNRLO (CONVENTIONAL|SI)"
+  refRangeHigh:
+    description: Reference range upper limit in this unit system.
+    aliases: [PLRRHI, CVURHI, SIURHI]
+    exact_mappings: [labtx:PLRRHI, labtx:CVURHI, labtx:SIURHI]
+    annotations:
+      lab_tx_var: "PLRRHI / CVURHI / SIURHI"
+      sdtm_lb_target: "LBORNRHI (ORIGINAL) / LBSTNRHI (CONVENTIONAL|SI)"
+  refRangeDesc:
+    description: Reference range description / textual range in this unit system.
+    aliases: [PLRRRD, CVURRD, SIURRD]
+    exact_mappings: [labtx:PLRRRD, labtx:CVURRD, labtx:SIURRD]
+    annotations:
+      lab_tx_var: "PLRRRD / CVURRD / SIURRD"
+      sdtm_lb_target: "LBORNRIND/LBSTNRC context"
+  refRangeType:
+    description: Reference range type (e.g. NORMAL RANGE) in this unit system.
+    range: ReferenceRangeTypeEnum
+    aliases: [PLRRRT, CVURRT, SIURRT]
+    exact_mappings: [labtx:PLRRRT, labtx:CVURRT, labtx:SIURRT]
+    annotations:
+      lab_tx_var: "PLRRRT / CVURRT / SIURRT"
+
+# ──────────────────────────────────────────────────────────────────────────────
+# ENUMS  (subsets of CDISC Controlled Terminology; source: NCI EVS evs-2026-Q1)
+# ──────────────────────────────────────────────────────────────────────────────
+enums:
+
+  # ════════════════════════ AGREEMENT-LAYER ENUMS ════════════════════════
+
+  BcFacetGroupEnum:
+    description: Facet dimension of a BiomedicalConcept classification row.
+    permissible_values:
+      category:        { description: "Test grouping / panel membership (e.g. CBC, CMP, Lipid Panel)." }
+      disease_area:    { description: Clinical / disease area the concept is relevant to. }
+      is_used_by_form: { description: An EDC form that collects this concept. }
+      is_used_by_dta:  { description: A Data Transfer Agreement this concept is in scope for (BC->DTA edge). }
+
+  ProvenanceEnum:
+    description: >-
+      Field-level provenance: the KIND of source a value originated from, kept
+      deliberately app-agnostic. "UI" denotes any human-facing data-entry interface
+      (the specific application is recorded once at the agreement root via app_name,
+      never here), so the vocabulary survives changes of UI tooling.
+    permissible_values:
+      USDM:       { description: Auto-populated from the upstream USDM protocol. }
+      UI:         { description: Entered or edited by a human via a data-entry interface. }
+      USDM + UI:  { description: "Prepopulated from USDM, then human-edited." }
+      Derived:    { description: Computed or defaulted by the agreement generator. }
+
+  OrganizationTypeEnum:
+    description: Type of a party organization. Illustrative subset; extend as needed.
+    permissible_values:
+      Clinical Study Sponsor: { description: Study sponsor organization. }
+      Manufacturer:           { description: Investigational product / device manufacturer. }
+      Laboratory:             { description: Performing / central laboratory. }
+      CRO:                    { description: Contract research organization. }
+
+  DataExchangeRoleEnum:
+    description: Direction of data exchange for a party.
+    permissible_values:
+      Data Provider:  { description: The party that sends the data (e.g. central lab). }
+      Data Recipient: { description: The party that receives the data (e.g. sponsor). }
+
+  FileFormatEnum:
+    description: Transferred file format.
+    permissible_values:
+      XPT:       { description: SAS Transport (XPORT) file. }
+      SAS 7bdat: { description: SAS dataset (sas7bdat). }
+      CSV:       { description: Comma-separated values. }
+      Txt:       { description: Delimited text. }
+      JSON:      { description: JSON. }
+      XLSX:      { description: Excel (OOXML). }
+      XLS:       { description: Excel (legacy). }
+      Parquet:   { description: Apache Parquet. }
+
+  EncodingEnum:
+    description: Character encoding of the transferred file.
+    permissible_values:
+      UTF8:  { description: UTF-8. }
+      ASCII: { description: US-ASCII. }
+
+  DelimiterEnum:
+    description: Field delimiter (where applicable to the file format).
+    permissible_values:
+      Not Applicable: { description: No delimiter (non-delimited format). }
+      Comma:          { description: Comma. }
+      Tab:            { description: Tab. }
+      Pipe:           { description: Pipe (|). }
+      Semicolon:      { description: Semicolon. }
+
+  TransmissionMethodEnum:
+    description: Method by which the file is transmitted.
+    permissible_values:
+      sFTP:          { description: Secure FTP. }
+      Secure Portal: { description: Web secure-transfer portal. }
+      API:           { description: Programmatic API transfer. }
+      Manual:        { description: Manual / out-of-band transfer. }
+
+  TransferModeEnum:
+    description: >-
+      Whether each transmission carries the full dataset or only changes since the
+      last. Distinct from the instance-layer TransmissionTypeEnum (file-level I/U/D).
+    permissible_values:
+      Cumulative:  { description: Each transfer contains the full cumulative dataset. }
+      Incremental: { description: Each transfer contains only new/changed records. }
+
+  TransferEnvironmentEnum:
+    description: Environment the transfer targets.
+    permissible_values:
+      Development: { description: Development environment. }
+      Test:        { description: Test / validation environment. }
+      Production:  { description: Production environment. }
+
+  BlindingEnum:
+    description: Blinding status of the transferred data.
+    permissible_values:
+      Blinded:           { description: Fully blinded transfer. }
+      Unblinded:         { description: Unblinded transfer. }
+      Partially blinded: { description: Partially blinded transfer. }
+
+  # ════════════════════════ INSTANCE / SEMANTIC-LAYER ENUMS ════════════════════════
+
+  UnitSystemEnum:
+    description: Internal key distinguishing the three LAB Tx unit blocks (not a CDISC codelist).
+    permissible_values:
+      ORIGINAL:    { description: As-reported by the performing lab (PLR* block). }
+      CONVENTIONAL: { description: Conventional units (CVU* block). }
+      SI:          { description: Système International units (SIU* block). }
+
+  TransmissionTypeEnum:
+    description: Transmission Type (LAB Tx TRSTYP). Subset; confirm against CDISC CT.
+    permissible_values:
+      I: { description: Initial transmission. }
+      U: { description: Update transmission. }
+      D: { description: Delete transmission. }
+
+  RecordTransactionTypeEnum:
+    description: Record Transaction Type (LAB Tx RTRTYP).
+    permissible_values:
+      I: { description: Insert. }
+      U: { description: Update. }
+      D: { description: Delete. }
+
+  AdministrativeSexEnum:
+    description: Administrative Sex. Bound to CDISC CT codelist SEX (C66731).
+    permissible_values:
+      M: { description: Male. }
+      F: { description: Female. }
+      U: { description: Unknown. }
+
+  ResultStatusEnum:
+    description: Test tracking status code (PLBTTC). Illustrative subset.
+    permissible_values:
+      RESULTS REPORTED:  { description: Result has been reported. }
+      NOT DONE:          { description: Test not performed. }
+      PENDING:           { description: Result pending. }
+
+  ReferenceRangeTypeEnum:
+    description: Reference range type. Illustrative subset.
+    permissible_values:
+      NORMAL RANGE:   { description: Standard normal reference range. }
+      TOXICITY GRADE: { description: Toxicity-grade-based range. }
+
+  UnitEnum:
+    description: >-
+      Unit of measure. Subset of CDISC CT codelist UNIT (C71620), source NCI EVS
+      evs-2026-Q1. meaning CURIEs are NCIt C-codes.
+    permissible_values:
+      g/dL:    { description: Gram per Deciliter, meaning: ncit:C64783 }
+      g/L:     { description: Gram per Liter (EVS-mapped), meaning: ncit:C42576 }
+      mg/dL:   { description: Milligram per Deciliter, meaning: ncit:C67015 }
+      "10^6/uL": { description: Million per Microliter (no EVS code in cache). }
+      "10^12/L": { description: 10^12 per Liter, meaning: ncit:C67308 }
+      "10^9/L":  { description: Billion per Liter, meaning: ncit:C67255 }
+      "10^3/uL": { description: "Thousand per Microliter (no EVS code in cache)." }
+      "%":     { description: Percentage, meaning: ncit:C25613 }
+      fL:      { description: Femtoliter, meaning: ncit:C64780 }
+      pg:      { description: Picogram, meaning: ncit:C64551 }
+      U/L:     { description: "Enzyme Units per Liter (chemistry; no EVS code in cache)." }
+      mmol/L:  { description: Millimole per Liter, meaning: ncit:C64387 }
+      umol/L:  { description: Micromole per Liter, meaning: ncit:C64389 }
+      ng/dL:   { description: "Nanogram per Deciliter (no EVS code in cache)." }
+
+  LbTestCdEnum:
+    description: >-
+      Hematology subset of CDISC CT codelist LBTESTCD (C65047), source NCI EVS
+      evs-2026-Q1. Used by Dataset Specializations / mappings, not directly on a
+      DTA instance slot (the DTA carries vendor codes in PLBTID).
+    permissible_values:
+      HGB:  { description: Hemoglobin Measurement, meaning: ncit:C64848 }
+      RBC:  { description: Erythrocyte Count, meaning: ncit:C51946 }
+      WBC:  { description: Leukocyte Count, meaning: ncit:C51948 }
+      HCT:  { description: Hematocrit Measurement, meaning: ncit:C64796 }
+      PLAT: { description: Platelet Count, meaning: ncit:C51951 }
+      MCV:  { description: Erythrocyte Mean Corpuscular Volume, meaning: ncit:C64799 }
+      MCH:  { description: Erythrocyte Mean Corpuscular Hemoglobin, meaning: ncit:C64797 }
+      MCHC: { description: Erythrocyte Mean Corpuscular Hemoglobin Concentration, meaning: ncit:C64798 }

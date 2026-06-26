@@ -1,0 +1,116 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Mock Data Transfer AGREEMENT instance — validates against dta.linkml.yaml
+# (root class: DataTransferAgreement).
+#
+# Exercises every agreement-layer class: Study/StudySummary, DtaVersion,
+# BcSelection (+ faceted BcClassification incl. the is_used_by_dta edge), Party,
+# TransferRequirements, VisitMapping, Source. Study context is an illustrative
+# USDM projection; the model is study-agnostic.
+#
+# Validate:
+#   linkml-validate -s dta.linkml.yaml -C DataTransferAgreement agreement.example.yaml
+# ─────────────────────────────────────────────────────────────────────────────
+
+app_name: dta_agreement_usdm_v1
+
+source:
+  usdm: anonymized USDM sample
+  mvp: filtered MVP metadata
+  template: "no template"
+
+study:
+  study_name: NCT01797120
+  study_identifier: NCT01797120
+  study_title: >-
+    Study of Fulvestrant +/- Everolimus in Post-Menopausal, Hormone-Receptor +
+    Metastatic Breast Ca Resistant to AI
+  version_identifier: "1"
+  version_id: StudyVersion_1
+  design_id: InterventionalStudyDesign_1
+  description: >-
+    Post-menopausal women with HR+ metastatic breast cancer resistant to aromatase
+    inhibitor therapy randomized to Fulvestrant with Everolimus or with placebo.
+  summary:
+    organizations: 3
+    roles: 12
+    assigned_persons: 9
+    encounters: 8
+    biomedical_concepts: 50
+    bc_surrogates: 14
+
+dta_version:
+  version_number: "1.0"
+  version_date: "2026-06-11"
+
+data_types:
+  - "Leukocyte Count (C51948)"
+  - "Erythrocyte Count (C51946)"
+
+data_type_details:
+  - key: "C51948||Leukocyte Count"
+    bc_id: C51948
+    short_name: Leukocyte Count
+    facets:
+      - { group_name: category, value: "Hematology Tests" }
+      - { group_name: category, value: "Complete Blood Count (CBC)" }
+      - { group_name: disease_area, value: "Infection" }
+      - { group_name: is_used_by_form, value: "EDC Form Local Lab - Hematology" }
+      - { group_name: is_used_by_dta, value: "Data Transfer Agreement Central Lab" }
+  - key: "C51946||Erythrocyte Count"
+    bc_id: C51946
+    short_name: Erythrocyte Count
+    facets:
+      - { group_name: category, value: "Blood Cell Counts" }
+      - { group_name: category, value: "Complete Blood Count (CBC)" }
+      - { group_name: is_used_by_dta, value: "Data Transfer Agreement Central Lab" }
+
+parties:
+  - id: StudyRole_1_Organization_1
+    name: ""
+    role: Clinical Study Sponsor
+    organization: "PrECOG, LLC"
+    organization_type: Clinical Study Sponsor
+    data_exchange_role: Data Recipient
+    email: ""
+    signature_date: ""
+    source: "USDM + UI"
+  - id: StudyRole_11_Person_8
+    name: Mary Smith
+    role: Data Acquisition Lead
+    organization: VendorLab1
+    organization_type: Laboratory
+    data_exchange_role: Data Provider
+    email: ""
+    signature_date: ""
+    source: "USDM + UI"
+
+transfer:
+  file_name: Safety_Lab
+  file_format: XPT
+  encoding_system: UTF8
+  delimiter: Not Applicable
+  transmission_method: sFTP
+  transmission_type: Cumulative
+  transfer_environment: Production
+  transfer_blinding: Blinded
+  folder_name_provider: provider_out
+  folder_name_recipient: sponsor_in
+
+visit_mapping:
+  - protocol_visit_number: "PRE-STUDY"
+    protocol_visit_name: "Pre-Study"
+    data_provider_visit_number: "01"
+    data_provider_visit_name: "PRESTUDY"
+    source: "USDM + UI"
+  - protocol_visit_number: "C1D1"
+    protocol_visit_name: "Cycle 1 Day 1"
+    data_provider_visit_number: "02"
+    data_provider_visit_name: "C1D1"
+    source: "USDM + UI"
+
+timepoint_mapping:
+  - protocol_timepoint_number: "1"
+    protocol_timepoint_name: "Pre-dose"
+    data_provider_timepoint_number: "T1"
+    data_provider_timepoint_name: "PREDOSE"
+    source: UI
