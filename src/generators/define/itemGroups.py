@@ -149,7 +149,7 @@ class ItemGroups(define_object.DefineObject):
         if attributes.get("IsReferenceData") == "Yes":
             return "No"
         if attributes["Domain"] in NON_REPEATING_DOMAINS:
-            # TODO check for presence of -PARMCD for DI/OI domains
+            # FUTURE: update for ADaM check for presence of -PARMCD for DI/OI domains
             return "No"
         if attributes["Structure"] != "NA" and attributes["Structure"].count("per") == 1:
             return "No"

@@ -46,7 +46,7 @@ class CodeLists(define_object.DefineObject):
                 else:
                     en_item = self._create_enumerateditem_object(term, is_non_standard)
                     cl_defn.EnumeratedItem.append(en_item)
-            # TODO no indicator that a codelist is a dictionary with an external codelist reference
+            # ASSUMPTION: a codelist with no items is an external codelist reference
             if len(cl["codeListItems"]) == 0:
                 self._create_external_code_list(cl_defn, cl)
             self._add_codelist_to_objects(cl_c_code, cl_defn, define_objects)
@@ -54,9 +54,10 @@ class CodeLists(define_object.DefineObject):
     @staticmethod
     def _create_external_code_list(cl, obj):
         # TODO temp to create the external codelist content - not yet available in define.json
-        attr = {"Dictionary": obj["name"], "Version": "1.0", "href": "https://www.iso.org"}
-        exd = DEFINE.ExternalCodeList(**attr)
-        cl.ExternalCodeList = exd
+        # attr = {"Dictionary": obj["name"], "Version": "1.0", "href": "https://www.iso.org"}
+        # exd = DEFINE.ExternalCodeList(**attr)
+        # cl.ExternalCodeList = exd
+        pass
 
     @staticmethod
     def _add_codelist_to_objects(cl_c_code, cl, objects):
