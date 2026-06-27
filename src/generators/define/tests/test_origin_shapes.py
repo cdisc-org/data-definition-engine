@@ -17,8 +17,9 @@ def items_instance():
 def _new_itemdef():
     """Mirror the descriptor-bypass pattern used in Items._create_itemdef_object."""
     from odmlib.define_2_1 import model as DEFINE
-    item = object.__new__(DEFINE.ItemDef)
-    item.__dict__["Origin"] = []
+    from odmlib import permissive
+    with permissive():
+        item = DEFINE.ItemDef()
     return item
 
 
@@ -36,6 +37,7 @@ class TestOriginDictShape:
     def test_collected_investigator_attaches_acrf_documentref(self, items_instance):
         item = _new_itemdef()
         obj = {"origin": {"type": "Collected", "source": "Investigator"}}
+
         items_instance._add_origin(item, obj)
         assert len(item.Origin[0].DocumentRef) == 1
         assert item.Origin[0].DocumentRef[0].leafID == "LF.ACRF"
@@ -184,8 +186,10 @@ class TestPostProcessingMultiOrigin:
 
     def _build_objects(self, origin_value):
         from odmlib.define_2_1 import model as DEFINE
+        from odmlib import permissive
+
         item = _new_itemdef()
-        item.__dict__["OID"] = "IT.DM.USUBJID"
+        item.OID = "IT.DM.USUBJID"
 
         items_inst_module = __import__("items")
         inst = items_inst_module.Items()
@@ -193,11 +197,10 @@ class TestPostProcessingMultiOrigin:
         inst.acrf = "LF.ACRF"
         inst._add_origin(item, {"origin": origin_value})
 
-        igd = object.__new__(DEFINE.ItemGroupDef)
-        ir = object.__new__(DEFINE.ItemRef)
-        ir.__dict__["ItemOID"] = item.OID
-        ir.__dict__["MethodOID"] = None
-        igd.__dict__["ItemRef"] = [ir]
+        with permissive():
+            igd = DEFINE.ItemGroupDef()
+            ir = DEFINE.ItemRef(ItemOID=item.OID, MethodOID=None)
+            igd.ItemRef = [ir]
 
         return {
             "ItemDef": [item],
