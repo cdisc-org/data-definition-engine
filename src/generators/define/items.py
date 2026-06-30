@@ -1,5 +1,6 @@
 from typing import Any
 from odmlib.define_2_1 import model as DEFINE
+from odmlib import permissive
 import define_object
 
 
@@ -48,11 +49,9 @@ class Items(define_object.DefineObject):
         data_type = self.require_key(obj, "dataType", f"ItemDef {oid}")
         attr = {"OID": oid, "Name": name, "DataType": data_type, "SASFieldName": name}
         self._add_optional_itemdef_attributes(attr, obj)
-        # TODO hack — bypasses odmlib descriptor validation so "__PLACEHOLDER__" values
-        # can be stashed on an ItemDef until odmlib v0.2.0 ships. We must manually
-        # materialize the list-typed children that downstream code later appends to
-        # because skipping __init__ skips their initialization.
-        item = self._new_itemdef(attr)
+        # permissive mode needed to bypass odmlib descriptor validation to allow __PLACEHOLDER__ values
+        with permissive():
+            item = DEFINE.ItemDef(**attr)
 
         if obj.get("description"):
             tt = DEFINE.TranslatedText(_content=obj["description"], lang=self.lang)
@@ -64,15 +63,6 @@ class Items(define_object.DefineObject):
         for list_attr in ("Origin",):
             if list_attr not in item.__dict__:
                 item.__dict__[list_attr] = []
-        return item
-
-    @staticmethod
-    def _new_itemdef(attr: dict[str, Any]) -> Any:
-        """Instantiate an ItemDef without triggering descriptor validation."""
-        # TODO replace this with v0.2.0 odmlib permissive mode
-        item = object.__new__(DEFINE.ItemDef)
-        for key, value in attr.items():
-            item.__dict__[key] = value
         return item
 
     def _add_optional_itemdef_elements(self, item, obj, it_oid, slice):
@@ -113,12 +103,9 @@ class Items(define_object.DefineObject):
             attr["Type"] = origin_type
         if origin_source:
             attr["Source"] = origin_source
-        # Bypass odmlib descriptor validation to allow __PLACEHOLDER__ values later.
-        # TODO remove this hack when odmlib v0.2.0 is released.
-        origin = object.__new__(DEFINE.Origin)
-        for key, value in attr.items():
-            origin.__dict__[key] = value
-        origin.__dict__.setdefault("DocumentRef", [])
+        # permissive mode needed to bypass odmlib descriptor validation to allow __PLACEHOLDER__ values
+        with permissive():
+            origin = DEFINE.Origin(**attr)
 
         if origin_type == "Collected" and origin_source == "Investigator":
             dr = DEFINE.DocumentRef(leafID=self.acrf)
@@ -148,7 +135,7 @@ class Items(define_object.DefineObject):
         if obj.get("significantDigits"):
             attr["SignificantDigits"] = obj["significantDigits"]
         elif obj.get("displayFormat") and obj.get("dataType") == "float":
-            # TODO work around issue 78 - missing significant digits - remove after USDM updated
+            # ASSUMPTION: workaround for cases where SignificantDigits is missing
             length_str, sep, sig_str = str(obj["displayFormat"]).partition(".")
             if sep and sig_str.isdigit():
                 attr["SignificantDigits"] = int(sig_str)
