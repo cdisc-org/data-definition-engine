@@ -21,7 +21,7 @@ data/
 │   └── templates/
 │       └── Define-Excel-Spec.xlsx             # Template for the Define-XML Excel spec format
 └── protocols/
-        ├── HCT01797120/            # Study NCT01797120
+        ├── NCT01797120/            # Study NCT01797120
         │   ├── NCT01797120-latest.json         # USDM 4.0 protocol export
         │   └── NCT01797120-define-latest.json  # Define-JSON export
         └── pilot-LZZT/                   # Study CDISC Pilot LZZT (H2Q-MC-LZZT)
