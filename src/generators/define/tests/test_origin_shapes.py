@@ -212,7 +212,9 @@ class TestPostProcessingMultiOrigin:
     def test_derived_in_first_origin_triggers_method(self):
         import post_processing
         objects, ir = self._build_objects([{"type": "Derived"}, {"type": "Predecessor"}])
-        post_processing.PostProcessing(objects, is_xpt=False, lang="en").process_define_objects()
+        post_processing.PostProcessing(
+            objects, {"itemGroups": []}, is_xpt=False, lang="en"
+        ).process_define_objects()
         assert ir.MethodOID is not None
         assert len(objects["MethodDef"]) == 1
 
@@ -221,7 +223,9 @@ class TestPostProcessingMultiOrigin:
         objects, ir = self._build_objects(
             [{"type": "Collected", "source": "Investigator"}, {"type": "Derived"}]
         )
-        post_processing.PostProcessing(objects, is_xpt=False, lang="en").process_define_objects()
+        post_processing.PostProcessing(
+            objects, {"itemGroups": []}, is_xpt=False, lang="en"
+        ).process_define_objects()
         assert ir.MethodOID is not None
         assert len(objects["MethodDef"]) == 1
 
@@ -230,6 +234,8 @@ class TestPostProcessingMultiOrigin:
         objects, ir = self._build_objects(
             [{"type": "Collected", "source": "Investigator"}, {"type": "Predecessor"}]
         )
-        post_processing.PostProcessing(objects, is_xpt=False, lang="en").process_define_objects()
+        post_processing.PostProcessing(
+            objects, {"itemGroups": []}, is_xpt=False, lang="en"
+        ).process_define_objects()
         assert ir.MethodOID is None
         assert objects["MethodDef"] == []

@@ -124,17 +124,17 @@ class DefineGenerator:
             logging.info(f"processing {section}")
             self._load(section, value)
 
-        self._post_process_elements()
+        self._post_process_elements(template_objects)
         odm = self._build_doc()
         self._write_define(odm)
 
 
-    def _post_process_elements(self) -> None:
+    def _post_process_elements(self, template_objects) -> None:
         """
         Post-processing adds content determined after all elements are created.
         :return: None
         """
-        pp = PP.PostProcessing(self.define_objects, self.is_xpt, self.lang)
+        pp = PP.PostProcessing(self.define_objects, template_objects, self.is_xpt, self.lang)
         pp.process_define_objects()
 
     def _init_define_objects(self) -> None:

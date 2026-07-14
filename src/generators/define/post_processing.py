@@ -7,16 +7,41 @@ class PostProcessing:
     """
     Base class for post-processing Define-XML elements.
     """
-    def __init__(self, define_objects: dict[str, list[Any]], is_xpt: bool, lang: str):
+    def __init__(self, define_objects: dict[str, list[Any]], template_objects: dict[str, list[Any]], is_xpt: bool, lang: str):
         self.define_objects = define_objects
+        self.template_objects = template_objects
         self.is_xpt = is_xpt
         self.lang = lang
 
     def process_define_objects(self) -> None:
         self._add_derived_methods()
+        self._add_key_sequences()
         if self.is_xpt:
             self._update_dataset_file_type_to_xpt()
 
+
+    def _add_key_sequences(self):
+        """
+        go through all item groups and find and assign key sequences
+        """
+        for igd in self.define_objects['ItemGroupDef']:
+            for tgd in self.template_objects['itemGroups']:
+                if igd.OID == tgd["OID"]:
+                    if tgd.get("keySequence"):
+                        self._add_item_ref_key_sequences(igd, tgd)
+
+    @staticmethod
+    def _add_item_ref_key_sequences(igd: Any, tgd: Any) -> None:
+        """
+        once an item group with a key sequence is found, assign the key sequence to the item ref
+        :param igd: define-xml ItemGroupDef object
+        :param tgd: template item group object
+        """
+        key_sequence = tgd["keySequence"]
+        for ir in igd.ItemRef:
+            oid_parts = ir.ItemOID.split('.')
+            if oid_parts and (oid_parts[-1].upper() in key_sequence):
+                ir.KeySequence = key_sequence.index(oid_parts[-1].upper()) + 1
 
     def _update_dataset_file_type_to_xpt(self) -> None:
         """
