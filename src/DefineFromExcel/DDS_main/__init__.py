@@ -21,6 +21,7 @@ class DDSMain:
         return self._excel
 
     def from_excel(self, file: Path, xltemplate, schema_file: Path):
+        print ('FILE FROM DDS_MAIN: ',file)
         self._excel = DDSExcel(file,xltemplate)
         self._wrapper = self._excel.execute()
 
@@ -29,17 +30,18 @@ class DDSMain:
             f.write(json.dumps(self._wrapper,indent=2))
 
         # Validate
-        # val_errors = []
-        # self.validation_report = validate_file(file.with_suffix('.json'),str(schema_file))
+        val_errors = []
+        self.validation_report = validate_file(file.with_suffix('.json'),str(schema_file))
 
-        # if report.results:
-        #     for result in report.results:
-        #         val_errors.append({'Message':str(result)})
+        if self.validation_report.results:
+            for result in self.validation_report.results:
+                #val_errors.append({'Message':str(result)})
+                val_errors.append({'Message':str(result.message)})
 
-        # else:
-        #     val_errors.append({"Message":'No schema validation errors!'})
+        else:
+            val_errors.append({"Message":'No schema validation errors!'})
 
-        # pd.DataFrame(val_errors).to_excel(file.with_name(file.stem+"_schema_validation.xlsx"))
+        pd.DataFrame(val_errors).to_excel(file.with_name(file.stem+"_schema_validation.xlsx"))
 
         # print("input file      :", file.resolve())
         # print("json output     :", file.with_suffix('.json').resolve())

@@ -1,6 +1,7 @@
 from DDS_excel.base_sheet import BaseSheet
 from DDS_excel.globals import Globals
 from datetime import datetime
+import traceback
 
 
 class StudySheet(BaseSheet):
@@ -8,6 +9,7 @@ class StudySheet(BaseSheet):
     def __init__(self, file_path: str, globals: Globals):
 
         self._study_template={}
+        print ('FILE_PATH FROM STUDY SHEET: ',file_path)
 
         try:
             super().__init__(
@@ -19,7 +21,9 @@ class StudySheet(BaseSheet):
             self._process_sheet()
 
         except Exception as e:
+            traceback.print_exc()
             self._sheet_exception(e)
+            raise
 
     def _process_sheet(self):
         # map of attribute names in Study sheet to corresponding names in DDS

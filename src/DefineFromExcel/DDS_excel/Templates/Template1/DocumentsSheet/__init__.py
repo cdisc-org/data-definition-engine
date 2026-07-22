@@ -1,17 +1,17 @@
 from DDS_excel.base_sheet import BaseSheet
 from DDS_excel.globals import Globals
 
-class StandardsSheet(BaseSheet):
+class DocumentsSheet(BaseSheet):
 
-    def __init__(self, file_path: str, globals: Globals, template: dict):
+    def __init__(self, file_path: str, globals: Globals):
 
-        self._study_template=template
+        self._documents=[]
 
         try:
             super().__init__(
                 file_path=file_path,
                 globals=globals,
-                sheet_name="Standards"
+                sheet_name="Documents"
             )        
       
             self._process_sheet()
@@ -20,5 +20,6 @@ class StandardsSheet(BaseSheet):
             self._sheet_exception(e)
 
     def _process_sheet(self):
-        pass
+        for row in self.sheet.itertuples():
+            self._documents.append({'OID':row.ID,'leafID':row.ID,'title':row.Title,'href':row.Href})
 

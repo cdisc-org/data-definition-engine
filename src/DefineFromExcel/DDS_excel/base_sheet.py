@@ -49,6 +49,8 @@ class BaseSheet:
                     sheet_name=sheet_name,
                     header=header,
                     converters=converters,
+                    keep_default_na=False,
+                    na_values=''
                 )
                 self.success = True
                 self._general_info("Processed sheet %s" % (sheet_name))

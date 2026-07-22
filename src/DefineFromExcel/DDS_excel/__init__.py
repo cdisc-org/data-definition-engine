@@ -10,6 +10,7 @@ class DDSExcel:
         self._globals = Globals()
         self._file_path = file_path
         self._plugin = importlib.import_module(f"DDS_excel.Templates.{xltemplate}.Process")
+        print ('FILE FROM DDS_EXCEL: ',file_path)
 
         self._template = {
             'OID': '',
@@ -36,11 +37,14 @@ class DDSExcel:
             'concepts': [],
             'conceptProperties': [],
             'items': [],
-            'comments':[]
+            'comments':[],
+            'dictionaries':[],
+            'resources':[]
         }        
 
     def execute(self):
         self._globals.create()
+        print ('SELF._FILE_PATH FROM EXECUTE: ',self._file_path)
         return self._plugin.process(self._file_path,self._globals,self._template)
 
     def errors(self):

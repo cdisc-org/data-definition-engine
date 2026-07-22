@@ -25,6 +25,7 @@ class ItemDefs(BaseSheet):
             )              
 
             self.sheet_var = self.sheet
+            # self.sheet_var['Pages'] = self.sheet_var['Pages'].astype(str)
 
             super().__init__(
                 file_path=file_path,
@@ -33,6 +34,7 @@ class ItemDefs(BaseSheet):
             )              
 
             self.sheet_vlm = self.sheet
+            self.sheet_vlm['Format'] = self.sheet_vlm['Format'].astype(str)
 
             self._process_sheet()
 
@@ -82,8 +84,8 @@ def CreateItem(row,names,namesb):
     if pd.notna(row.Document):
         docdict['leafID'] = row.Document
         if pd.notna(row.Pages):
-            docdict['pages']=row.Pages.split(',')
-        origindict['documents'] = docdict
+            docdict['pages']=[int(x) for x in row.Pages.split(',')] if isinstance(row.Pages,str) else [row.Pages]
+        origindict['documents'] = [docdict]
     if origindict:
         itemdict['origin'] = origindict
 
