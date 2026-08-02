@@ -46,6 +46,10 @@ class CodeLists(define_object.DefineObject):
                 else:
                     en_item = self._create_enumerateditem_object(term, is_non_standard)
                     cl_defn.EnumeratedItem.append(en_item)
+            # if it's an empty codelist then add a placeholder enumerated item
+            if not codelist_items:
+                en_item = self._create_placeholder_enumerateditem_object()
+                cl_defn.EnumeratedItem.append(en_item)
             self._add_codelist_to_objects(cl_c_code, cl_defn, define_objects)
 
     @staticmethod
@@ -81,6 +85,12 @@ class CodeLists(define_object.DefineObject):
             alias = DEFINE.Alias(Context="nci:ExtCodeID", Name="__PLACEHOLDER__")
             en_item.Alias.append(alias)
         return en_item
+
+    def _create_placeholder_enumerateditem_object(self):
+        attr = {"CodedValue": "__PLACEHOLDER__"}
+        en_item = DEFINE.EnumeratedItem(**attr)
+        return en_item
+
 
     def _create_codelistitem_object(self, obj, is_non_standard):
         coded_value = self.require_key(obj, "codedValue", "CodeListItem")
