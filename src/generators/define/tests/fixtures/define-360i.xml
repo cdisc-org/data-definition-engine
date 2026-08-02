@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<ODM FileOID="ODM.DEFINE21.ea73ce1d-9dc0-4f68-aae7-2cfaadc7ad73" AsOfDateTime="2026-07-14T19:14:01.092889+00:00"
-     CreationDateTime="2026-07-14T19:14:01.092900+00:00" ODMVersion="1.3.2" FileType="Snapshot"
+<ODM FileOID="ODM.DEFINE21.ad58b8af-a56b-40f0-bdf2-3e46c90b9b81" AsOfDateTime="2026-08-02T15:39:57.087612+00:00"
+     CreationDateTime="2026-08-02T15:39:57.087621+00:00" ODMVersion="1.3.2" FileType="Snapshot"
      Originator="360i Define-XML Team" SourceSystem="odmlib" SourceSystemVersion="0.2" def:Context="Other"
      xmlns="http://www.cdisc.org/ns/odm/v1.3" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance"
      xmlns:xml="http://www.w3.org/XML/1998/namespace" xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -2304,7 +2304,7 @@
                     <CheckValue>EX23</CheckValue>
                 </RangeCheck>
             </def:WhereClauseDef>
-            <ItemGroupDef OID="IG.DS" Name="DS" Domain="DS" SASDatasetName="DS"
+            <ItemGroupDef OID="IG.DS" Name="DS" Domain="DS" SASDatasetName="DS" def:ArchiveLocationID="LF.DS"
                           def:Structure="One record per disposition status or protocol milestone per subject"
                           IsReferenceData="No" Repeating="Yes" Purpose="Tabulation" def:StandardOID="STD.SDTMIG">
                 <Description>
@@ -2325,8 +2325,9 @@
                     <def:title>ds.ndjson</def:title>
                 </def:leaf>
             </ItemGroupDef>
-            <ItemGroupDef OID="IG.DM" Name="DM" Domain="DM" SASDatasetName="DM" def:Structure="One record per subject"
-                          IsReferenceData="No" Repeating="No" Purpose="Tabulation" def:StandardOID="STD.SDTMIG">
+            <ItemGroupDef OID="IG.DM" Name="DM" Domain="DM" SASDatasetName="DM" def:ArchiveLocationID="LF.DM"
+                          def:Structure="One record per subject" IsReferenceData="No" Repeating="No"
+                          Purpose="Tabulation" def:StandardOID="STD.SDTMIG">
                 <Description>
                     <TranslatedText xml:lang="en">Demographics</TranslatedText>
                 </Description>
@@ -2361,7 +2362,7 @@
                     <def:title>dm.ndjson</def:title>
                 </def:leaf>
             </ItemGroupDef>
-            <ItemGroupDef OID="IG.SC" Name="SC" Domain="SC" SASDatasetName="SC"
+            <ItemGroupDef OID="IG.SC" Name="SC" Domain="SC" SASDatasetName="SC" def:ArchiveLocationID="LF.SC"
                           def:Structure="One record per characteristic per visit per subject." IsReferenceData="No"
                           Repeating="Yes" Purpose="Tabulation" def:StandardOID="STD.SDTMIG">
                 <Description>
@@ -2386,7 +2387,7 @@
                     <def:title>sc.ndjson</def:title>
                 </def:leaf>
             </ItemGroupDef>
-            <ItemGroupDef OID="IG.MH" Name="MH" Domain="MH" SASDatasetName="MH"
+            <ItemGroupDef OID="IG.MH" Name="MH" Domain="MH" SASDatasetName="MH" def:ArchiveLocationID="LF.MH"
                           def:Structure="One record per medical history event per subject" IsReferenceData="No"
                           Repeating="Yes" Purpose="Tabulation" def:StandardOID="STD.SDTMIG">
                 <Description>
@@ -2408,7 +2409,7 @@
                     <def:title>mh.ndjson</def:title>
                 </def:leaf>
             </ItemGroupDef>
-            <ItemGroupDef OID="IG.SU" Name="SU" Domain="SU" SASDatasetName="SU"
+            <ItemGroupDef OID="IG.SU" Name="SU" Domain="SU" SASDatasetName="SU" def:ArchiveLocationID="LF.SU"
                           def:Structure="One record per substance type per reported occurrence per subject"
                           IsReferenceData="No" Repeating="Yes" Purpose="Tabulation" def:StandardOID="STD.SDTMIG">
                 <Description>
@@ -2441,7 +2442,7 @@
                     <def:title>su.ndjson</def:title>
                 </def:leaf>
             </ItemGroupDef>
-            <ItemGroupDef OID="IG.PR" Name="PR" Domain="PR" SASDatasetName="PR"
+            <ItemGroupDef OID="IG.PR" Name="PR" Domain="PR" SASDatasetName="PR" def:ArchiveLocationID="LF.PR"
                           def:Structure="One record per recorded procedure per occurrence per subject"
                           IsReferenceData="No" Repeating="Yes" Purpose="Tabulation" def:StandardOID="STD.SDTMIG">
                 <Description>
@@ -2465,7 +2466,7 @@
                     <def:title>pr.ndjson</def:title>
                 </def:leaf>
             </ItemGroupDef>
-            <ItemGroupDef OID="IG.VS" Name="VS" Domain="VS" SASDatasetName="VS"
+            <ItemGroupDef OID="IG.VS" Name="VS" Domain="VS" SASDatasetName="VS" def:ArchiveLocationID="LF.VS"
                           def:Structure="One record per vital sign measurement per time point per visit per subject"
                           IsReferenceData="No" Repeating="Yes" Purpose="Tabulation" def:StandardOID="STD.SDTMIG">
                 <Description>
@@ -2495,7 +2496,7 @@
                     <def:title>vs.ndjson</def:title>
                 </def:leaf>
             </ItemGroupDef>
-            <ItemGroupDef OID="IG.EG" Name="EG" Domain="EG" SASDatasetName="EG"
+            <ItemGroupDef OID="IG.EG" Name="EG" Domain="EG" SASDatasetName="EG" def:ArchiveLocationID="LF.EG"
                           def:Structure="One record per ECG observation per replicate per time point or one record per ECG observation per beat per visit per subject"
                           IsReferenceData="No" Repeating="Yes" Purpose="Tabulation" def:StandardOID="STD.SDTMIG">
                 <Description>
@@ -2527,7 +2528,7 @@
                     <def:title>eg.ndjson</def:title>
                 </def:leaf>
             </ItemGroupDef>
-            <ItemGroupDef OID="IG.CM" Name="CM" Domain="CM" SASDatasetName="CM"
+            <ItemGroupDef OID="IG.CM" Name="CM" Domain="CM" SASDatasetName="CM" def:ArchiveLocationID="LF.CM"
                           def:Structure="One record per recorded intervention occurrence or constant-dosing interval per subject"
                           IsReferenceData="No" Repeating="Yes" Purpose="Tabulation" def:StandardOID="STD.SDTMIG">
                 <Description>
@@ -2555,7 +2556,7 @@
                     <def:title>cm.ndjson</def:title>
                 </def:leaf>
             </ItemGroupDef>
-            <ItemGroupDef OID="IG.LB" Name="LB" Domain="LB" SASDatasetName="LB"
+            <ItemGroupDef OID="IG.LB" Name="LB" Domain="LB" SASDatasetName="LB" def:ArchiveLocationID="LF.LB"
                           def:Structure="One record per lab test per time point per visit per subject"
                           IsReferenceData="No" Repeating="Yes" Purpose="Tabulation" def:StandardOID="STD.SDTMIG">
                 <Description>
@@ -2591,7 +2592,7 @@
                     <def:title>lb.ndjson</def:title>
                 </def:leaf>
             </ItemGroupDef>
-            <ItemGroupDef OID="IG.MB" Name="MB" Domain="MB" SASDatasetName="MB"
+            <ItemGroupDef OID="IG.MB" Name="MB" Domain="MB" SASDatasetName="MB" def:ArchiveLocationID="LF.MB"
                           def:Structure="One record per microbiology specimen finding per time point per visit per subject"
                           IsReferenceData="No" Repeating="Yes" Purpose="Tabulation" def:StandardOID="STD.SDTMIG">
                 <Description>
@@ -2616,7 +2617,7 @@
                     <def:title>mb.ndjson</def:title>
                 </def:leaf>
             </ItemGroupDef>
-            <ItemGroupDef OID="IG.EC" Name="EC" Domain="EC" SASDatasetName="EC"
+            <ItemGroupDef OID="IG.EC" Name="EC" Domain="EC" SASDatasetName="EC" def:ArchiveLocationID="LF.EC"
                           def:Structure="One record per protocol-specified study treatment, collected-dosing interval, per subject, per mood"
                           IsReferenceData="No" Repeating="Yes" Purpose="Tabulation" def:StandardOID="STD.SDTMIG">
                 <Description>
@@ -2645,7 +2646,7 @@
                     <def:title>ec.ndjson</def:title>
                 </def:leaf>
             </ItemGroupDef>
-            <ItemGroupDef OID="IG.AE" Name="AE" Domain="AE" SASDatasetName="AE"
+            <ItemGroupDef OID="IG.AE" Name="AE" Domain="AE" SASDatasetName="AE" def:ArchiveLocationID="LF.AE"
                           def:Structure="One record per adverse event per subject" IsReferenceData="No" Repeating="Yes"
                           Purpose="Tabulation" def:StandardOID="STD.SDTMIG">
                 <Description>
@@ -2700,7 +2701,7 @@
                     <def:title>ae.ndjson</def:title>
                 </def:leaf>
             </ItemGroupDef>
-            <ItemGroupDef OID="IG.TS" Name="TS" Domain="TS" SASDatasetName="TS"
+            <ItemGroupDef OID="IG.TS" Name="TS" Domain="TS" SASDatasetName="TS" def:ArchiveLocationID="LF.TS"
                           def:Structure="One record per trial summary parameter value" IsReferenceData="Yes"
                           Repeating="No" Purpose="Tabulation" def:StandardOID="STD.SDTMIG">
                 <Description>
@@ -2720,7 +2721,7 @@
                     <def:title>ts.ndjson</def:title>
                 </def:leaf>
             </ItemGroupDef>
-            <ItemGroupDef OID="IG.TA" Name="TA" Domain="TA" SASDatasetName="TA"
+            <ItemGroupDef OID="IG.TA" Name="TA" Domain="TA" SASDatasetName="TA" def:ArchiveLocationID="LF.TA"
                           def:Structure="One record per planned Element per Arm" IsReferenceData="Yes" Repeating="No"
                           Purpose="Tabulation" def:StandardOID="STD.SDTMIG">
                 <Description>
@@ -2741,7 +2742,7 @@
                     <def:title>ta.ndjson</def:title>
                 </def:leaf>
             </ItemGroupDef>
-            <ItemGroupDef OID="IG.TE" Name="TE" Domain="TE" SASDatasetName="TE"
+            <ItemGroupDef OID="IG.TE" Name="TE" Domain="TE" SASDatasetName="TE" def:ArchiveLocationID="LF.TE"
                           def:Structure="One record per planned Element" IsReferenceData="Yes" Repeating="No"
                           Purpose="Tabulation" def:StandardOID="STD.SDTMIG">
                 <Description>
@@ -2757,7 +2758,7 @@
                     <def:title>te.ndjson</def:title>
                 </def:leaf>
             </ItemGroupDef>
-            <ItemGroupDef OID="IG.TI" Name="TI" Domain="TI" SASDatasetName="TI"
+            <ItemGroupDef OID="IG.TI" Name="TI" Domain="TI" SASDatasetName="TI" def:ArchiveLocationID="LF.TI"
                           def:Structure="One record per I/E criterion" IsReferenceData="Yes" Repeating="No"
                           Purpose="Tabulation" def:StandardOID="STD.SDTMIG">
                 <Description>
@@ -2773,7 +2774,7 @@
                     <def:title>ti.ndjson</def:title>
                 </def:leaf>
             </ItemGroupDef>
-            <ItemGroupDef OID="IG.TV" Name="TV" Domain="TV" SASDatasetName="TV"
+            <ItemGroupDef OID="IG.TV" Name="TV" Domain="TV" SASDatasetName="TV" def:ArchiveLocationID="LF.TV"
                           def:Structure="One record per planned Visit per Arm" IsReferenceData="Yes" Repeating="No"
                           Purpose="Tabulation" def:StandardOID="STD.SDTMIG">
                 <Description>
@@ -2793,7 +2794,7 @@
                     <def:title>tv.ndjson</def:title>
                 </def:leaf>
             </ItemGroupDef>
-            <ItemGroupDef OID="IG.SV" Name="SV" Domain="SV" SASDatasetName="SV"
+            <ItemGroupDef OID="IG.SV" Name="SV" Domain="SV" SASDatasetName="SV" def:ArchiveLocationID="LF.SV"
                           def:Structure="One record per actual or planned visit per subject" IsReferenceData="No"
                           Repeating="Yes" Purpose="Tabulation" def:StandardOID="STD.SDTMIG">
                 <Description>
@@ -2814,7 +2815,7 @@
                     <def:title>sv.ndjson</def:title>
                 </def:leaf>
             </ItemGroupDef>
-            <ItemGroupDef OID="IG.IE" Name="IE" Domain="IE" SASDatasetName="IE"
+            <ItemGroupDef OID="IG.IE" Name="IE" Domain="IE" SASDatasetName="IE" def:ArchiveLocationID="LF.IE"
                           def:Structure="One record per inclusion/exclusion criterion not met per subject"
                           IsReferenceData="No" Repeating="Yes" Purpose="Tabulation" def:StandardOID="STD.SDTMIG">
                 <Description>
@@ -2834,7 +2835,7 @@
                     <def:title>ie.ndjson</def:title>
                 </def:leaf>
             </ItemGroupDef>
-            <ItemGroupDef OID="IG.SE" Name="SE" Domain="SE" SASDatasetName="SE"
+            <ItemGroupDef OID="IG.SE" Name="SE" Domain="SE" SASDatasetName="SE" def:ArchiveLocationID="LF.SE"
                           def:Structure="One record per actual Element per subject" IsReferenceData="No" Repeating="Yes"
                           Purpose="Tabulation" def:StandardOID="STD.SDTMIG">
                 <Description>

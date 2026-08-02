@@ -98,11 +98,9 @@ class ItemGroups(define_object.DefineObject):
         name = self.require_key(obj, "name", "ItemGroupDef")
         oid = self.generate_oid(["IG", name])
         attr = {"OID": oid, "Name": name, "Domain": name, "SASDatasetName": name}
-        if obj.get("archiveLocationID"):
-            attr["ArchiveLocationID"] = ".".join(["LF", obj["archiveLocationID"]])
+        # if obj.get("archiveLocationID"):
+        attr["ArchiveLocationID"] = ".".join(["LF", name])
         attr["Structure"] = obj.get("structure", "NA")
-        # if obj.get("sasDatasetName"):
-        #     attr["SASDatasetName"] = obj["sasDatasetName"]
         if "isReferenceData" in obj:
             attr["IsReferenceData"] = "Yes" if obj["isReferenceData"] else "No"
         attr["Repeating"] = self._generate_repeating_value(attr)
