@@ -518,8 +518,8 @@ class USDMDefineJSONProcessor:
             self.vlm_lookup["TSPARMCD"].append(tsparmcd_entry)
 
         # AGEMIN
-        if self.studyDesignData.get('population', {}).get("plannedAge", {}).get("minValue", {}).get("value") is not None or \
-           any(cohort.get('plannedAge', {}).get('minValue', {}).get('value') is not None for cohort in self.studyDesignData.get('population', {}).get('cohorts', [])):
+        if (self.studyDesignData.get('population', {}).get("plannedAge", {}) or {}).get("minValue", {}).get("value") is not None or \
+           any((cohort.get('plannedAge', {}) or {}).get('minValue', {}).get('value') is not None for cohort in self.studyDesignData.get('population', {}).get('cohorts', [])):
             tsparmcd_entry = {
                 "dataType": "text", "length": 200, "originType": "Protocol", "originSource": "Sponsor",
                 "WhereClause": [{"Clause": [{"Dataset": "TS", "Variable": "TSPARMCD", "item": "IT.TS.TSPARMCD", "Comparator": "EQ", "Values": ["AGEMIN"]}]}]
@@ -527,8 +527,8 @@ class USDMDefineJSONProcessor:
             self.vlm_lookup["TSPARMCD"].append(tsparmcd_entry)
 
         # AGEMAX
-        if self.studyDesignData.get('population', {}).get("plannedAge", {}).get("maxValue", {}).get("value") is not None or \
-           any(cohort.get('plannedAge', {}).get('maxValue', {}).get('value') is not None for cohort in self.studyDesignData.get('population', {}).get('cohorts', [])):
+        if (self.studyDesignData.get('population', {}).get("plannedAge", {}) or {}).get("maxValue", {}).get("value") is not None or \
+           any((cohort.get('plannedAge', {}) or {}).get('maxValue', {}).get('value') is not None for cohort in self.studyDesignData.get('population', {}).get('cohorts', [])):
             tsparmcd_entry = {
                 "dataType": "text", "length": 200, "originType": "Protocol", "originSource": "Sponsor",
                 "WhereClause": [{"Clause": [{"Dataset": "TS", "Variable": "TSPARMCD", "item": "IT.TS.TSPARMCD", "Comparator": "EQ", "Values": ["AGEMAX"]}]}]
@@ -566,7 +566,7 @@ class USDMDefineJSONProcessor:
 
         # CRMDUR
         if any(
-            intervention.get('minimumResponseDuration', {}).get('value', None)
+            (intervention.get('minimumResponseDuration', {}) or {}).get('value', None)
             for intervention_id in self.studyDesignData.get('studyInterventionIds', [])
             for intervention in self.study_version_data.get('studyInterventions', [])
             if intervention.get('id') == intervention_id
@@ -682,7 +682,7 @@ class USDMDefineJSONProcessor:
             self.vlm_lookup["TSPARMCD"].append(tsparmcd_entry)
 
         # INTMODEL
-        if self.studyDesignData['studyType']['code'] == 'C98388' and self.studyDesignData.get('model', {}).get('decode', '') != '':
+        if (self.studyDesignData.get('studyType',{}) or {}).get('code','') == 'C98388' and self.studyDesignData.get('model', {}).get('decode', '') != '':
             tsparmcd_entry = {
                 "dataType": "text", "length": 200, "originType": "Protocol", "originSource": "Sponsor",
                 "WhereClause": [{"Clause": [{"Dataset": "TS", "Variable": "TSPARMCD", "item": "IT.TS.TSPARMCD", "Comparator": "EQ", "Values": ["INTMODEL"]}]}]
@@ -755,7 +755,7 @@ class USDMDefineJSONProcessor:
             self.vlm_lookup["TSPARMCD"].append(tsparmcd_entry)
 
         # OBSMODEL
-        if self.studyDesignData['studyType']['code'] == 'C16084' and self.studyDesignData.get('model', {}).get('decode', '') != '':
+        if (self.studyDesignData.get('studyType',{}) or {}).get('code') == 'C16084' and self.studyDesignData.get('model', {}).get('decode', '') != '':
             tsparmcd_entry = {
                 "dataType": "text", "length": 200, "originType": "Protocol", "originSource": "Sponsor",
                 "WhereClause": [{"Clause": [{"Dataset": "TS", "Variable": "TSPARMCD", "item": "IT.TS.TSPARMCD", "Comparator": "EQ", "Values": ["OBSMODEL"]}]}]
@@ -763,7 +763,7 @@ class USDMDefineJSONProcessor:
             self.vlm_lookup["TSPARMCD"].append(tsparmcd_entry)
 
         # OBSTIMP
-        if self.studyDesignData['studyType']['code'] == 'C16084' and self.studyDesignData.get('timePerspective', {}).get('decode', '') != '':
+        if (self.studyDesignData.get('studyType',{}) or {}).get('code') == 'C16084' and self.studyDesignData.get('timePerspective', {}).get('decode', '') != '':
             tsparmcd_entry = {
                 "dataType": "text", "length": 200, "originType": "Protocol", "originSource": "Sponsor",
                 "WhereClause": [{"Clause": [{"Dataset": "TS", "Variable": "TSPARMCD", "item": "IT.TS.TSPARMCD", "Comparator": "EQ", "Values": ["OBSTIMP"]}]}]
@@ -771,7 +771,7 @@ class USDMDefineJSONProcessor:
             self.vlm_lookup["TSPARMCD"].append(tsparmcd_entry)
 
         # OBSTPOPD
-        if self.studyDesignData['studyType']['code'] == 'C16084' and self.studyDesignData.get('population', {}).get('description', '') != '':
+        if (self.studyDesignData.get('studyType',{}) or {}).get('code') == 'C16084' and self.studyDesignData.get('population', {}).get('description', '') != '':
             tsparmcd_entry = {
                 "dataType": "text", "length": 200, "originType": "Protocol", "originSource": "Sponsor",
                 "WhereClause": [{"Clause": [{"Dataset": "TS", "Variable": "TSPARMCD", "item": "IT.TS.TSPARMCD", "Comparator": "EQ", "Values": ["OBSTPOPD"]}]}]
@@ -779,7 +779,7 @@ class USDMDefineJSONProcessor:
             self.vlm_lookup["TSPARMCD"].append(tsparmcd_entry)
 
         # OBSTSMM
-        if self.studyDesignData['studyType']['code'] == 'C16084' and self.studyDesignData.get('samplingMethod', {}).get('decode', '') != '':
+        if (self.studyDesignData.get('studyType',{}) or {}).get('code') == 'C16084' and self.studyDesignData.get('samplingMethod', {}).get('decode', '') != '':
             tsparmcd_entry = {
                 "dataType": "text", "length": 200, "originType": "Protocol", "originSource": "Sponsor",
                 "WhereClause": [{"Clause": [{"Dataset": "TS", "Variable": "TSPARMCD", "item": "IT.TS.TSPARMCD", "Comparator": "EQ", "Values": ["OBSTSMM"]}]}]
@@ -854,7 +854,7 @@ class USDMDefineJSONProcessor:
             self.vlm_lookup["TSPARMCD"].append(tsparmcd_entry)
 
         # PLANSUB
-        if self.studyDesignData.get('population', {}).get("plannedEnrollmentNumber", {}).get("value", None) is not None:
+        if (self.studyDesignData.get('population', {}).get("plannedEnrollmentNumber", {}) or {}).get("value", None) is not None:
             tsparmcd_entry = {
                 "dataType": "text", "length": 200, "originType": "Protocol", "originSource": "Sponsor",
                 "WhereClause": [{"Clause": [{"Dataset": "TS", "Variable": "TSPARMCD", "item": "IT.TS.TSPARMCD", "Comparator": "EQ", "Values": ["PLANSUB"]}]}]
@@ -939,7 +939,7 @@ class USDMDefineJSONProcessor:
             self.vlm_lookup["TSPARMCD"].append(tsparmcd_entry)
 
         # STYPE
-        if self.studyDesignData.get('studyType', {}).get('decode', '') != '':
+        if (self.studyDesignData.get('studyType', {}) or {}).get('decode', '') != '':
             tsparmcd_entry = {
                 "dataType": "text", "length": 200, "originType": "Protocol", "originSource": "Sponsor",
                 "WhereClause": [{"Clause": [{"Dataset": "TS", "Variable": "TSPARMCD", "item": "IT.TS.TSPARMCD", "Comparator": "EQ", "Values": ["STYPE"]}]}]
@@ -947,7 +947,7 @@ class USDMDefineJSONProcessor:
             self.vlm_lookup["TSPARMCD"].append(tsparmcd_entry)
 
         # TBLIND
-        if self.studyDesignData.get('blindingSchema', {}).get('standardCode', {}).get('decode', '') != '':
+        if (self.studyDesignData.get('blindingSchema', {}) or {}).get('standardCode', {}).get('decode', '') != '':
             tsparmcd_entry = {
                 "dataType": "text", "length": 200, "originType": "Protocol", "originSource": "Sponsor",
                 "WhereClause": [{"Clause": [{"Dataset": "TS", "Variable": "TSPARMCD", "item": "IT.TS.TSPARMCD", "Comparator": "EQ", "Values": ["TBLIND"]}]}]
@@ -963,7 +963,7 @@ class USDMDefineJSONProcessor:
             self.vlm_lookup["TSPARMCD"].append(tsparmcd_entry)
 
         # TINDTP
-        if self.studyDesignData.get('studyType', {}).get('code', '') == 'C98388' and \
+        if (self.studyDesignData.get('studyType', {}) or {}).get('code', '') == 'C98388' and \
            any(intent.get('decode', '') != '' for intent in self.studyDesignData.get('intentTypes', [])):
             tsparmcd_entry = {
                 "dataType": "text", "length": 200, "originType": "Protocol", "originSource": "Sponsor",
@@ -984,7 +984,7 @@ class USDMDefineJSONProcessor:
             self.vlm_lookup["TSPARMCD"].append(tsparmcd_entry)
 
         # TPHASE
-        if self.studyDesignData.get('studyPhase', {}).get('standardCode', {}).get('decode', '') != '':
+        if (self.studyDesignData.get('studyPhase', {}) or {}).get('standardCode', {}).get('decode', '') != '':
             tsparmcd_entry = {
                 "dataType": "text", "length": 200, "originType": "Protocol", "originSource": "Sponsor",
                 "WhereClause": [{"Clause": [{"Dataset": "TS", "Variable": "TSPARMCD", "item": "IT.TS.TSPARMCD", "Comparator": "EQ", "Values": ["TPHASE"]}]}]
@@ -1005,7 +1005,7 @@ class USDMDefineJSONProcessor:
             self.vlm_lookup["TSPARMCD"].append(tsparmcd_entry)
 
         # TTYPE
-        if self.studyDesignData.get('studyType', {}).get('code', '') == 'C98388' and \
+        if (self.studyDesignData.get('studyType', {}) or {}).get('code', '') == 'C98388' and \
            any(subType.get('decode', '') != '' for subType in self.studyDesignData.get('subTypes', [])):
             tsparmcd_entry = {
                 "dataType": "text", "length": 200, "originType": "Protocol", "originSource": "Sponsor",
