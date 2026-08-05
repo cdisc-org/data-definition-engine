@@ -1,0 +1,48 @@
+{
+  "study": {
+    "versions": [
+      {
+        "titles": [
+          {"type": {"decode": "Study Acronym", "code": "C207617"}, "text": "LZZT"},
+          {"type": {"decode": "Official Study Title", "code": "C207616"}, "text": "A Randomised Study of LZZT"}
+        ],
+        "documentVersionIds": ["v001"],
+        "biomedicalConcepts": [],
+        "organizations": [],
+        "studyInterventions": [],
+        "administrableProducts": [],
+        "referenceIdentifiers": [],
+        "roles": [],
+        "studyDesigns": [
+          {
+            "studyType": {"code": "C98388", "decode": "Interventional"},
+            "characteristics": [],
+            "eligibilityCriteria": [],
+            "arms": [],
+            "epochs": [],
+            "elements": [],
+            "encounters": [],
+            "objectives": [],
+            "indications": [],
+            "therapeuticAreas": [],
+            "studyInterventionIds": [],
+            "scheduleTimelines": [],
+            "population": {
+              "cohorts": [],
+              "plannedSex": []
+            },
+            "biospecimenRetentions": [],
+            "subTypes": [],
+            "intentTypes": [],
+            "model": {},
+            "timePerspective": {},
+            "samplingMethod": {},
+            "studyPhase": {},
+            "blindingSchema": {}
+          }
+        ]
+      }
+    ],
+    "documentedBy": []
+  }
+}
