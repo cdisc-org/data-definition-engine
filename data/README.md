@@ -6,13 +6,6 @@ Input and reference data for the data-definition-engine. Files are organized by 
 
 ```
 data/
-├── archive/                        # Superseded files kept for reference
-│   └── protocol/
-│       └── LZZT/
-│           └── usdm/
-│               └── pilot_LLZT_protocol.json   # Earlier USDM draft for LZZT pilot
-|       └── NCT01797120/
-|           └── *                              # Will contain outdated versions of JSON files for NCT01797120
 |           
 ├── metadata_xlsx/                  # Excel-based metadata specifications
 │   ├── LZZT/
@@ -22,11 +15,9 @@ data/
 │       └── Define-Excel-Spec.xlsx             # Template for the Define-XML Excel spec format
 └── protocols/
         ├── NCT01797120/            # Study NCT01797120
-        │   ├── NCT01797120-latest.json         # USDM 4.0 protocol export
-        │   └── NCT01797120-define-latest.json  # Define-JSON export
-        └── pilot-LZZT/                   # Study CDISC Pilot LZZT (H2Q-MC-LZZT)
-            ├── pilot-LZZT-latest.json         # USDM 4.0 protocol export
-            └── pilot-LZZT-define-latest.json  # Define-JSON export
+           ├── NCT01797120-latest.json          # USDM 4.0 protocol export
+           └── NCT01797120-dds-latest.json      # DDS/Define JSON export
+        
 ```
 
 ## Subdirectories
