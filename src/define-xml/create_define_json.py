@@ -67,6 +67,7 @@ class USDMDefineJSONProcessor:
             studydesign (int): Study design index in USDM
             docversion (int): Document version index in USDM
             cdisc_api_key (str): CDISC Library API Key (can be None to use environment variable)
+            cdisc_base_url (str): CDISC Library base API URL (optional)
             cosmosversion (str): CDISC Cosmos API version
             debug (bool): Enable debug mode to save intermediate dictionaries
             
@@ -76,7 +77,11 @@ class USDMDefineJSONProcessor:
         load_dotenv()
 
         self.api_key = cdisc_api_key if cdisc_api_key else os.getenv("CDISC_API_KEY")
-        self.client = CDISCLibraryClient(api_key=self.api_key)
+
+        cdisc_lib_args = {"api_key": self.api_key}
+        if cdisc_base_url:
+            cdisc_lib_args["base_api_url"] = cdisc_base_url
+        self.client = CDISCLibraryClient(**cdisc_lib_args)
 
         with open(usdm_file, "r") as file:
             self.usdm_data = json.load(file)
@@ -3002,6 +3007,11 @@ def main():
         "--cdisc_api_key",
         default=None,
         help="CDISC Library API Key (optional, defaults to environment variable CDISC_API_KEY)"
+    )
+    parser.add_argument(
+        "--cdisc_base_url",
+        default=None,
+        help="CDISC Library base API URL (optional)"
     )
     parser.add_argument(
         "--cosmosversion",
