@@ -155,12 +155,51 @@ class TestProcessVariables:
 # ── _build_where_clause ───────────────────────────────────────────────────────
 
 class TestBuildWhereClause:
-    """_build_where_clause(bc, bc_data, dss_response, dataset_name)."""
+    """_build_where_clause(bc, dss_response, dataset_name)."""
 
     def test_empty_list_when_no_variable_has_comparator(self, processor):
         bc = {"id": "BC001", "properties": [{"name": "VSTESTCD", "responseCodes": []}]}
-        bc_data = {"variables": [{"name": "VSTESTCD"}]}  # no 'comparator' key
-        assert processor._build_where_clause(bc, bc_data, {"variables": []}, "VS") == []
+        dss_response = {"variables": [{"name": "VSTESTCD"}]}  # no 'comparator' key
+        assert processor._build_where_clause(bc, dss_response, "VS") == []
+
+    def test_no_properties_key_yields_empty_where_clause(self, processor):
+        """BCs that declare a specialization but no properties must not raise."""
+        assert processor._build_where_clause({"id": "BC001"}, {"variables": []}, "VS") == []
+
+    def test_discriminator_clause_built_when_usdm_omits_the_property(self, processor, mock_client):
+        """SoA Workbench omits TESTCD from BC properties; the clause must still appear."""
+        mock_client.get_codelist_terms.return_value = []
+        bc = {"id": "BC001", "properties": [{"name": "VSORRES", "responseCodes": []}]}
+        dss_response = {"variables": [
+            {"name": "VSTESTCD", "comparator": "EQ", "codelist": {"conceptId": "C66741"},
+             "assignedTerm": {"conceptId": "C25298", "value": "SYSBP"}},
+            {"name": "VSORRES", "vlmTarget": True},
+        ]}
+        result = processor._build_where_clause(bc, dss_response, "VS")
+        clause = result[0]["Clause"][0]
+        assert clause["Variable"] == "VSTESTCD"
+        assert clause["Comparator"] == "EQ"
+        assert clause["Values"] == ["SYSBP"]
+
+    def test_matching_property_response_codes_narrow_the_values(self, processor, mock_client):
+        """When the USDM does list the property, its response codes win over valueList."""
+        mock_client.get_codelist_terms.return_value = [
+            {"conceptId": "C25298", "submissionValue": "SYSBP"}
+        ]
+        bc = {"id": "BC001", "properties": [
+            {"name": "VSTESTCD", "responseCodes": [{"code": {"code": "C25298"}}]}
+        ]}
+        dss_response = {"variables": [
+            {"name": "VSTESTCD", "comparator": "EQ", "codelist": {"conceptId": "C66741"},
+             "valueList": ["SYSBP", "DIABP", "PULSE"]},
+        ]}
+        result = processor._build_where_clause(bc, dss_response, "VS")
+        assert result[0]["Clause"][0]["Values"] == ["SYSBP"]
+
+    def test_variables_without_a_comparator_are_not_clauses(self, processor):
+        bc = {"id": "BC001", "properties": [{"name": "VSORRES", "responseCodes": []}]}
+        dss_response = {"variables": [{"name": "VSORRES", "vlmTarget": True}]}
+        assert processor._build_where_clause(bc, dss_response, "VS") == []
 
     def test_builds_clause_item_with_response_code_values(self, processor, mock_client):
         mock_client.get_codelist_terms.return_value = [
@@ -169,8 +208,8 @@ class TestBuildWhereClause:
         bc = {"id": "BC001", "properties": [
             {"name": "VSTESTCD", "responseCodes": [{"code": {"code": "C49670_SYSBP"}}]}
         ]}
-        bc_data = {"variables": [{"name": "VSTESTCD", "comparator": "EQ", "codelist": {"conceptId": "C96664"}}]}
-        result = processor._build_where_clause(bc, bc_data, {"variables": []}, "VS")
+        dss_response = {"variables": [{"name": "VSTESTCD", "comparator": "EQ", "codelist": {"conceptId": "C96664"}}]}
+        result = processor._build_where_clause(bc, dss_response, "VS")
         assert len(result) == 1
         clause_item = result[0]["Clause"][0]
         assert clause_item["Comparator"] == "EQ"
@@ -181,17 +220,21 @@ class TestBuildWhereClause:
     def test_falls_back_to_assigned_term_when_no_response_codes_match(self, processor, mock_client):
         mock_client.get_codelist_terms.return_value = []
         bc = {"id": "BC001", "properties": [{"name": "VSTESTCD", "responseCodes": []}]}
-        bc_data = {"variables": [{"name": "VSTESTCD", "comparator": "EQ", "codelist": {"conceptId": "C96664"}}]}
-        dss_response = {"variables": [{"name": "VSTESTCD", "assignedTerm": {"conceptId": "C12345", "value": "SYSBP"}}]}
-        result = processor._build_where_clause(bc, bc_data, dss_response, "VS")
+        dss_response = {"variables": [{
+            "name": "VSTESTCD", "comparator": "EQ", "codelist": {"conceptId": "C96664"},
+            "assignedTerm": {"conceptId": "C12345", "value": "SYSBP"},
+        }]}
+        result = processor._build_where_clause(bc, dss_response, "VS")
         assert "SYSBP" in result[0]["Clause"][0]["Values"]
 
     def test_falls_back_to_value_list_when_no_assigned_term(self, processor, mock_client):
         mock_client.get_codelist_terms.return_value = []
         bc = {"id": "BC001", "properties": [{"name": "VSTESTCD", "responseCodes": []}]}
-        bc_data = {"variables": [{"name": "VSTESTCD", "comparator": "IN", "codelist": {"conceptId": "C96664"}}]}
-        dss_response = {"variables": [{"name": "VSTESTCD", "valueList": ["SYSBP", "DIABP"]}]}
-        result = processor._build_where_clause(bc, bc_data, dss_response, "VS")
+        dss_response = {"variables": [{
+            "name": "VSTESTCD", "comparator": "IN", "codelist": {"conceptId": "C96664"},
+            "valueList": ["SYSBP", "DIABP"],
+        }]}
+        result = processor._build_where_clause(bc, dss_response, "VS")
         values = result[0]["Clause"][0]["Values"]
         assert "SYSBP" in values and "DIABP" in values
 
@@ -201,11 +244,11 @@ class TestBuildWhereClause:
             {"name": "VSTESTCD", "responseCodes": [{"code": {"code": "X1"}}]},
             {"name": "VSPOS",   "responseCodes": [{"code": {"code": "X1"}}]},
         ]}
-        bc_data = {"variables": [
+        dss_response = {"variables": [
             {"name": "VSTESTCD", "comparator": "EQ", "codelist": {"conceptId": "C96664"}},
             {"name": "VSPOS",   "comparator": "EQ", "codelist": {"conceptId": "C96665"}},
         ]}
-        result = processor._build_where_clause(bc, bc_data, {"variables": []}, "VS")
+        result = processor._build_where_clause(bc, dss_response, "VS")
         assert len(result) == 1
         assert len(result[0]["Clause"]) == 2  # implicit AND
 
@@ -474,85 +517,310 @@ class TestProcessStandardDataset:
         assert "origin" not in vstestcd_parent
 
 
-# ── _process_bc_type / _process_dss_type ─────────────────────────────────────
+# ── _usdm_dataset_specialization_ids ─────────────────────────────────────────
 
-class TestProcessBcAndDssTypes:
-    """_process_bc_type and _process_dss_type dispatch and population logic."""
+class TestUsdmDatasetSpecializationIds:
+    """Resolving the SDTM dataset specialization declared by a USDM BC."""
 
-    def test_bc_type_calls_dataset_specialization_api(self, processor, mock_client):
-        bc = {"id": "BC001", "reference": "/biomedicalconcepts/C123", "properties": []}
-        bc_data = {"conceptId": "C123"}
-        mock_client.get_biomedicalconcept_latest_datasetspecializations.return_value = {"sdtm": []}
-        processor._process_bc_type(bc, bc_data)
-        mock_client.get_biomedicalconcept_latest_datasetspecializations.assert_called_once_with("v2", "C123")
+    EXT_URL = "http://www.cdisc.org/usdm/extensions/specializations/sdtm"
 
-    def test_bc_type_processes_variables_for_each_dataset_link(self, processor, mock_client):
-        # all_dataset_data is initialised by process_biomedical_concepts(), not __init__
-        processor.all_dataset_data = []
-        bc = {"id": "BC001", "reference": "/biomedicalconcepts/C123", "properties": []}
-        bc_data = {"conceptId": "C123"}
-        mock_client.get_biomedicalconcept_latest_datasetspecializations.return_value = {
-            "sdtm": [{"href": "/cosmos/v2/datasetspecializations/VS-SYSBP"}]
+    def test_reads_id_from_extension_attribute(self, processor):
+        """SoA Workbench layout: reference is a BC, specialization is an extension."""
+        bc = {
+            "id": "BC001",
+            "reference": "/mdr/bc/biomedicalconcepts/C16735",
+            "extensionAttributes": [{
+                "url": self.EXT_URL,
+                "valueString": "/mdr/specializations/sdtm/datasetspecializations/CONSENT",
+            }],
         }
+        assert processor._usdm_dataset_specialization_ids(bc) == ["CONSENT"]
+
+    def test_extension_attribute_wins_over_reference(self, processor):
+        bc = {
+            "id": "BC001",
+            "reference": "/mdr/specializations/sdtm/datasetspecializations/OTHER",
+            "extensionAttributes": [{
+                "url": self.EXT_URL,
+                "valueString": "/mdr/specializations/sdtm/datasetspecializations/CONSENT",
+            }],
+        }
+        assert processor._usdm_dataset_specialization_ids(bc) == ["CONSENT"]
+
+    def test_ignores_unrelated_extension_attributes(self, processor):
+        bc = {
+            "id": "BC001",
+            "reference": "/mdr/bc/biomedicalconcepts/C16735",
+            "extensionAttributes": [
+                {"url": "http://www.cdisc.org/usdm/extensions/studyDesignSolution",
+                 "valueString": "irrelevant"},
+                {"url": self.EXT_URL,
+                 "valueString": "/mdr/specializations/sdtm/datasetspecializations/CONSENT"},
+            ],
+        }
+        assert processor._usdm_dataset_specialization_ids(bc) == ["CONSENT"]
+
+    def test_reads_id_from_package_dated_reference(self, processor):
+        """E2J layout: reference points straight at a package-dated specialization."""
+        bc = {"id": "BC001",
+              "reference": "/mdr/specializations/sdtm/packages/2023-12-12/datasetspecializations/CONSENT",
+              "extensionAttributes": []}
+        assert processor._usdm_dataset_specialization_ids(bc) == ["CONSENT"]
+
+    def test_reads_id_from_reference_without_package_date(self, processor):
+        bc = {"id": "BC001",
+              "reference": "/mdr/specializations/sdtm/datasetspecializations/CONSENT",
+              "extensionAttributes": []}
+        assert processor._usdm_dataset_specialization_ids(bc) == ["CONSENT"]
+
+    def test_empty_for_bc_reference_with_no_extension(self, processor):
+        """Nothing declared in the USDM → caller falls back to the CDISC Library."""
+        bc = {"id": "BC001", "reference": "/mdr/bc/biomedicalconcepts/C85522",
+              "extensionAttributes": []}
+        assert processor._usdm_dataset_specialization_ids(bc) == []
+
+    def test_empty_when_reference_and_extensions_absent(self, processor):
+        assert processor._usdm_dataset_specialization_ids({"id": "BC001"}) == []
+
+    def test_tolerates_null_extension_attributes(self, processor):
+        bc = {"id": "BC001", "reference": "/mdr/bc/biomedicalconcepts/C85522",
+              "extensionAttributes": None}
+        assert processor._usdm_dataset_specialization_ids(bc) == []
+
+    def test_multiple_extension_attributes_yield_multiple_ids(self, processor):
+        bc = {"id": "BC001", "reference": "/mdr/bc/biomedicalconcepts/C16735",
+              "extensionAttributes": [
+                  {"url": self.EXT_URL,
+                   "valueString": "/mdr/specializations/sdtm/datasetspecializations/CONSENT"},
+                  {"url": self.EXT_URL,
+                   "valueString": "/mdr/specializations/sdtm/datasetspecializations/ELIGMET"},
+              ]}
+        assert processor._usdm_dataset_specialization_ids(bc) == ["CONSENT", "ELIGMET"]
+
+
+# ── _process_dataset_specialization ──────────────────────────────────────────
+
+class TestProcessDatasetSpecialization:
+    """_process_dataset_specialization(bc, dss_id) fetches and processes one DSS."""
+
+    def test_fetches_the_named_specialization(self, processor, mock_client):
+        processor.all_dataset_data = []
+        mock_client.get_sdtm_latest_sdtm_datasetspecialization.return_value = {
+            "domain": "VS", "variables": []}
+        processor._process_dataset_specialization({"id": "BC001", "properties": []}, "SYSBP")
+        mock_client.get_sdtm_latest_sdtm_datasetspecialization.assert_called_once_with("v2", "SYSBP")
+
+    def test_populates_datasets_dict(self, processor, mock_client):
+        processor.all_dataset_data = []
         mock_client.get_sdtm_latest_sdtm_datasetspecialization.return_value = {
             "domain": "VS",
             "variables": [{"name": "VSTESTCD", "dataElementConceptId": "C96664"}],
         }
-        processor._process_bc_type(bc, bc_data)
+        processor._process_dataset_specialization({"id": "BC001", "properties": []}, "SYSBP")
         assert "VS" in processor.datasets_dict
         assert "VSTESTCD" in processor.datasets_dict["VS"]
 
-    def test_dss_type_calls_dataset_specialization_api(self, processor, mock_client):
-        bc = {"id": "BC001", "reference": "/datasetspecializations/DS123", "properties": []}
-        bc_data = {"datasetSpecializationId": "DS123", "variables": []}
-        mock_client.get_sdtm_latest_sdtm_datasetspecialization.return_value = {"domain": "VS", "variables": []}
-        processor._process_dss_type(bc, bc_data)
-        mock_client.get_sdtm_latest_sdtm_datasetspecialization.assert_called_once_with("v2", "DS123")
+    def test_accumulates_dataset_data_for_debug(self, processor, mock_client):
+        processor.all_dataset_data = []
+        dss = {"domain": "VS", "variables": []}
+        mock_client.get_sdtm_latest_sdtm_datasetspecialization.return_value = dss
+        processor._process_dataset_specialization({"id": "BC001", "properties": []}, "SYSBP")
+        assert processor.all_dataset_data == [dss]
 
-    def test_dss_type_populates_datasets_dict(self, processor, mock_client):
-        bc = {"id": "BC001", "reference": "/datasetspecializations/DS123", "properties": []}
-        bc_data = {"datasetSpecializationId": "DS123", "variables": []}
+    def test_builds_vlm_entry_in_bc_dict(self, processor, mock_client):
+        """The VLM path runs for every specialization, not just DSS-typed references."""
+        processor.all_dataset_data = []
+        mock_client.get_codelist_terms.return_value = []
+        mock_client.get_sdtm_latest_sdtm_datasetspecialization.return_value = {
+            "domain": "VS",
+            "variables": [
+                {"name": "VSTESTCD", "comparator": "EQ", "codelist": {"conceptId": "C96664"},
+                 "valueList": ["SYSBP"]},
+                {"name": "VSORRES", "vlmTarget": True, "dataType": "float"},
+            ],
+        }
+        bc = {"id": "BC001", "properties": [
+            {"name": "VSTESTCD", "responseCodes": []},
+            {"name": "VSORRES", "responseCodes": []},
+        ]}
+        processor._process_dataset_specialization(bc, "SYSBP")
+        assert "BC001" in processor.bc_dict
+        assert processor.bc_dict["BC001"][0]["VSORRES"]["WhereClause"][0]["Clause"][0]["Values"] == ["SYSBP"]
+
+    def test_records_where_clause_for_debug(self, processor, mock_client):
+        processor.all_dataset_data = []
+        mock_client.get_codelist_terms.return_value = []
+        mock_client.get_sdtm_latest_sdtm_datasetspecialization.return_value = {
+            "domain": "VS",
+            "variables": [{"name": "VSTESTCD", "comparator": "EQ",
+                           "codelist": {"conceptId": "C96664"}, "valueList": ["SYSBP"]}],
+        }
+        bc = {"id": "BC001", "properties": [{"name": "VSTESTCD", "responseCodes": []}]}
+        processor._process_dataset_specialization(bc, "SYSBP")
+        assert processor.debug_where_clauses[0]["bc_id"] == "BC001"
+        assert processor.debug_where_clauses[0]["dataset"] == "VS"
+
+    def test_bc_without_properties_does_not_raise(self, processor, mock_client):
+        processor.all_dataset_data = []
         mock_client.get_sdtm_latest_sdtm_datasetspecialization.return_value = {
             "domain": "VS",
             "variables": [{"name": "VSTESTCD", "dataElementConceptId": "C96664"}],
         }
-        processor._process_dss_type(bc, bc_data)
+        processor._process_dataset_specialization({"id": "BC001"}, "SYSBP")
         assert "VS" in processor.datasets_dict
 
 
 # ── process_biomedical_concepts ───────────────────────────────────────────────
 
 class TestProcessBiomedicalConcepts:
-    """process_biomedical_concepts() dispatches by concept type."""
+    """process_biomedical_concepts() resolves each BC to its specializations."""
+
+    EXT_URL = "http://www.cdisc.org/usdm/extensions/specializations/sdtm"
 
     def test_empty_biomedical_concepts_is_a_no_op(self, processor):
         processor.study_version_data = {"biomedicalConcepts": []}
         processor.process_biomedical_concepts()
         assert processor.datasets_dict == {}
 
-    def test_dispatches_to_bc_type_handler(self, processor, mock_client):
-        processor.study_version_data = {
-            "biomedicalConcepts": [{"id": "BC001", "reference": "/biomedicalconcepts/C123", "properties": []}]
-        }
-        mock_client.get_api_json.return_value = {
-            "_links": {"self": {"type": "Biomedical Concept"}},
-            "conceptId": "C123",
-        }
-        mock_client.get_biomedicalconcept_latest_datasetspecializations.return_value = {"sdtm": []}
+    def test_extension_attribute_resolves_without_calling_the_library(self, processor, mock_client):
+        """SoA Workbench BCs need no concept lookup at all."""
+        processor.study_version_data = {"biomedicalConcepts": [{
+            "id": "BC001",
+            "reference": "/mdr/bc/biomedicalconcepts/C16735",
+            "extensionAttributes": [{
+                "url": self.EXT_URL,
+                "valueString": "/mdr/specializations/sdtm/datasetspecializations/CONSENT",
+            }],
+            "properties": [],
+        }]}
+        mock_client.get_sdtm_latest_sdtm_datasetspecialization.return_value = {
+            "domain": "DS", "variables": []}
         processor.process_biomedical_concepts()
-        mock_client.get_biomedicalconcept_latest_datasetspecializations.assert_called_once()
+        mock_client.get_api_json.assert_not_called()
+        mock_client.get_biomedicalconcept_latest_datasetspecializations.assert_not_called()
+        mock_client.get_sdtm_latest_sdtm_datasetspecialization.assert_called_once_with("v2", "CONSENT")
 
-    def test_dispatches_to_dss_type_handler(self, processor, mock_client):
-        processor.study_version_data = {
-            "biomedicalConcepts": [{"id": "BC001", "reference": "/datasetspecializations/DS123", "properties": []}]
-        }
+    def test_package_dated_reference_resolves_without_calling_the_library(self, processor, mock_client):
+        """E2J BCs also resolve straight from the USDM."""
+        processor.study_version_data = {"biomedicalConcepts": [{
+            "id": "BC001",
+            "reference": "/mdr/specializations/sdtm/packages/2023-12-12/datasetspecializations/CONSENT",
+            "extensionAttributes": [],
+            "properties": [],
+        }]}
+        mock_client.get_sdtm_latest_sdtm_datasetspecialization.return_value = {
+            "domain": "DS", "variables": []}
+        processor.process_biomedical_concepts()
+        mock_client.get_api_json.assert_not_called()
+        mock_client.get_sdtm_latest_sdtm_datasetspecialization.assert_called_once_with("v2", "CONSENT")
+
+    def test_falls_back_to_library_for_bare_bc_reference(self, processor, mock_client):
+        processor.study_version_data = {"biomedicalConcepts": [{
+            "id": "BC001", "reference": "/mdr/bc/biomedicalconcepts/C123",
+            "extensionAttributes": [], "properties": [],
+        }]}
+        mock_client.get_api_json.return_value = {
+            "_links": {"self": {"type": "Biomedical Concept"}}, "conceptId": "C123"}
+        mock_client.get_biomedicalconcept_latest_datasetspecializations.return_value = {
+            "sdtm": [{"href": "/mdr/specializations/sdtm/datasetspecializations/CONSENT"}]}
+        mock_client.get_sdtm_latest_sdtm_datasetspecialization.return_value = {
+            "domain": "DS", "variables": []}
+        processor.process_biomedical_concepts()
+        mock_client.get_biomedicalconcept_latest_datasetspecializations.assert_called_once_with("v2", "C123")
+        mock_client.get_sdtm_latest_sdtm_datasetspecialization.assert_called_once_with("v2", "CONSENT")
+
+    def test_library_fallback_tolerates_missing_sdtm_key(self, processor, mock_client):
+        """A BC with no SDTM specializations is skipped, not a KeyError."""
+        processor.study_version_data = {"biomedicalConcepts": [{
+            "id": "BC001", "reference": "/mdr/bc/biomedicalconcepts/C85522",
+            "extensionAttributes": [], "properties": [],
+        }]}
+        mock_client.get_api_json.return_value = {
+            "_links": {"self": {"type": "Biomedical Concept"}}, "conceptId": "C85522"}
+        mock_client.get_biomedicalconcept_latest_datasetspecializations.return_value = {}
+        processor.process_biomedical_concepts()
+        mock_client.get_sdtm_latest_sdtm_datasetspecialization.assert_not_called()
+        assert processor.datasets_dict == {}
+
+    def test_library_fallback_for_dss_typed_reference(self, processor, mock_client):
+        """A reference that resolves to a specialization but is not shaped like one."""
+        processor.study_version_data = {"biomedicalConcepts": [{
+            "id": "BC001", "reference": "/mdr/specializations/sdtm/other/DS123",
+            "extensionAttributes": [], "properties": [],
+        }]}
         mock_client.get_api_json.return_value = {
             "_links": {"self": {"type": "SDTM Dataset Specialization"}},
             "datasetSpecializationId": "DS123",
         }
-        mock_client.get_sdtm_latest_sdtm_datasetspecialization.return_value = {"domain": "VS", "variables": []}
+        mock_client.get_sdtm_latest_sdtm_datasetspecialization.return_value = {
+            "domain": "VS", "variables": []}
         processor.process_biomedical_concepts()
-        mock_client.get_sdtm_latest_sdtm_datasetspecialization.assert_called_once()
+        mock_client.get_sdtm_latest_sdtm_datasetspecialization.assert_called_once_with("v2", "DS123")
+
+    def test_bc_without_reference_is_skipped(self, processor, mock_client):
+        processor.study_version_data = {"biomedicalConcepts": [{"id": "BC001", "properties": []}]}
+        processor.process_biomedical_concepts()
+        mock_client.get_api_json.assert_not_called()
+        assert processor.datasets_dict == {}
+
+    def test_each_declared_specialization_is_fetched_once(self, processor, mock_client):
+        """No fan-out: only the specializations the USDM names are fetched."""
+        processor.study_version_data = {"biomedicalConcepts": [{
+            "id": "BC001", "reference": "/mdr/bc/biomedicalconcepts/C16735",
+            "extensionAttributes": [
+                {"url": self.EXT_URL,
+                 "valueString": "/mdr/specializations/sdtm/datasetspecializations/CONSENT"},
+                {"url": self.EXT_URL,
+                 "valueString": "/mdr/specializations/sdtm/datasetspecializations/ELIGMET"},
+            ],
+            "properties": [],
+        }]}
+        mock_client.get_sdtm_latest_sdtm_datasetspecialization.return_value = {
+            "domain": "DS", "variables": []}
+        processor.process_biomedical_concepts()
+        assert mock_client.get_sdtm_latest_sdtm_datasetspecialization.call_count == 2
+
+
+# ── mixed-producer USDM fixture ──────────────────────────────────────────────
+
+class TestMixedProducerUsdmFixture:
+    """Both producer layouts resolve from a real USDM file, not a hand-built dict."""
+
+    def _dss_by_id(self, dss_id):
+        return {
+            "SYSBP": {"domain": "VS",
+                      "variables": [{"name": "VSTESTCD", "dataElementConceptId": "C25298"}]},
+            "CONSENT": {"domain": "DS",
+                        "variables": [{"name": "DSDECOD", "dataElementConceptId": "C82977"}]},
+        }[dss_id]
+
+    def test_both_layouts_resolve_from_the_usdm(self, two_bc_processor, mock_client):
+        mock_client.get_sdtm_latest_sdtm_datasetspecialization.side_effect = \
+            lambda version, dss_id: self._dss_by_id(dss_id)
+
+        two_bc_processor.process_biomedical_concepts()
+
+        fetched = [call.args[1] for call
+                   in mock_client.get_sdtm_latest_sdtm_datasetspecialization.call_args_list]
+        assert sorted(fetched) == ["CONSENT", "SYSBP"]
+        # Neither layout needed a concept lookup.
+        mock_client.get_api_json.assert_not_called()
+        mock_client.get_biomedicalconcept_latest_datasetspecializations.assert_not_called()
+
+    def test_both_domains_reach_datasets_dict(self, two_bc_processor, mock_client):
+        mock_client.get_sdtm_latest_sdtm_datasetspecialization.side_effect = \
+            lambda version, dss_id: self._dss_by_id(dss_id)
+
+        two_bc_processor.process_biomedical_concepts()
+
+        assert "VSTESTCD" in two_bc_processor.datasets_dict["VS"]
+        assert "DSDECOD" in two_bc_processor.datasets_dict["DS"]
+
+    def test_study_name_falls_back_to_study_name_field(self, two_bc_processor):
+        """The fixture has no Study Acronym title, mirroring SoA Workbench exports."""
+        two_bc_processor.populate_study_elements()
+        assert two_bc_processor.template["studyName"] == "NCT01797120"
+        assert "None" not in two_bc_processor.template["fileOID"]
 
 
 # ── update_datasets_dict ──────────────────────────────────────────────────────
