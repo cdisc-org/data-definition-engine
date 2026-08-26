@@ -380,6 +380,71 @@ class TestPopulateStudyElements:
         processor.populate_study_elements()
         assert "Version1" in processor.template["fileOID"]
 
+    def test_titles_matched_by_nci_code_when_decode_absent(self, processor):
+        processor.usdm_data["study"]["versions"][0]["titles"] = [
+            {"type": {"code": "C207646"}, "text": "LZZT"},
+            {"type": {"code": "C207616"}, "text": "A Study of LZZT"},
+        ]
+        processor.populate_study_elements()
+        assert processor.template["studyName"] == "LZZT"
+        assert processor.template["studyDescription"] == "A Study of LZZT"
+
+    def test_null_title_type_does_not_raise(self, processor):
+        processor.usdm_data["study"]["versions"][0]["titles"] = [{"type": None, "text": "x"}]
+        processor.usdm_data["study"]["name"] = "NCT01797120"
+        processor.populate_study_elements()
+        assert processor.template["studyName"] == "NCT01797120"
+
+
+class TestPopulateStudyElementsNameFallback:
+    """study_name falls back when the USDM has no Study Acronym title.
+
+    Producers such as the SoA Workbench emit only an Official Study Title.
+    Without a fallback the literal string "None" ends up in every OID.
+    """
+
+    def _drop_acronym(self, processor):
+        processor.usdm_data["study"]["versions"][0]["titles"] = [
+            {"type": {"decode": "Official Study Title"}, "text": "A Study"},
+        ]
+
+    def test_falls_back_to_study_name(self, processor):
+        self._drop_acronym(processor)
+        processor.usdm_data["study"]["name"] = "NCT01797120"
+        processor.populate_study_elements()
+        assert processor.template["studyName"] == "NCT01797120"
+
+    def test_fallback_name_reaches_every_oid(self, processor):
+        self._drop_acronym(processor)
+        processor.usdm_data["study"]["name"] = "NCT01797120"
+        processor.populate_study_elements()
+        assert processor.template["fileOID"] == "ODM.DEFINE-JSON.NCT01797120.Version1.Design1"
+        assert processor.template["studyOID"] == "ODM.NCT01797120.Version1.Design1"
+        assert processor.template["OID"] == "MDV.NCT01797120.Version1.Design1"
+        assert "None" not in processor.template["name"]
+
+    def test_falls_back_to_study_identifier_when_no_study_name(self, processor):
+        self._drop_acronym(processor)
+        processor.usdm_data["study"].pop("name", None)
+        processor.study_version_data["studyIdentifiers"] = [{"text": "PrE0102"}]
+        processor.populate_study_elements()
+        assert processor.template["studyName"] == "PrE0102"
+
+    def test_falls_back_to_placeholder_as_last_resort(self, processor):
+        self._drop_acronym(processor)
+        processor.usdm_data["study"].pop("name", None)
+        processor.study_version_data["studyIdentifiers"] = []
+        processor.populate_study_elements()
+        assert processor.template["studyName"] == "STUDY"
+
+    def test_acronym_title_still_wins_over_fallback(self, processor):
+        processor.usdm_data["study"]["versions"][0]["titles"] = [
+            {"type": {"decode": "Study Acronym"}, "text": "LZZT - NEW"},
+        ]
+        processor.usdm_data["study"]["name"] = "CDISC PILOT - LZZT"
+        processor.populate_study_elements()
+        assert processor.template["studyName"] == "LZZT - NEW"
+
 
 # ── _get_or_create_condition_from_vlm / _create_where_clause_for_variable ────
 
@@ -490,6 +555,36 @@ class TestBuildVlmLookup:
         processor.studyDesignData["arms"] = []
         processor.build_vlm_lookup()
         assert "NARMS" not in self._tsparmcd_values(processor)
+
+    def test_length_added_from_timeline_flagged_as_main(self, processor):
+        """The main timeline is identified by the mainTimeline flag, not its label."""
+        processor.bc_dict = {}
+        processor.studyDesignData["scheduleTimelines"] = [{
+            "name": "MAIN_TIMELINE",
+            "label": "PrE0102 Main Schedule of Activities Timeline",
+            "mainTimeline": True,
+            "plannedDuration": {"quantity": {"value": 52}},
+        }]
+        processor.build_vlm_lookup()
+        assert "LENGTH" in self._tsparmcd_values(processor)
+
+    def test_length_not_added_from_non_main_timeline(self, processor):
+        processor.bc_dict = {}
+        processor.studyDesignData["scheduleTimelines"] = [{
+            "label": "Main Timeline",
+            "mainTimeline": False,
+            "plannedDuration": {"quantity": {"value": 52}},
+        }]
+        processor.build_vlm_lookup()
+        assert "LENGTH" not in self._tsparmcd_values(processor)
+
+    def test_length_not_added_when_main_timeline_has_no_duration(self, processor):
+        processor.bc_dict = {}
+        processor.studyDesignData["scheduleTimelines"] = [{
+            "label": "Main Timeline", "mainTimeline": True, "plannedDuration": None,
+        }]
+        processor.build_vlm_lookup()
+        assert "LENGTH" not in self._tsparmcd_values(processor)
 
     def test_stype_added_when_study_type_decode_populated(self, processor):
         processor.bc_dict = {}

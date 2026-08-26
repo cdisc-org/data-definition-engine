@@ -27,7 +27,7 @@ class Study(define_object.DefineObject):
         study_oid = study_dict["studyOID"]
         study = DEFINE.Study(OID=study_oid)
         gv = DEFINE.GlobalVariables()
-        gv.StudyName = DEFINE.StudyName(_content=study_dict["studyName"])
+        gv.StudyName = DEFINE.StudyName(_content=study_dict.get("studyName", "NA"))
         gv.StudyDescription = DEFINE.StudyDescription(_content=study_dict.get("studyDescription", "NA"))
         gv.ProtocolName = DEFINE.ProtocolName(_content=study_dict.get("protocolName", "NA"))
         study.GlobalVariables = gv

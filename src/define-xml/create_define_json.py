@@ -23,6 +23,11 @@ from collections import defaultdict
 from dotenv import load_dotenv
 from datetime import datetime
 
+# USDM extension attribute that carries the SDTM Dataset Specialization a
+# biomedical concept specializes. Producers that predate this extension put the
+# specialization path directly in BiomedicalConcept.reference instead.
+SDTM_SPECIALIZATION_EXT_URL = "http://www.cdisc.org/usdm/extensions/specializations/sdtm"
+
 
 class USDMDefineJSONProcessor:
     """
@@ -192,70 +197,104 @@ class USDMDefineJSONProcessor:
         # Extract study design data once
         self.studyDesignData = jmespath.search(f'studyDesigns[{self.studydesign}]', self.study_version_data if self.study_version_data else {})
 
+    def _usdm_dataset_specialization_ids(self, bc):
+        """
+        Return the SDTM dataset specialization ids a USDM biomedical concept declares.
+
+        Two USDM producer layouts are supported:
+
+        * SoA Workbench and later: ``reference`` points at the biomedical concept
+          and the specialization is carried in an ``extensionAttributes`` entry
+          whose ``url`` is :data:`SDTM_SPECIALIZATION_EXT_URL`.
+        * CDISC USDM E2J: ``reference`` points straight at the specialization,
+          with or without a ``/packages/<date>/`` segment.
+
+        The package date is deliberately ignored -- the CDISC Library client
+        always resolves the latest specialization.
+
+        Args:
+            bc (dict): Biomedical concept from USDM
+
+        Returns:
+            list: Dataset specialization ids (e.g. ["CONSENT"]); empty when the
+                USDM declares none, in which case the caller falls back to the
+                CDISC Library.
+        """
+        ids = []
+        for ext in bc.get('extensionAttributes') or []:
+            if ext.get('url') == SDTM_SPECIALIZATION_EXT_URL and ext.get('valueString'):
+                ids.append(ext['valueString'].rstrip('/').rsplit('/', 1)[-1])
+
+        if not ids:
+            reference = bc.get('reference') or ''
+            if '/datasetspecializations/' in reference:
+                ids.append(reference.rstrip('/').rsplit('/', 1)[-1])
+
+        return ids
+
     def process_biomedical_concepts(self):
         """
         Process all biomedical concepts from USDM.
-        
-        Iterates through biomedical concepts and dispatches to appropriate
-        handler based on concept type (Biomedical Concept vs Dataset Specialization).
-        Populates datasets_dict and bc_dict data structures.
+
+        Resolves each concept to one or more SDTM dataset specializations -- from
+        the USDM itself where possible, otherwise via the CDISC Library -- and
+        processes each specialization. Populates datasets_dict and bc_dict.
         """
         # Debug: Accumulate all dataset_data for debugging
         self.all_dataset_data = []
 
         for bc in self.study_version_data.get('biomedicalConcepts', []):
-            bc_data = self.client.get_api_json(f"/cosmos/{self.cosmosversion}" + bc['reference'])
-            concept_type = bc_data['_links']['self']['type']
+            dss_ids = self._usdm_dataset_specialization_ids(bc)
 
-            if concept_type == "Biomedical Concept":
-                self._process_bc_type(bc, bc_data)
-            elif concept_type == "SDTM Dataset Specialization":
-                self._process_dss_type(bc, bc_data)
+            if not dss_ids:
+                reference = bc.get('reference')
+                if not reference:
+                    print(f"Warning: biomedical concept {bc.get('id')} has no reference; skipped")
+                    continue
 
-    def _process_bc_type(self, bc, bc_data):
+                bc_data = self.client.get_api_json(f"/cosmos/{self.cosmosversion}" + reference)
+                concept_type = bc_data.get('_links', {}).get('self', {}).get('type')
+
+                if concept_type == "SDTM Dataset Specialization":
+                    dss_ids = [bc_data['datasetSpecializationId']]
+                elif concept_type == "Biomedical Concept":
+                    dataset_links = self.client.get_biomedicalconcept_latest_datasetspecializations(
+                        self.cosmosversion, bc_data['conceptId'])
+                    dss_ids = [link['href'].rstrip('/').rsplit('/', 1)[-1]
+                               for link in dataset_links.get('sdtm', [])]
+
+            if not dss_ids:
+                print(f"Warning: no SDTM dataset specialization for {bc.get('name')}; skipped")
+
+            for dss_id in dss_ids:
+                self._process_dataset_specialization(bc, dss_id)
+
+    def _process_dataset_specialization(self, bc, dss_id):
         """
-        Process 'Biomedical Concept' type concepts.
-        
-        Extracts dataset specializations and their variables, updating datasets_dict.
-        
-        Args:
-            bc (dict): Biomedical concept from USDM
-            bc_data (dict): Detailed concept data from CDISC Library
-        """
-        dataset_links = self.client.get_biomedicalconcept_latest_datasetspecializations(self.cosmosversion, bc_data['conceptId'])['sdtm']
+        Process one SDTM dataset specialization for a biomedical concept.
 
-        for dataset_link in dataset_links:
-            dataset_data = self.client.get_sdtm_latest_sdtm_datasetspecialization(self.cosmosversion, dataset_link['href'].split('/')[-1])
-            self.all_dataset_data.append(dataset_data)
-            dataset_name = dataset_data['domain']
-            variables = dataset_data.get('variables', [])
-            self._process_variables(variables, dataset_name, bc)
-
-    def _process_dss_type(self, bc, bc_data):
-        """
-        Process 'SDTM Dataset Specialization' type concepts.
-        
         Extracts variables, builds where clauses, and processes VLM targets.
         Updates both bc_dict and datasets_dict.
-        
+
         Args:
             bc (dict): Biomedical concept from USDM
-            bc_data (dict): Detailed concept data from CDISC Library
+            dss_id (str): Dataset specialization id (e.g. "CONSENT")
         """
-        dss_response = self.client.get_sdtm_latest_sdtm_datasetspecialization(self.cosmosversion, bc_data['datasetSpecializationId'])
+        dss_response = self.client.get_sdtm_latest_sdtm_datasetspecialization(self.cosmosversion, dss_id)
+        self.all_dataset_data.append(dss_response)
 
         dataset_name = dss_response['domain']
         variables = dss_response.get('variables', [])
 
         self._process_variables(variables, dataset_name, bc)
-        where_clause = self._build_where_clause(bc, bc_data, dss_response, dataset_name)
+        where_clause = self._build_where_clause(bc, dss_response, dataset_name)
         if where_clause:
             self.debug_where_clauses.append({
-                "bc_id": bc['id'],
+                "bc_id": bc.get('id'),
                 "dataset": dataset_name,
                 "where_clause": where_clause
             })
-        self._process_vlm_target_variables(bc, bc_data, where_clause)
+        self._process_vlm_target_variables(bc, dss_response, where_clause)
 
     def _process_variables(self, variables, dataset_name, bc):
         """
@@ -293,7 +332,7 @@ class USDMDefineJSONProcessor:
                             self.datasets_dict[dataset_name][variable_name][field] = value
 
                 if not vlmTarget:
-                    for property in bc['properties']:
+                    for property in bc.get('properties', []):
                         property_code = property['code']['standardCode']['code']
 
                         if data_element_concept_id == property_code:
@@ -326,27 +365,44 @@ class USDMDefineJSONProcessor:
                                 )
                             break
 
-    def _build_where_clause(self, bc, bc_data, dss_response, dataset_name):
+    def _build_where_clause(self, bc, dss_response, dataset_name):
         """
         Build where clauses for variables with comparators.
-        
+
+        The specialization is the authority on which variables discriminate a
+        value list -- it is where ``comparator`` lives. Iterating it (rather than
+        the USDM biomedical concept properties) matters because producers differ
+        on whether the discriminator is listed as a property at all: CDISC USDM
+        E2J lists TESTCD, the SoA Workbench does not. Driving the loop from the
+        USDM would silently drop ``WHERE xxTESTCD EQ ...`` for the latter and
+        leave every value list keyed on its qualifier variables instead.
+
+        A matching USDM property, where one exists, narrows the clause to the
+        response codes the study actually collects; otherwise the specialization's
+        own assignedTerm or valueList supplies the values.
+
         Args:
             bc (dict): Biomedical concept from USDM
-            bc_data (dict): Detailed concept data
-            dss_response (dict): Dataset specialization data
+            dss_response (dict): Dataset specialization data from CDISC Library
             dataset_name (str): Dataset domain name
-        
+
         Returns:
             list: Where clause dictionaries with variables, comparators, and values
         """
         where_clause = []
         clause_items = []
 
-        for property in bc['properties']:
-            variable_name = property['name']
-            variable_data = next((var for var in bc_data['variables'] if var.get('name') == variable_name), None)
+        properties_by_name = {
+            property['name']: property
+            for property in bc.get('properties', [])
+            if property.get('name')
+        }
 
-            if variable_data and 'comparator' in variable_data:
+        for variable_data in dss_response.get('variables', []):
+            variable_name = variable_data.get('name')
+
+            if variable_name and 'comparator' in variable_data:
+                property = properties_by_name.get(variable_name, {})
                 codelist_concept_id = variable_data.get('codelist', {}).get('conceptId')
                 terms = self.client.get_codelist_terms(f"sdtmct-{self.sdtmct}/", codelist_concept_id)
 
@@ -358,13 +414,10 @@ class USDMDefineJSONProcessor:
                         response_values.append(value['submissionValue'])
 
                 if not response_values:
-                    dataset_variable = next((var for var in dss_response['variables'] if var.get('name') == variable_name), None)
-
-                    if dataset_variable:
-                        if 'assignedTerm' in dataset_variable and 'conceptId' in dataset_variable['assignedTerm']:
-                            response_values = [dataset_variable['assignedTerm']['value']]
-                        elif 'valueList' in dataset_variable and dataset_variable['valueList']:
-                            response_values = dataset_variable['valueList']
+                    if 'assignedTerm' in variable_data and 'conceptId' in variable_data['assignedTerm']:
+                        response_values = [variable_data['assignedTerm']['value']]
+                    elif 'valueList' in variable_data and variable_data['valueList']:
+                        response_values = variable_data['valueList']
 
                 clause_item = {
                     "Dataset": dataset_name,
@@ -383,28 +436,28 @@ class USDMDefineJSONProcessor:
 
         return where_clause
 
-    def _process_vlm_target_variables(self, bc, bc_data, where_clause):
+    def _process_vlm_target_variables(self, bc, dss_response, where_clause):
         """
         Process VLM (Variable Level Metadata) target variables.
-        
+
         Extracts VLM metadata including data types, origins, and response codes,
         associating them with where clauses. Updates bc_dict.
-        
+
         Args:
             bc (dict): Biomedical concept from USDM
-            bc_data (dict): Detailed concept data
+            dss_response (dict): Dataset specialization data from CDISC Library
             where_clause (list): Associated where clause definitions
         """
         vlm_targets_found = False
 
-        for property in bc['properties']:
+        for property in bc.get('properties', []):
             variable_name = property['name']
-            variable_data = next((var for var in bc_data['variables'] if var.get('name') == variable_name), None)
+            variable_data = next((var for var in dss_response['variables'] if var.get('name') == variable_name), None)
 
             if (variable_data and 'comparator' not in variable_data and variable_data.get('vlmTarget') == True):
                 if not vlm_targets_found:
-                    if bc['id'] not in self.bc_dict:
-                        self.bc_dict[bc['id']] = []
+                    if bc.get('id') not in self.bc_dict:
+                        self.bc_dict[bc.get('id')] = []
                     vlm_targets_found = True
 
                 codelist_concept_id = variable_data.get('codelist', {}).get('conceptId')
@@ -443,7 +496,7 @@ class USDMDefineJSONProcessor:
 
                 vlm_data['WhereClause'] = where_clause
                 variable_dict = {variable_name: vlm_data}
-                self.bc_dict[bc['id']].append(variable_dict)
+                self.bc_dict[bc.get('id')].append(variable_dict)
 
     def build_vlm_lookup(self):
         """
@@ -706,7 +759,7 @@ class USDMDefineJSONProcessor:
         if any(
             (timeline.get('plannedDuration') or {}).get('quantity', {}).get('value', '') != ''
             for timeline in self.studyDesignData.get('scheduleTimelines', [])
-            if timeline.get('label') == 'Main Timeline'
+            if timeline.get('mainTimeline') is True
         ):
             tsparmcd_entry = {
                 "dataType": "text", "length": 200, "originType": "Protocol", "originSource": "Sponsor",
@@ -1173,12 +1226,15 @@ class USDMDefineJSONProcessor:
                                             )
 
         for (variable, dataset, codelist_concept_id), values in variable_values.items():
-            if dataset not in self.datasets_dict:
-                self.datasets_dict[dataset] = {}
-            if variable not in self.datasets_dict[dataset]:
-                self.datasets_dict[dataset][variable] = {"codelist": {}}
-            if codelist_concept_id not in self.datasets_dict[dataset][variable]["codelist"]:
-                self.datasets_dict[dataset][variable]["codelist"][codelist_concept_id] = {
+            # The variable may already be present from _process_variables without a
+            # "codelist" key -- that key is only added when a USDM biomedical concept
+            # property matched the variable. A discriminator the USDM does not list as
+            # a property (xxTESTCD in SoA Workbench exports) lands here exactly that
+            # way, so build the nesting with setdefault rather than assuming it.
+            variable_entry = self.datasets_dict.setdefault(dataset, {}).setdefault(variable, {})
+            codelist_entry = variable_entry.setdefault("codelist", {})
+            if codelist_concept_id not in codelist_entry:
+                codelist_entry[codelist_concept_id] = {
                     "codelist_concept_id": codelist_concept_id,
                     "codelist_name": codelist_name_lookup.get(codelist_concept_id),
                     "terms": []
@@ -1196,10 +1252,8 @@ class USDMDefineJSONProcessor:
                     self.test_dict[dataset] = {}
                 self.test_dict[dataset][variable.replace('TESTCD', 'TEST')] = response_codes
 
-            existing_terms = set(self.datasets_dict[dataset][variable]["codelist"][codelist_concept_id]["terms"])
-            self.datasets_dict[dataset][variable]["codelist"][codelist_concept_id]["terms"] = sorted(
-                list(existing_terms.union(values))
-            )
+            existing_terms = set(codelist_entry[codelist_concept_id]["terms"])
+            codelist_entry[codelist_concept_id]["terms"] = sorted(list(existing_terms.union(values)))
 
         # Create ARMCD / ARM codelists from arms
         if self.studyDesignData.get('arms', []):
@@ -2061,17 +2115,34 @@ class USDMDefineJSONProcessor:
 
         Extracts study name, description, protocol name from USDM titles
         and populates template header fields with study-specific information.
+
+        Titles are matched on both the NCI code and the decode, because
+        producers vary in which they populate. When no Study Acronym title is
+        present the study name falls back to study.name, then to the first
+        study identifier, then to a literal placeholder -- an unresolved name
+        would otherwise be interpolated into every OID as the string "None".
         """
         # Extract study name, description, protocol name using jmespath filtering
-        titles = jmespath.search(f'versions[{self.studyversion}].titles', self.usdm_data.get('study', {}))
+        study = self.usdm_data.get('study', {})
+        titles = jmespath.search(f'versions[{self.studyversion}].titles', study)
         study_name = None
         study_description = None
         if titles:
             for title in titles:
-                if title.get('type', {}).get('decode') == 'Study Acronym':
+                title_type = title.get('type') or {}
+                if title_type.get('code') == 'C207646' or title_type.get('decode') == 'Study Acronym':
                     study_name = title.get('text')
-                elif title.get('type', {}).get('decode') == 'Official Study Title':
+                elif title_type.get('code') == 'C207616' or title_type.get('decode') == 'Official Study Title':
                     study_description = title.get('text')
+
+        study_name = (
+            study_name
+            or study.get('name')
+            or next((identifier.get('text')
+                     for identifier in (self.study_version_data or {}).get('studyIdentifiers') or []
+                     if identifier.get('text')), None)
+            or "STUDY"
+        )
         protocol_name = study_name
 
         # Extract language code

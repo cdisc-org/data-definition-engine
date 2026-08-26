@@ -32,6 +32,18 @@ def minimal_usdm_file():
 
 
 @pytest.fixture
+def two_bc_usdm_file():
+    """
+    Path to a USDM fixture carrying one biomedical concept of each producer layout.
+
+    BiomedicalConcept_1 uses the SoA Workbench layout (concept reference plus an
+    sdtm specialization extension attribute); BiomedicalConcept_2 uses the CDISC
+    USDM E2J layout (a package-dated specialization reference).
+    """
+    return FIXTURES_DIR / "two_bc_usdm.json"
+
+
+@pytest.fixture
 def mock_client():
     """A fresh MagicMock standing in for CDISCLibraryClient."""
     return MagicMock()
@@ -46,12 +58,22 @@ def processor(minimal_usdm_file, mock_client, tmp_path):
     mock_client.  Tests configure mock_client.<method>.return_value as needed
     before calling the method under test.
     """
+    return _build_processor(minimal_usdm_file, mock_client, tmp_path)
+
+
+@pytest.fixture
+def two_bc_processor(two_bc_usdm_file, mock_client, tmp_path):
+    """A processor loaded from the two-layout USDM fixture, with a mocked client."""
+    return _build_processor(two_bc_usdm_file, mock_client, tmp_path)
+
+
+def _build_processor(usdm_file, mock_client, tmp_path):
     from create_define_json import USDMDefineJSONProcessor
 
     output_path = tmp_path / "output.json"
     with patch("create_define_json.CDISCLibraryClient", return_value=mock_client):
         proc = USDMDefineJSONProcessor(
-            usdm_file=str(minimal_usdm_file),
+            usdm_file=str(usdm_file),
             output_template=str(output_path),
             sdtmig="3.4",
             sdtmct="2025-03-28",
