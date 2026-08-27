@@ -53,7 +53,7 @@ class USDMDefineJSONProcessor:
     """
     
     def __init__(self, usdm_file, output_template, sdtmig, sdtmct,
-                 studyversion, studydesign, docversion, cdisc_api_key,
+                 studyversion, studydesign, docversion, cdisc_api_key, base_api_url,
                  cosmosversion, debug):
         """
         Initialize the USDM processor.
@@ -3071,6 +3071,7 @@ def main():
         studydesign=args.studydesign,
         docversion=args.docversion,
         cdisc_api_key=args.cdisc_api_key,
+        base_api_url=args.base_api_url,
         cosmosversion=args.cosmosversion,
         debug=args.debug
     )
