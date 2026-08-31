@@ -114,3 +114,133 @@ timepoint_mapping:
     data_provider_timepoint_number: "T1"
     data_provider_timepoint_name: "PREDOSE"
     source: UI
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TEST SPECIFICATION (new in v0.2.0) — the agreed tests.
+# Joined from the payload on (test_panel_name -> lbpanel,
+# data_provider_test_code -> ctestcd), falling back to
+# data_provider_test_name -> ctest where the vendor code is absent.
+#
+# Row 1 is the worked example from the DTA MVP Inventory's Test_Specification
+# sheet verbatim. Rows 2-3 back the transmission.example.yaml payload. Row 4 shows a
+# test identified by NAME ONLY — the flow-cytometry pattern, which is why the
+# natural key needs a name fallback.
+# ─────────────────────────────────────────────────────────────────────────────
+test_specification:
+  - test_panel_name: Blood Differential
+    category: HEMATOLOGY
+    bc_id: C51950
+    data_provider_test_code: WBC
+    data_provider_test_name: Leukocytes
+    data_provider_test_description: Leukocytes in Blood
+    test_name: Leukocytes
+    test_code: "620043"
+    method: HPLC
+    specimen: BLOOD
+    loinc_code: 26471-3
+    data_type: numeric
+    reported_unit: "10^9/L"
+    conventional_unit: mcL
+    si_unit: mm3
+    blinding_flag: true
+    agreement_status: Ordered
+
+  - test_panel_name: HEMATOLOGY
+    category: HEMATOLOGY
+    bc_id: C64848
+    data_provider_test_code: HGB
+    data_provider_test_name: Hemoglobin
+    test_name: Hemoglobin
+    test_code: HGB
+    method: HPLC
+    specimen: BLOOD
+    data_type: numeric
+    reported_unit: g/dL
+    conventional_unit: g/dL
+    si_unit: g/L
+    blinding_flag: false
+    agreement_status: Final
+
+  # Categorical test: data_type is what stops LBORRES "STRAW" being cast to LBSTRESN.
+  - test_panel_name: URINALYSIS
+    category: URINALYSIS
+    bc_id: C51948
+    data_provider_test_code: WBCU
+    data_provider_test_name: Color Urine
+    test_name: Color
+    test_code: COLOR
+    method: DIPSTICK
+    specimen: URINE
+    data_type: "<text 200>"
+    result_values: CL_RESULT1
+    blinding_flag: true
+    agreement_status: Final
+
+  # Identified by NAME only — no vendor test code (flow cytometry pattern).
+  - test_panel_name: Revised T Cell Panel (V2_SP34-2)
+    category: HEMATOLOGY
+    bc_id: C51948
+    data_provider_test_name: Naive_CD4_Th/CD3+
+    test_name: Naive CD4 T Helper Cells
+    test_code: CD4NAIVE
+    method: FLOW CYTOMETRY
+    specimen: Cryo PBMC
+    data_type: numeric
+    reported_unit: "%"
+    blinding_flag: false
+    agreement_status: Received
+
+# ─────────────────────────────────────────────────────────────────────────────
+# DATA STRUCTURE (new in v0.2.0) — the declared shape of the transferred file.
+# Abridged: a representative sample of the 61 declared variables, chosen to cover
+# each kind of column metadata (length, CT, core, mandatory, vendor naming).
+# ─────────────────────────────────────────────────────────────────────────────
+data_structure:
+  dataset_name: LB
+  dataset_description: Laboratory test results transfer dataset.
+  variables:
+    - variable_name: STUDYID
+      variable_label: Study Identifier
+      variable_description: Unique identifier for a study.
+      variable_format: text
+      variable_length: 40
+      mandatory_variable_flag: true
+      mandatory_value: true
+
+    - variable_name: DOMAIN
+      variable_label: Domain Abbreviation
+      variable_description: Two-character abbreviation for the domain.
+      variable_format: text
+      variable_length: 2
+      controlled_terminology: DOMAIN
+      example_values: [LB, CP, MB]
+      core_variable: Mandatory/Conditional
+      mandatory_variable_flag: false
+      mandatory_value: false
+
+    - variable_name: LBORRES
+      variable_label: Result or Finding in Original Units
+      variable_description: Original result of the measurement or finding, as reported to the sites.
+      variable_format: text
+      variable_length: 200
+      mandatory_variable_flag: true
+
+    - variable_name: VISITNUM
+      variable_label: Visit Number
+      variable_description: Clinical encounter number. Numeric version of VISIT, used for sorting.
+      variable_format: numeric
+      variable_length: 8
+
+    - variable_name: LBDTC
+      variable_label: Date/Time of Specimen Collection
+      variable_description: Specimen collection date or date and time, ISO 8601.
+      variable_format: datetime
+      variable_length: 19
+
+    - variable_name: CTESTCD
+      variable_label: External Vendor Test Code
+      variable_description: Populated with the vendor internal test code.
+      variable_format: text
+      variable_length: 200
+      vendor_variable_name: CTESTCD
+      vendor_variable_label: Vendor Test Code

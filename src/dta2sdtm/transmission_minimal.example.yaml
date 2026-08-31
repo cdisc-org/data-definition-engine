@@ -1,113 +1,82 @@
 # ─────────────────────────────────────────────────────────────────────────────
-# Mock LZZT DTA instance — validates against dta.linkml.yaml (root class: Transmission)
+# Mock LZZT DTA instance — validates against dta.linkml.yaml (root: Transmission)
 #
-# Values are taken verbatim from the project's real generated output
-# (out/dta/lab_dta.csv), study H2Q-MC-LZZT (the CDISC LZZT pilot). Two analytes
-# are shown:
-#   * HGB — fully linked to the vendored COSMoS specialization (specialization: HGBBLD)
-#   * RBC — intentionally UNLINKED (no specialization) to illustrate the gap case
-#           the gap report is meant to surface.
+# Rewritten for schema v0.2.0: the payload is now a flat TransferRecord list
+# (DTA MVP Inventory / Data_Structure), replacing the v0.1.0 nested LAB v2 graph.
+#
+# Clinical values are carried over from the project's real generated output
+# (out/dta/lab_dta.csv), study H2Q-MC-LZZT (the CDISC LZZT pilot). Two analytes:
+#   * HGB — agreed in the DTA test specification (joins on lbpanel + ctestcd)
+#   * RBC — intentionally NOT in the agreed test specification, to exercise the
+#           "received a test nobody agreed to" case the gap report surfaces.
+#
+# NOTE — facts the v0.1.0 payload carried that this structure cannot:
+#   * conventional / SI results and units (old CVU*/SIU* blocks). Data_Structure
+#     carries original result only (lborres/lborresu); the standardised result is
+#     now DERIVED downstream using TestSpecification.conventional_unit / .si_unit.
+#   * reference ranges (old PLRRLO/PLRRHI/PLRRRD). Data_Structure has no
+#     LBORNRLO/LBORNRHI/LBNRIND equivalent — see the schema's `known_gap`.
 #
 # Validate:
 #   linkml-validate -s dta.linkml.yaml -C Transmission transmission_minimal.example.yaml
 # ─────────────────────────────────────────────────────────────────────────────
 
-# Transmission (GTP header)
-ltvrsn: LAB-MODEL-2.0
+# ── file header ──
+transfer_structure_version: DTA-MVP-1.0
 igvrsn: SDTMIG 3.4
 fcrdtc: "2025-01-01T00:00:00"
 trssid: CENTRALLAB-001
 trstyp: I
+dta_version_ref: "1.0"          # -> DataTransferAgreement.dta_version.version_number
 
-subjects:
+records:
+
+  # ── Hemoglobin: agreed in the test specification ──
   - studyid: H2Q-MC-LZZT
-    siteid: "701"
-    scrnid: SCR-0001
-    asubjid: STUDY-0001
-    adsex: M
+    domain: LB
+    usubjid: STUDY-0001
+    subjid: SCR-0001
+    lbgrpid: ACC-0001-V1          # accession / collection event
+    lbrefid: SPEC-0001-V1-1       # specimen id
+    lbtestcd: HGB
+    lbtest: Hemoglobin
+    lbcat: HEMATOLOGY
+    lborres: "16.98"
+    lborresu: g/dL
+    lbstat: ""                    # null => a result was produced
+    lbnam: Central Laboratory Services
+    lbspec: BLOOD
+    lbmethod: HPLC
+    visitnum: 1
+    visit: E1
+    lbdtc: "2025-01-02"
+    lbpanel: HEMATOLOGY           # ─┐ natural key to TestSpecification
+    ctestcd: HGB                  # ─┘
+    ctest: Hemoglobin
+    cunit: g/dL
+    cspec: BLOOD
+    cpanel: HEMATOLOGY
 
-    collections:
-      - accsnid: ACC-0001-V1
-        kitid: KIT-0001-V1
-        kitdsc: Standard collection kit
-        visit: E1
-        visitnum: 1
-
-        specimens:
-          - lddom: LB
-            specid: SPEC-0001-V1-1
-            rcvdtc: "2025-01-02"
-            agespc: 75
-
-            panels:
-              - pnlid: HEM
-                tstpnl: HEMATOLOGY
-                plbid: PLAB-01
-                plbnam: Central Laboratory Services
-                plbtyp: CENTRAL
-
-                labTestResults:
-                  # ── Hemoglobin: fully linked to the vendored COSMoS spec ──
-                  - plbtid: HGB
-                    plbtnm: Hemoglobin
-                    plbtds: Hemoglobin
-                    plbtct: HEMATOLOGY
-                    dtrtid: HGB
-                    dtrtnm: Hemoglobin
-                    dtrtct: HEMATOLOGY
-                    plbtts: RESULTS REPORTED
-                    asydtc: "2025-01-03"
-                    rrdtc: "2025-01-04"
-                    rtrtyp: I
-                    specialization: HGBBLD          # -> cosmos/hgbbld.specialization.yaml -> BC C64848
-                    results:
-                      - unitSystem: ORIGINAL
-                        numResult: 16.98
-                        unit: g/dL
-                        refRangeLow: "12"
-                        refRangeHigh: "18"
-                        refRangeDesc: "12-18"
-                        refRangeType: NORMAL RANGE
-                      - unitSystem: CONVENTIONAL
-                        numResult: 16.98
-                        unit: g/dL
-                        refRangeLow: "12.0"
-                        refRangeHigh: "18.0"
-                        refRangeDesc: "12-18"
-                        refRangeType: NORMAL RANGE
-                      - unitSystem: SI
-                        numResult: 169.8
-                        unit: g/L
-                        refRangeLow: "120.0"
-                        refRangeHigh: "180.0"
-                        refRangeDesc: "120.0-180.0"
-                        refRangeType: NORMAL RANGE
-
-                  # ── Erythrocytes: NO specialization linked (gap case) ──
-                  - plbtid: RBC
-                    plbtnm: Erythrocytes
-                    plbtds: Erythrocytes
-                    plbtct: HEMATOLOGY
-                    dtrtid: RBC
-                    dtrtnm: Erythrocytes
-                    dtrtct: HEMATOLOGY
-                    plbtts: RESULTS REPORTED
-                    asydtc: "2025-01-03"
-                    rrdtc: "2025-01-04"
-                    rtrtyp: I
-                    # specialization: (absent) -> surfaces under gap report "unmapped-BCs"
-                    results:
-                      - unitSystem: ORIGINAL
-                        numResult: 5.29
-                        unit: "10^6/uL"
-                        refRangeLow: "4.0"
-                        refRangeHigh: "6.0"
-                        refRangeDesc: "4.0-6.0"
-                        refRangeType: NORMAL RANGE
-                      - unitSystem: SI
-                        numResult: 5.29
-                        unit: "10^12/L"
-                        refRangeLow: "4.0"
-                        refRangeHigh: "6.0"
-                        refRangeDesc: "4.0-6.0"
-                        refRangeType: NORMAL RANGE
+  # ── Erythrocytes: NOT in the agreed test specification (gap case) ──
+  - studyid: H2Q-MC-LZZT
+    domain: LB
+    usubjid: STUDY-0001
+    subjid: SCR-0001
+    lbgrpid: ACC-0001-V1
+    lbrefid: SPEC-0001-V1-1
+    lbtestcd: RBC
+    lbtest: Erythrocytes
+    lbcat: HEMATOLOGY
+    lborres: "5.29"
+    lborresu: "10^6/uL"
+    lbnam: Central Laboratory Services
+    lbspec: BLOOD
+    visitnum: 1
+    visit: E1
+    lbdtc: "2025-01-02"
+    lbpanel: HEMATOLOGY
+    ctestcd: RBC                  # no matching TestSpecification row
+    ctest: Erythrocytes
+    cunit: "10^6/uL"
+    cspec: BLOOD
+    cpanel: HEMATOLOGY
