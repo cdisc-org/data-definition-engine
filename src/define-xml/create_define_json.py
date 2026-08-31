@@ -58,7 +58,7 @@ class USDMDefineJSONProcessor:
     """
     
     def __init__(self, usdm_file, output_template, sdtmig, sdtmct,
-                 studyversion, studydesign, docversion, cdisc_api_key,
+                 studyversion, studydesign, docversion, cdisc_api_key, base_api_url,
                  cosmosversion, debug):
         """
         Initialize the USDM processor.
@@ -72,6 +72,7 @@ class USDMDefineJSONProcessor:
             studydesign (int): Study design index in USDM
             docversion (int): Document version index in USDM
             cdisc_api_key (str): CDISC Library API Key (can be None to use environment variable)
+            base_api_url (str): CDISC Library base API URL (optional)
             cosmosversion (str): CDISC Cosmos API version
             debug (bool): Enable debug mode to save intermediate dictionaries
             
@@ -81,7 +82,11 @@ class USDMDefineJSONProcessor:
         load_dotenv()
 
         self.api_key = cdisc_api_key if cdisc_api_key else os.getenv("CDISC_API_KEY")
-        self.client = CDISCLibraryClient(api_key=self.api_key)
+
+        cdisc_lib_args = {"api_key": self.api_key}
+        if base_api_url:
+            cdisc_lib_args["base_api_url"] = base_api_url
+        self.client = CDISCLibraryClient(**cdisc_lib_args)
 
         with open(usdm_file, "r") as file:
             self.usdm_data = json.load(file)
@@ -3075,6 +3080,11 @@ def main():
         help="CDISC Library API Key (optional, defaults to environment variable CDISC_API_KEY)"
     )
     parser.add_argument(
+        "--base_api_url",
+        default=None,
+        help="CDISC Library base API URL (optional)"
+    )
+    parser.add_argument(
         "--cosmosversion",
         default="v2",
         help="CDISC Cosmos API version (default: v2)"
@@ -3132,6 +3142,7 @@ def main():
         studydesign=args.studydesign,
         docversion=args.docversion,
         cdisc_api_key=args.cdisc_api_key,
+        base_api_url=args.base_api_url,
         cosmosversion=args.cosmosversion,
         debug=args.debug
     )
