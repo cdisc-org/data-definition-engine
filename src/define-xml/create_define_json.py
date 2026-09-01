@@ -125,7 +125,10 @@ class USDMDefineJSONProcessor:
             'methods': [],
             'comments': [],
             'standards': [],
-            'annotatedCRF': [],
+            # 'annotatedCRFs' (plural) is the slot name in define.yaml/dds.yaml; this
+            # was written as 'annotatedCRF' until 2026-08-31. define_generator.py accepts
+            # either key so files written before the rename still load.
+            'annotatedCRFs': [],
             'concepts': [],
             'conceptProperties': []
         }

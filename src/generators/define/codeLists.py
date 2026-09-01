@@ -3,6 +3,22 @@ from odmlib.define_2_1 import model as DEFINE
 import define_object
 
 
+def first_coding(obj: dict[str, Any]) -> dict[str, Any] | None:
+    """Return an object's first Coding, whether it is stored as a list or a bare dict.
+
+    ``coding`` is multivalued in the DDS model and ``create_define_json.py`` writes a
+    list, but some hand-built files (including this package's own canonical fixture)
+    carry a single dict. Accepting both is what lets the generator read the loader's
+    real output.
+    """
+    coding = obj.get("coding")
+    if isinstance(coding, list):
+        return coding[0] if coding else None
+    if isinstance(coding, dict):
+        return coding
+    return None
+
+
 class CodeLists(define_object.DefineObject):
     """Create Define-XML v2.1 CodeList element objects."""
 
@@ -73,7 +89,7 @@ class CodeLists(define_object.DefineObject):
         coded_value = self.require_key(obj, "codedValue", "CodeListItem")
         attr = {"CodedValue": coded_value}
         en_item = DEFINE.EnumeratedItem(**attr)
-        coding = obj.get("coding", {})
+        coding = first_coding(obj)
         if coding:
             alias = DEFINE.Alias(Context="nci:ExtCodeID", Name=coding.get("code"))
             en_item.Alias.append(alias)
@@ -94,7 +110,7 @@ class CodeLists(define_object.DefineObject):
             tt = DEFINE.TranslatedText(_content=coded_value, lang="en")
         decode.TranslatedText.append(tt)
         cl_item.Decode = decode
-        coding = obj.get("coding", {})
+        coding = first_coding(obj)
         if coding:
             alias = DEFINE.Alias(Context="nci:ExtCodeID", Name=coding.get("code"))
             cl_item.Alias.append(alias)
