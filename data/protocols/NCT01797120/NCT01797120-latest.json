@@ -31,7 +31,7 @@
                 {
                   "id": "ExtensionAttribute_47",
                   "url": "usdm-creation-date",
-                  "valueString": "20260916T08:19",
+                  "valueString": "20260916T09:53",
                   "instanceType": "ExtensionAttribute"
                 }
               ],
@@ -3190,6 +3190,136 @@
         ],
         "dateValues": [],
         "amendments": [
+          {
+            "id": "StudyAmendment_1",
+            "extensionAttributes": [],
+            "notes": [],
+            "name": "Randomization Update",
+            "label": "RANDOMIZATION-UPDATE",
+            "description": "An incorrect Biomedical Concept (C25196) was assigned to the RANDOMIZATION activity. This is updated to 'Subject is Randomized' with a code of C114209.  This will also require updated of the assigned child SDTM dataset specialization to 'RAND'.",
+            "number": "1",
+            "summary": "An incorrect Biomedical Concept (C25196) was assigned to the RANDOMIZATION activity. This is updated to 'Subject is Randomized' with a code of C114209.  This will also require updated of the assigned child SDTM dataset specialization to 'RAND'.",
+            "primaryReason": {
+              "id": "StudyAmendmentReason_1",
+              "extensionAttributes": [],
+              "code": {
+                "id": "Code_11337",
+                "extensionAttributes": [],
+                "code": "C207603",
+                "codeSystem": "http://www.cdisc.org",
+                "codeSystemVersion": "2026-03-27",
+                "decode": "Inconsistency And/or Error In The Protocol",
+                "instanceType": "Code"
+              },
+              "otherReason": null,
+              "instanceType": "StudyAmendmentReason"
+            },
+            "secondaryReasons": [
+              {
+                "id": "StudyAmendmentReason_2",
+                "extensionAttributes": [],
+                "code": {
+                  "id": "Code_11338",
+                  "extensionAttributes": [],
+                  "code": "C207604",
+                  "codeSystem": "http://www.cdisc.org",
+                  "codeSystemVersion": "2026-03-27",
+                  "decode": "Investigator/Site Feedback",
+                  "instanceType": "Code"
+                },
+                "otherReason": null,
+                "instanceType": "StudyAmendmentReason"
+              }
+            ],
+            "changes": [
+              {
+                "id": "StudyChange_1",
+                "extensionAttributes": [],
+                "name": "randomization-change",
+                "label": "randomization-change",
+                "description": "Update to RANDOMIZATION activity; changed assignment of C25196 to C114209 and updated DSS assignment to RAND.",
+                "summary": "Update to RANDOMIZATION activity; changed assignment of C25196 to C114209 and updated DSS assignment to RAND.",
+                "rationale": "Study accuracy",
+                "changedSections": [],
+                "instanceType": "StudyChange"
+              }
+            ],
+            "impacts": [
+              {
+                "id": "StudyAmendmentImpact_1",
+                "extensionAttributes": [],
+                "notes": [],
+                "type": {
+                  "id": "Code_11339",
+                  "extensionAttributes": [],
+                  "code": "C215667",
+                  "codeSystem": "http://www.cdisc.org",
+                  "codeSystemVersion": "2026-03-27",
+                  "decode": "Study Data Reliability",
+                  "instanceType": "Code"
+                },
+                "text": "Previous Biomedical Concept applies to study design and not the subject. The SoA requires the activity of recording the time (and perhaps other details) of the randomisation activity.",
+                "isSubstantial": false,
+                "instanceType": "StudyAmendmentImpact"
+              }
+            ],
+            "geographicScopes": [
+              {
+                "id": "GeographicScope_1",
+                "extensionAttributes": [],
+                "type": {
+                  "id": "Code_11341",
+                  "extensionAttributes": [],
+                  "code": "C68846",
+                  "codeSystem": "http://www.cdisc.org",
+                  "codeSystemVersion": "2026-03-27",
+                  "decode": "Global",
+                  "instanceType": "Code"
+                },
+                "code": null,
+                "instanceType": "GeographicScope"
+              }
+            ],
+            "enrollments": [],
+            "dateValues": [
+              {
+                "id": "GovernanceDate_1",
+                "extensionAttributes": [],
+                "name": "randomization-update-date",
+                "label": null,
+                "description": null,
+                "type": {
+                  "id": "Code_11340",
+                  "extensionAttributes": [],
+                  "code": "C215663",
+                  "codeSystem": "http://www.cdisc.org",
+                  "codeSystemVersion": "2026-03-27",
+                  "decode": "Effective Date",
+                  "instanceType": "Code"
+                },
+                "dateValue": "2026-09-16",
+                "geographicScopes": [
+                  {
+                    "id": "GeographicScope_1",
+                    "extensionAttributes": [],
+                    "type": {
+                      "id": "Code_11341",
+                      "extensionAttributes": [],
+                      "code": "C68846",
+                      "codeSystem": "http://www.cdisc.org",
+                      "codeSystemVersion": "2026-03-27",
+                      "decode": "Global",
+                      "instanceType": "Code"
+                    },
+                    "code": null,
+                    "instanceType": "GeographicScope"
+                  }
+                ],
+                "instanceType": "GovernanceDate"
+              }
+            ],
+            "instanceType": "StudyAmendment"
+          },
           {
             "id": "StudyAmendment_2",
             "extensionAttributes": [],
@@ -19254,12 +19384,105 @@
               "Randomized"
             ],
             "reference": "/mdr/bc/biomedicalconcepts/C114209",
-            "properties": [],
+            "properties": [
+              {
+                "id": "BiomedicalConceptProperty_1002",
+                "extensionAttributes": [],
+                "name": "DSDECOD",
+                "label": "DSDECOD",
+                "isRequired": true,
+                "isEnabled": true,
+                "datatype": "text",
+                "responseCodes": [
+                  {
+                    "id": "ResponseCode_116",
+                    "instanceType": "ResponseCode",
+                    "name": "RANDOMIZED",
+                    "label": "RANDOMIZED",
+                    "isEnabled": true,
+                    "code": {
+                      "id": "Code_11350",
+                      "extensionAttributes": [],
+                      "code": "C114209",
+                      "codeSystem": "http://www.cdisc.org",
+                      "codeSystemVersion": "2026-05-26",
+                      "decode": "RANDOMIZED",
+                      "instanceType": "Code"
+                    }
+                  }
+                ],
+                "code": {
+                  "id": "AliasCode_10582",
+                  "standardCode": {
+                    "id": "Code_11349",
+                    "extensionAttributes": [],
+                    "code": "C82977",
+                    "codeSystem": "http://www.cdisc.org",
+                    "codeSystemVersion": "2026-05-26",
+                    "decode": "Dictionary-derived Term",
+                    "instanceType": "Code"
+                  },
+                  "instanceType": "AliasCode"
+                },
+                "notes": [],
+                "instanceType": "BiomedicalConceptProperty"
+              },
+              {
+                "id": "BiomedicalConceptProperty_1003",
+                "extensionAttributes": [],
+                "name": "DSTERM",
+                "label": "DSTERM",
+                "isRequired": true,
+                "isEnabled": true,
+                "datatype": "text",
+                "responseCodes": [],
+                "code": {
+                  "id": "AliasCode_10584",
+                  "standardCode": {
+                    "id": "Code_11351",
+                    "extensionAttributes": [],
+                    "code": "C82571",
+                    "codeSystem": "http://www.cdisc.org",
+                    "codeSystemVersion": "2026-05-26",
+                    "decode": "Reported Event Term",
+                    "instanceType": "Code"
+                  },
+                  "instanceType": "AliasCode"
+                },
+                "notes": [],
+                "instanceType": "BiomedicalConceptProperty"
+              },
+              {
+                "id": "BiomedicalConceptProperty_1004",
+                "extensionAttributes": [],
+                "name": "DSSTDTC",
+                "label": "DSSTDTC",
+                "isRequired": false,
+                "isEnabled": true,
+                "datatype": "datetime",
+                "responseCodes": [],
+                "code": {
+                  "id": "AliasCode_10585",
+                  "standardCode": {
+                    "id": "Code_11352",
+                    "extensionAttributes": [],
+                    "code": "C82517",
+                    "codeSystem": "http://www.cdisc.org",
+                    "codeSystemVersion": "2026-05-26",
+                    "decode": "Observation Start Date Time",
+                    "instanceType": "Code"
+                  },
+                  "instanceType": "AliasCode"
+                },
+                "notes": [],
+                "instanceType": "BiomedicalConceptProperty"
+              }
+            ],
             "code": {
               "id": "AliasCode_10581",
               "extensionAttributes": [],
               "standardCode": {
-                "id": "Code_11342",
+                "id": "Code_11348",
                 "extensionAttributes": [],
                 "code": "C114209",
                 "codeSystem": "http://www.cdisc.org",

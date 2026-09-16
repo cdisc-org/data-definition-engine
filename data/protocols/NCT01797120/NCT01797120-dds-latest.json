@@ -3,7 +3,7 @@
   "name": "MDV None",
   "description": "Data Definitions for None",
   "fileOID": "ODM.DEFINE-JSON.None.Version1.Design1",
-  "creationDateTime": "2026-09-16T08:26:33.481930+00:00",
+  "creationDateTime": "2026-09-16T09:58:54.516460+00:00",
   "odmVersion": "1.3.2",
   "fileType": "Snapshot",
   "originator": "Define-JSON Processor",
@@ -4893,6 +4893,25 @@
               "codeSystem": "http://www.cdisc.org",
               "codeSystemVersion": "2026-05-26",
               "decode": "mm"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "OID": "CL.39e500d6",
+      "name": "DSDECOD Response Codes",
+      "dataType": "text",
+      "isNonStandard": true,
+      "codeListItems": [
+        {
+          "codedValue": "RANDOMIZED",
+          "coding": [
+            {
+              "code": "C114209",
+              "codeSystem": "http://www.cdisc.org",
+              "codeSystemVersion": "2026-05-26",
+              "decode": "RANDOMIZED"
             }
           ]
         }
@@ -13802,7 +13821,51 @@
         "Randomized"
       ],
       "href": "/mdr/bc/biomedicalconcepts/C114209",
-      "properties": [],
+      "properties": [
+        {
+          "OID": "CONCPROP.BiomedicalConceptProperty_1002",
+          "name": "DSDECOD",
+          "label": "DSDECOD",
+          "mandatory": true,
+          "coding": [
+            {
+              "code": "C82977",
+              "codeSystem": "http://www.cdisc.org",
+              "codeSystemVersion": "2026-05-26",
+              "decode": "Dictionary-derived Term"
+            }
+          ],
+          "codeList": "CL.39e500d6"
+        },
+        {
+          "OID": "CONCPROP.BiomedicalConceptProperty_1003",
+          "name": "DSTERM",
+          "label": "DSTERM",
+          "mandatory": true,
+          "coding": [
+            {
+              "code": "C82571",
+              "codeSystem": "http://www.cdisc.org",
+              "codeSystemVersion": "2026-05-26",
+              "decode": "Reported Event Term"
+            }
+          ]
+        },
+        {
+          "OID": "CONCPROP.BiomedicalConceptProperty_1004",
+          "name": "DSSTDTC",
+          "label": "DSSTDTC",
+          "mandatory": false,
+          "coding": [
+            {
+              "code": "C82517",
+              "codeSystem": "http://www.cdisc.org",
+              "codeSystemVersion": "2026-05-26",
+              "decode": "Observation Start Date Time"
+            }
+          ]
+        }
+      ],
       "coding": [
         {
           "code": "C114209",
@@ -20044,6 +20107,49 @@
           "codeSystem": "http://www.cdisc.org",
           "codeSystemVersion": "2026-05-26",
           "decode": "Collection Date Time"
+        }
+      ]
+    },
+    {
+      "OID": "CONCPROP.BiomedicalConceptProperty_1002",
+      "name": "DSDECOD",
+      "label": "DSDECOD",
+      "mandatory": true,
+      "coding": [
+        {
+          "code": "C82977",
+          "codeSystem": "http://www.cdisc.org",
+          "codeSystemVersion": "2026-05-26",
+          "decode": "Dictionary-derived Term"
+        }
+      ],
+      "codeList": "CL.39e500d6"
+    },
+    {
+      "OID": "CONCPROP.BiomedicalConceptProperty_1003",
+      "name": "DSTERM",
+      "label": "DSTERM",
+      "mandatory": true,
+      "coding": [
+        {
+          "code": "C82571",
+          "codeSystem": "http://www.cdisc.org",
+          "codeSystemVersion": "2026-05-26",
+          "decode": "Reported Event Term"
+        }
+      ]
+    },
+    {
+      "OID": "CONCPROP.BiomedicalConceptProperty_1004",
+      "name": "DSSTDTC",
+      "label": "DSSTDTC",
+      "mandatory": false,
+      "coding": [
+        {
+          "code": "C82517",
+          "codeSystem": "http://www.cdisc.org",
+          "codeSystemVersion": "2026-05-26",
+          "decode": "Observation Start Date Time"
         }
       ]
     }
