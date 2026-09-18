@@ -8,6 +8,9 @@ from constants import TRIAL_DESIGN_DOMAINS, NON_REPEATING_DOMAINS, DEFAULT_PURPO
 
 MAX_SUBCLASS_DEPTH = 4
 
+# ItemGroup types owned by the CRF half of a combined DDS.
+CRF_ITEM_GROUP_TYPES = frozenset({"Form", "Section", "Concept"})
+
 
 class ItemGroups(define_object.DefineObject):
     """ create a Define-XML v2.1 ItemGroupDef element template """
@@ -31,6 +34,13 @@ class ItemGroups(define_object.DefineObject):
         """
         self.lang = lang
         for dataset in template:
+            # A combined DDS also carries CRF metadata: Form, Section and Concept groups
+            # written by crf_loader.py and consumed by crf_generator.py. They are not
+            # tabulation datasets, so Define-XML ignores them.
+            if dataset.get("type") in CRF_ITEM_GROUP_TYPES:
+                self.logger.info("skipping CRF %s itemGroup %s - owned by the CRF generator",
+                                 dataset.get("type"), dataset.get("OID"))
+                continue
             self._generate_dataset(dataset, define_objects, lang, acrf)
             if dataset.get("slices"):
                 self._generate_vlm(dataset, define_objects, lang, acrf)

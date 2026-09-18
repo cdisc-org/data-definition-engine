@@ -89,5 +89,6 @@ normalized/*.json
 # App specific
 normalized/
 src/define-xml/output
+output/
 
 # End of file

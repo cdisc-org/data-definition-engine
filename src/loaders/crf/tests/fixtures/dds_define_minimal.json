@@ -1,0 +1,105 @@
+{
+  "OID": "MDV.None.Version1.Design1",
+  "name": "MDV",
+  "description": "d",
+  "fileOID": "ODM.DEFINE-JSON.None.Version1.Design1",
+  "odmVersion": "1.3.2",
+  "fileType": "Snapshot",
+  "originator": "Define-JSON Processor",
+  "context": "Other",
+  "defineVersion": "2.1.0",
+  "studyOID": "ODM.None.Version1.Design1",
+  "studyName": null,
+  "studyDescription": null,
+  "protocolName": null,
+  "itemGroups": [
+    {
+      "OID": "IG.VS",
+      "name": "VS",
+      "description": "Vital Signs",
+      "domain": "VS",
+      "purpose": "Tabulation",
+      "structure": "One record per test",
+      "standard": "STD.SDTMIG",
+      "items": [
+        {
+          "OID": "IT.VS.VSORRES",
+          "name": "VSORRES",
+          "description": "Result",
+          "dataType": "text",
+          "length": null,
+          "mandatory": true,
+          "origin": {
+            "type": "Collected",
+            "source": "Investigator"
+          }
+        },
+        {
+          "OID": "IT.VS.VSTESTCD",
+          "name": "VSTESTCD",
+          "description": "Test Code",
+          "dataType": "text",
+          "mandatory": true,
+          "origin": {
+            "type": "Collected",
+            "source": "Investigator"
+          }
+        },
+        {
+          "OID": "IT.VS.VSDTC",
+          "name": "VSDTC",
+          "description": "Date",
+          "dataType": "date",
+          "mandatory": false,
+          "origin": {
+            "type": "Collected",
+            "source": "Investigator"
+          }
+        }
+      ]
+    }
+  ],
+  "conditions": [],
+  "whereClauses": [],
+  "codeLists": [],
+  "methods": [],
+  "comments": [],
+  "standards": [
+    {
+      "OID": "STD.SDTMIG",
+      "name": "SDTMIG",
+      "type": "IG",
+      "version": "3.4",
+      "status": "FINAL"
+    },
+    {
+      "OID": "STD.SDTMCT",
+      "name": "CDISC/NCI",
+      "type": "CT",
+      "version": "2026-03-27",
+      "status": "FINAL",
+      "publishingSet": "SDTM"
+    }
+  ],
+  "annotatedCRF": [],
+  "concepts": [
+    {
+      "OID": "CONC.BiomedicalConcept_7",
+      "name": "Systolic Blood Pressure",
+      "href": "/mdr/bc/biomedicalconcepts/C25298",
+      "properties": [
+        {
+          "OID": "CONCPROP.BCP_44",
+          "name": "VSORRES",
+          "coding": [
+            {
+              "code": "C70856",
+              "codeSystem": "http://www.cdisc.org"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "conceptProperties": []
+}

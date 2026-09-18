@@ -36,6 +36,9 @@ ELEMENTS = ["ValueListDef", "WhereClauseDef", "ItemGroupDef", "ItemDef", "CodeLi
 # and post-processing depends on ItemDef being fully materialized.
 SECTION_ORDER = [
     "standards",
+    # The DDS schema names this slot annotatedCRFs; the singular is the legacy key that
+    # create_define_json.py wrote before the rename. Both dispatch to the same loader.
+    "annotatedCRFs",
     "annotatedCRF",
     "codeLists",
     "concepts",
@@ -56,6 +59,7 @@ LOADERS = {
     "codeLists": codeLists.CodeLists,
     "methods": methods.Methods,
     "standards": standards.Standards,
+    "annotatedCRFs": annotatedCRF.AnnotatedCRF,
     "annotatedCRF": annotatedCRF.AnnotatedCRF,
     "concepts": concepts.Concepts,
     "conceptProperties": conceptProperties.ConceptProperties,
@@ -115,12 +119,20 @@ class DefineGenerator:
         self._init_define_objects()
         self._load_study(template_objects)
         # explicit dispatch order — no dependency on JSON key order.
+        loaded: set[type] = set()
         for section in SECTION_ORDER:
             if section not in template_objects:
                 continue
             value = template_objects[section]
             if not isinstance(value, list):
                 continue
+            # annotatedCRFs and annotatedCRF are the same slot under two spellings; a
+            # file carrying both must not run the loader twice.
+            loader_class = LOADERS.get(section)
+            if loader_class in loaded:
+                logging.info(f"skipping {section} - already loaded under another key")
+                continue
+            loaded.add(loader_class)
             logging.info(f"processing {section}")
             self._load(section, value)
 
