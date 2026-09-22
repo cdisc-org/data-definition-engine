@@ -1,0 +1,1678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YAML Placeholder Filler</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* CDISC palette (light mode), mirroring cdiscTheme.ts in data-definition-engine-ui,
+     with component metrics taken from the Material UI defaults that app is built on. */
+  :root {
+    color-scheme: light;
+
+    --primary: #144678;
+    --primary-dark: #0e3154;
+    --primary-hover-bg: rgba(20, 70, 120, 0.04);
+    --primary-selected-bg: rgba(20, 70, 120, 0.08);
+    --primary-outline: rgba(20, 70, 120, 0.5);
+    --success: #2e8b6b;
+    --success-text: #226a51;
+    --warning-text: #7a5700;
+    --warning-bg: rgb(246, 237, 214);
+    --warning-border: rgb(232, 208, 148);
+    --error: #cb4544;
+    --error-bg: rgba(203, 69, 68, 0.08);
+
+    --bg: #ffffff;
+    --panel: #ffffff;
+    --panel-2: #ffffff;    /* tree rows at even depths */
+    --panel-alt: #f4f6f9;  /* tree rows at odd depths */
+    --subtle: #f4f6f9;
+    --chrome: #e8ecf1;
+    --border: #d4dbe3;
+    --divider: #e8ecf1;
+    --appbar-divider: rgba(169, 181, 194, 0.24);
+    --input-border: rgba(0, 0, 0, 0.23);
+    --text: #152638;
+    --text-dim: #5f7285;
+
+    --shadow-1: 0 2px 1px -1px rgba(0,0,0,0.2), 0 1px 1px 0 rgba(0,0,0,0.14), 0 1px 3px 0 rgba(0,0,0,0.12);
+    --shadow-2: 0 3px 1px -2px rgba(0,0,0,0.2), 0 2px 2px 0 rgba(0,0,0,0.14), 0 1px 5px 0 rgba(0,0,0,0.12);
+    --shadow-4: 0 2px 4px -1px rgba(0,0,0,0.2), 0 4px 5px 0 rgba(0,0,0,0.14), 0 1px 10px 0 rgba(0,0,0,0.12);
+    --shadow-6: 0 3px 5px -1px rgba(0,0,0,0.2), 0 6px 10px 0 rgba(0,0,0,0.14), 0 1px 18px 0 rgba(0,0,0,0.12);
+    --shadow-24: 0 11px 15px -7px rgba(0,0,0,0.2), 0 24px 38px 3px rgba(0,0,0,0.14), 0 9px 46px 8px rgba(0,0,0,0.12);
+
+    --radius: 8px;
+    --ease: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    --mono: "Roboto Mono", Consolas, "SFMono-Regular", "Liberation Mono", Menlo, monospace;
+    --sans: "Roboto", "Helvetica", "Arial", sans-serif;
+
+    /* Material icons, drawn with mask-image so they take the text colour */
+    --icon-save: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3m3-10H5V5h10z'/%3E%3C/svg%3E");
+    --icon-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z'/%3E%3C/svg%3E");
+    --icon-error: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m1 15h-2v-2h2zm0-4h-2V7h2z'/%3E%3C/svg%3E");
+    --icon-dropdown: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='rgba(0,0,0,0.54)' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.43;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* app bar, as in the DDE UI */
+  .appbar {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    padding: 0 24px 0 12px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--appbar-divider);
+  }
+  .appbar-logo {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    margin: 3px 0 0 8px;
+    padding: 4px;
+  }
+  .appbar-title {
+    padding-left: 16px;
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.6;
+    letter-spacing: 0.0075em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .page {
+    display: flex;
+    justify-content: center;
+    padding: 40px 16px 64px;
+  }
+  .app {
+    width: 100%;
+    max-width: 760px;
+  }
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.08333em;
+    text-transform: uppercase;
+    color: var(--primary);
+    margin-bottom: 4px;
+  }
+  h1 {
+    font-size: 2.125rem;
+    font-weight: 400;
+    line-height: 1.235;
+    letter-spacing: 0.00735em;
+    margin: 0 0 24px 0;
+  }
+  .card {
+    background: var(--panel);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-1);
+    padding: 24px;
+  }
+  code {
+    font-family: var(--mono);
+    font-size: 0.8125rem;
+    background: var(--subtle);
+    border: 1px solid var(--divider);
+    border-radius: 4px;
+    padding: 1px 5px;
+  }
+  .filename {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+    word-break: break-all;
+  }
+  .filename strong { color: var(--text); font-weight: 500; }
+
+  button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-width: 64px;
+    font-family: var(--sans);
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.75;
+    letter-spacing: 0.02857em;
+    text-transform: uppercase;
+    border-radius: var(--radius);
+    border: 1px solid transparent;
+    padding: 5px 15px;
+    cursor: pointer;
+    transition: background-color var(--ease), box-shadow var(--ease), border-color var(--ease), color var(--ease);
+  }
+  button:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+  button:disabled { color: rgba(0, 0, 0, 0.26); box-shadow: none; cursor: not-allowed; }
+
+  .btn-primary,
+  .btn-finish {
+    background: var(--primary);
+    color: #fff;
+    box-shadow: var(--shadow-2);
+  }
+  .btn-primary:hover:not(:disabled),
+  .btn-finish:hover:not(:disabled) {
+    background: var(--primary-dark);
+    box-shadow: var(--shadow-4);
+  }
+  .btn-primary:disabled,
+  .btn-finish:disabled { background: rgba(0, 0, 0, 0.12); }
+  .btn-finish::before {
+    content: "";
+    width: 18px;
+    height: 18px;
+    margin-left: -4px;
+    background-color: currentColor;
+    -webkit-mask: var(--icon-save) center / contain no-repeat;
+    mask: var(--icon-save) center / contain no-repeat;
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--primary);
+    border-color: var(--primary-outline);
+  }
+  .btn-secondary:hover:not(:disabled) {
+    background: var(--primary-hover-bg);
+    border-color: var(--primary);
+  }
+  .btn-secondary:disabled { border-color: rgba(0, 0, 0, 0.12); }
+
+  #pickScreen { text-align: center; padding: 48px 24px; }
+  #pickScreen p {
+    color: var(--text-dim);
+    font-size: 1rem;
+    line-height: 1.5;
+    margin: 0 auto 24px;
+    max-width: 520px;
+  }
+
+  .status-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .count {
+    font-size: 0.875rem;
+    color: var(--text-dim);
+  }
+  .count strong { color: var(--primary); font-weight: 700; font-size: 1rem; }
+
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.875rem;
+    color: var(--text);
+    margin-bottom: 16px;
+    user-select: none;
+    cursor: pointer;
+  }
+  .toggle-row input {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    accent-color: var(--primary);
+    cursor: pointer;
+  }
+
+  .tree-wrap {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin: 0 0 24px 0;
+  }
+  ul.tree-level {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .tree-level > li {
+    border-bottom: 1px solid var(--divider);
+    background: var(--panel-2);
+  }
+  .tree-level > li:last-child { border-bottom: none; }
+  .tree-level .tree-level > li:last-child { border-bottom: 1px solid var(--divider); }
+  .tree-level .tree-level { background: var(--subtle); }
+
+  .tree-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 44px;
+    padding: 10px 16px;
+    cursor: pointer;
+    transition: box-shadow 150ms ease;
+  }
+  /* The row background is set inline per depth, so hover is layered on as an inset shadow. */
+  .tree-row:hover { box-shadow: inset 0 0 0 999px var(--primary-selected-bg); }
+
+  .tree-row-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .arrow {
+    display: inline-block;
+    flex-shrink: 0;
+    width: 10px;
+    color: var(--text-dim);
+    font-size: 11px;
+    transition: transform 0.15s ease;
+  }
+  .arrow.expanded { transform: rotate(90deg); }
+  .arrow.leaf-spacer { width: 10px; }
+
+  .tree-label {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--text);
+    word-break: break-all;
+  }
+  .tree-branch > .tree-row .tree-label { font-weight: 500; }
+  .tree-count {
+    font-size: 12px;
+    color: var(--text-dim);
+    flex-shrink: 0;
+  }
+
+  li.tree-leaf.resolved > .tree-row { opacity: 0.6; }
+  li.tree-leaf.resolved > .tree-row:hover { opacity: 1; }
+
+  .path-value {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .path-value.is-placeholder {
+    color: var(--warning-text);
+    background: var(--warning-bg);
+    border: 1px solid var(--warning-border);
+    border-radius: 12px;
+    padding: 1px 8px;
+  }
+  .path-value.is-resolved { color: var(--success-text); font-weight: 500; }
+
+  .empty-state {
+    padding: 28px 16px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.875rem;
+    background: var(--subtle);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 24px;
+  }
+
+  .actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 8px; }
+
+  /* modal */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    z-index: 10;
+  }
+  .modal {
+    background: var(--panel);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-24);
+    padding: 24px;
+    width: 100%;
+    max-width: 520px;
+    max-height: calc(100% - 32px);
+    overflow-y: auto;
+  }
+  .modal h2 {
+    font-size: 1.25rem;
+    font-weight: 500;
+    line-height: 1.6;
+    letter-spacing: 0.0075em;
+    margin: 0 0 4px 0;
+  }
+  .modal .modal-path {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--primary);
+    margin-bottom: 18px;
+    word-break: break-all;
+  }
+  .modal label {
+    display: block;
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+  .modal .actions { justify-content: flex-end; }
+
+  .hint {
+    font-size: 0.8125rem;
+    color: var(--text-dim);
+    margin-top: 14px;
+    line-height: 1.5;
+  }
+
+  #fileInputFallback { display: none; }
+
+  /* toast, styled as the DDE UI's snackbar */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 288px;
+    max-width: calc(100% - 32px);
+    min-height: 48px;
+    background: #313131;
+    color: #fff;
+    padding: 6px 16px;
+    border-radius: var(--radius);
+    font-family: var(--sans);
+    font-size: 0.875rem;
+    line-height: 1.43;
+    letter-spacing: 0.01071em;
+    box-shadow: var(--shadow-6);
+    z-index: 20;
+  }
+  .toast.ok { background: var(--success); }
+  .toast.err { background: var(--error); }
+  .toast.ok::before,
+  .toast.err::before {
+    content: "";
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    background-color: currentColor;
+    -webkit-mask: var(--icon-check) center / contain no-repeat;
+    mask: var(--icon-check) center / contain no-repeat;
+  }
+  .toast.err::before {
+    -webkit-mask-image: var(--icon-error);
+    mask-image: var(--icon-error);
+  }
+
+  /* schema loader */
+  .schema-loader {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid var(--divider);
+  }
+  .schema-status {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 10px;
+    line-height: 1.5;
+  }
+  .schema-status.active { color: var(--success-text); }
+  .schema-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+    background: var(--subtle);
+    border-radius: var(--radius);
+    padding: 8px 8px 8px 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .schema-line.active { color: var(--success-text); }
+  .schema-line button {
+    font-size: 0.8125rem;
+    padding: 2px 9px;
+    background: var(--panel);
+  }
+  #schemaInputFallback { display: none; }
+
+  /* dynamic field controls in the edit modal */
+  .field-hint {
+    font-size: 0.8125rem;
+    color: var(--text-dim);
+    margin: -10px 0 16px 0;
+    line-height: 1.5;
+  }
+  .field-error {
+    font-size: 0.75rem;
+    color: var(--error);
+    margin: -12px 0 16px 0;
+  }
+  .field-input, .field-select {
+    width: 100%;
+    height: 40px;
+    background: var(--bg);
+    border: 1px solid var(--input-border);
+    border-radius: var(--radius);
+    padding: 0 14px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 14px;
+    margin-bottom: 20px;
+    transition: border-color var(--ease), box-shadow var(--ease);
+  }
+  .field-input::placeholder { color: var(--text-dim); opacity: 0.8; }
+  .field-select {
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: 36px;
+    background-image: var(--icon-dropdown);
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 24px;
+  }
+  .field-input:hover, .field-select:hover { border-color: var(--text); }
+  .field-input:focus, .field-select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: inset 0 0 0 1px var(--primary);
+  }
+
+  .enum-list-wrap { margin-bottom: 20px; }
+  .enum-list-wrap .enum-filter { margin-bottom: 8px; }
+  .enum-list {
+    max-height: 220px;
+    overflow-y: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg);
+  }
+  .enum-option {
+    padding: 8px 14px;
+    font-family: var(--mono);
+    font-size: 13px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--divider);
+  }
+  .enum-option:last-child { border-bottom: none; }
+  .enum-option:hover { background: var(--primary-hover-bg); }
+  .enum-option.selected {
+    background: var(--primary-selected-bg);
+    color: var(--primary);
+    font-weight: 500;
+    box-shadow: inset 3px 0 0 var(--primary);
+  }
+
+  .multi-wrap { margin-bottom: 20px; }
+  .multi-chip-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .multi-empty {
+    font-size: 0.8125rem;
+    color: var(--text-dim);
+    font-style: italic;
+  }
+  .multi-chip {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 32px;
+    background: var(--chrome);
+    border-radius: 16px;
+    padding: 0 5px 0 12px;
+    font-family: var(--mono);
+    font-size: 13px;
+  }
+  .multi-chip-remove {
+    min-width: 0;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: none;
+    color: var(--text-dim);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  .multi-chip-remove:hover { color: var(--error); background: var(--error-bg); }
+  .multi-add-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .multi-add-row .field-input,
+  .multi-add-row .field-select,
+  .multi-add-row .enum-list-wrap {
+    flex: 1;
+    margin-bottom: 0;
+  }
+  .multi-add-row .multi-add-btn { flex-shrink: 0; height: 40px; }
+
+  @media (max-width: 600px) {
+    .appbar { height: 56px; padding-right: 16px; }
+    .page { padding: 24px 16px 48px; }
+    h1 { font-size: 1.75rem; }
+    .card { padding: 16px; }
+    #pickScreen { padding: 32px 16px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="appbar">
+  <svg class="appbar-logo" viewBox="0 0 28 28" aria-hidden="true">
+    <circle cx="8" cy="8" r="4.5" fill="#144678"/>
+    <circle cx="20" cy="8" r="4.5" fill="#cb4544"/>
+    <circle cx="8" cy="20" r="4.5" fill="#edaa00"/>
+    <circle cx="20" cy="20" r="4.5" fill="#a1d0ca"/>
+  </svg>
+  <div class="appbar-title">Data Definition Engine</div>
+</header>
+
+<main class="page">
+<div class="app">
+  <div class="eyebrow">YAML // fill-in-the-blanks</div>
+  <h1>Placeholder Filler</h1>
+
+  <div class="card" id="pickScreen">
+    <p>Choose a Patch file. Any value set to <code>__PLACEHOLDER__</code> will be listed so you can fill it in.</p>
+    <button class="btn-primary" id="chooseBtn">Choose Patch file</button>
+    <input type="file" id="fileInputFallback" accept=".yml,.yaml,text/yaml">
+    <div class="hint" id="capabilityHint"></div>
+
+    <div class="schema-loader">
+      <button class="btn-secondary" id="chooseSchemaBtn">Attach LinkML schema (optional)</button>
+      <input type="file" id="schemaInputFallback" accept=".yml,.yaml,text/yaml">
+      <div class="schema-status" id="schemaStatusPick">No schema attached — replacements will use plain text boxes.</div>
+      <div class="hint">Order doesn't matter — attach the schema before or after choosing the patch file, and you can still attach or swap it later from the results screen.</div>
+    </div>
+  </div>
+
+  <div class="card" id="listScreen" style="display:none;">
+    <div class="filename">File: <strong id="fileNameLabel"></strong></div>
+
+    <div class="schema-line" id="schemaLinePick">
+      <span id="schemaStatusList">No schema attached</span>
+      <button class="btn-secondary" id="chooseSchemaBtn2">Attach schema</button>
+    </div>
+
+    <div class="status-row">
+      <div class="count" id="countLabel"></div>
+    </div>
+
+    <label class="toggle-row">
+      <input type="checkbox" id="showResolvedToggle">
+      Keep filled-in values in the list
+    </label>
+
+    <div id="listContainer"></div>
+
+    <div class="actions">
+      <button class="btn-secondary" id="loadAnotherBtn">Choose a different file</button>
+      <button class="btn-finish" id="finishBtn">Finish &amp; save</button>
+    </div>
+  </div>
+</div>
+</main>
+
+<div class="overlay" id="editOverlay" style="display:none;">
+  <div class="modal">
+    <h2>Replace __PLACEHOLDER__</h2>
+    <div class="modal-path" id="editPathLabel"></div>
+    <div class="field-hint" id="editHint" style="display:none;"></div>
+    <div id="editFieldArea"></div>
+    <div class="field-error" id="editError" style="display:none;"></div>
+    <div class="actions">
+      <button class="btn-secondary" id="cancelEditBtn">Cancel</button>
+      <button class="btn-primary" id="okEditBtn">OK</button>
+    </div>
+  </div>
+</div>
+
+<script>
+
+(function () {
+  const PLACEHOLDER = "__PLACEHOLDER__";
+
+  const state = {
+    data: null,          // parsed YAML (object graph)
+    fileName: "file.yaml",
+    fileHandle: null,    // File System Access API handle, if available
+    showResolved: false,
+    resolvedPaths: new Set(), // path keys that were edited (for "keep in list" mode)
+    expandedKeys: new Set(),  // path keys of tree nodes currently expanded
+    activePath: null,     // path array currently being edited
+    schema: null          // built schema index (see buildSchemaIndex), or null if none attached
+  };
+
+  const hasFSAccess = "showOpenFilePicker" in window;
+
+  const pickScreen = document.getElementById("pickScreen");
+  const listScreen = document.getElementById("listScreen");
+  const chooseBtn = document.getElementById("chooseBtn");
+  const fileInputFallback = document.getElementById("fileInputFallback");
+  const capabilityHint = document.getElementById("capabilityHint");
+  const fileNameLabel = document.getElementById("fileNameLabel");
+  const countLabel = document.getElementById("countLabel");
+  const listContainer = document.getElementById("listContainer");
+  const showResolvedToggle = document.getElementById("showResolvedToggle");
+  const finishBtn = document.getElementById("finishBtn");
+  const loadAnotherBtn = document.getElementById("loadAnotherBtn");
+
+  const chooseSchemaBtn = document.getElementById("chooseSchemaBtn");
+  const chooseSchemaBtn2 = document.getElementById("chooseSchemaBtn2");
+  const schemaInputFallback = document.getElementById("schemaInputFallback");
+  const schemaStatusPick = document.getElementById("schemaStatusPick");
+  const schemaStatusList = document.getElementById("schemaStatusList");
+  const schemaLinePick = document.getElementById("schemaLinePick");
+
+  const editOverlay = document.getElementById("editOverlay");
+  const editPathLabel = document.getElementById("editPathLabel");
+  const editHint = document.getElementById("editHint");
+  const editFieldArea = document.getElementById("editFieldArea");
+  const editError = document.getElementById("editError");
+  const cancelEditBtn = document.getElementById("cancelEditBtn");
+  const okEditBtn = document.getElementById("okEditBtn");
+
+  capabilityHint.textContent = hasFSAccess
+    ? "Your browser supports saving directly back to the original file."
+    : "Your browser will download the updated file instead of overwriting the original.";
+
+  // ---------- path helpers ----------
+
+  function pathToString(path) {
+    let out = "";
+    path.forEach((seg, i) => {
+      if (typeof seg === "number") {
+        out += `[${seg}]`;
+      } else {
+        out += (i === 0 ? "" : ".") + seg;
+      }
+    });
+    return out || "(root)";
+  }
+
+  function pathKey(path) {
+    return JSON.stringify(path);
+  }
+
+  function getAtPath(obj, path) {
+    let cur = obj;
+    for (const seg of path) cur = cur[seg];
+    return cur;
+  }
+
+  function setAtPath(obj, path, value) {
+    let cur = obj;
+    for (let i = 0; i < path.length - 1; i++) cur = cur[path[i]];
+    cur[path[path.length - 1]] = value;
+  }
+
+  function findPlaceholders(node, path = []) {
+    let results = [];
+    if (node !== null && typeof node === "object") {
+      if (Array.isArray(node)) {
+        node.forEach((item, idx) => {
+          results = results.concat(findPlaceholders(item, path.concat(idx)));
+        });
+      } else {
+        Object.keys(node).forEach((key) => {
+          results = results.concat(findPlaceholders(node[key], path.concat(key)));
+        });
+      }
+    } else if (typeof node === "string" && node === PLACEHOLDER) {
+      results.push(path);
+    }
+    return results;
+  }
+
+  // ---------- file loading ----------
+
+  chooseBtn.addEventListener("click", async () => {
+    if (hasFSAccess) {
+      try {
+        const [handle] = await window.showOpenFilePicker({
+          types: [{
+            description: "YAML files",
+            accept: { "text/yaml": [".yaml", ".yml"] }
+          }]
+        });
+        state.fileHandle = handle;
+        const file = await handle.getFile();
+        await loadFileText(await file.text(), file.name);
+      } catch (err) {
+        if (err && err.name !== "AbortError") showToast("Could not open file: " + err.message, "err");
+      }
+    } else {
+      fileInputFallback.click();
+    }
+  });
+
+  fileInputFallback.addEventListener("change", async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    state.fileHandle = null;
+    const text = await file.text();
+    await loadFileText(text, file.name);
+  });
+
+  async function loadFileText(text, fileName) {
+    try {
+      const parsed = jsyaml.load(text);
+      if (parsed === null || typeof parsed !== "object") {
+        showToast("This YAML file doesn't contain a mapping or list at its root.", "err");
+        return;
+      }
+      state.data = parsed;
+      state.fileName = fileName;
+      state.resolvedPaths = new Set();
+      state.expandedKeys = new Set();
+      pickScreen.style.display = "none";
+      listScreen.style.display = "block";
+      fileNameLabel.textContent = fileName;
+      renderList();
+    } catch (err) {
+      showToast("Failed to parse YAML: " + err.message, "err");
+    }
+  }
+
+  loadAnotherBtn.addEventListener("click", () => {
+    state.data = null;
+    state.fileHandle = null;
+    fileInputFallback.value = "";
+    listScreen.style.display = "none";
+    pickScreen.style.display = "block";
+  });
+
+  // ---------- schema (LinkML) loading ----------
+
+  const SCHEMA_STORAGE_KEY = "yaml-placeholder-editor:lastSchema";
+
+  chooseSchemaBtn.addEventListener("click", () => schemaInputFallback.click());
+  chooseSchemaBtn2.addEventListener("click", () => schemaInputFallback.click());
+
+  schemaInputFallback.addEventListener("change", async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const text = await file.text();
+    loadSchemaText(text, file.name);
+  });
+
+  function loadSchemaText(text, fileName, opts) {
+    opts = opts || {};
+    try {
+      const raw = jsyaml.load(text);
+      if (!raw || typeof raw !== "object" || !raw.classes) {
+        if (!opts.silent) showToast("That file doesn't look like a LinkML schema (no 'classes' section found).", "err");
+        return;
+      }
+      state.schema = buildSchemaIndex(raw, fileName);
+      const classCount = Object.keys(state.schema.classes).length;
+      const enumCount = Object.keys(state.schema.enums).length;
+      const rootNote = state.schema.rootClassName ? `, root: ${state.schema.rootClassName}` : "";
+      const statusText = `Schema attached: ${fileName} (${classCount} classes, ${enumCount} enums${rootNote})`;
+      schemaStatusPick.textContent = statusText;
+      schemaStatusPick.classList.add("active");
+      schemaStatusList.textContent = statusText;
+      schemaLinePick.classList.add("active");
+
+      try {
+        localStorage.setItem(SCHEMA_STORAGE_KEY, JSON.stringify({ fileName, text }));
+      } catch (storageErr) {
+        // Storage unavailable (private browsing, quota, etc.) — not critical, just won't persist.
+      }
+
+      if (state.data) renderList(); // no visual change to the list itself, but keep state consistent
+      if (!opts.silent) showToast("Schema attached: " + fileName, "ok");
+    } catch (err) {
+      if (!opts.silent) showToast("Failed to parse schema: " + err.message, "err");
+    }
+  }
+
+  // Auto-restore the last attached schema (if any) so returning users don't have to
+  // re-attach it every session. Silent: no toast, and a failure just leaves the
+  // "no schema" state as-is rather than surfacing an error for something automatic.
+  (function restoreLastSchema() {
+    try {
+      const raw = localStorage.getItem(SCHEMA_STORAGE_KEY);
+      if (!raw) return;
+      const saved = JSON.parse(raw);
+      if (saved && saved.text && saved.fileName) {
+        loadSchemaText(saved.text, saved.fileName, { silent: true });
+      }
+    } catch (err) {
+      // Corrupt or inaccessible storage — ignore, tool just starts with no schema.
+    }
+  })();
+
+  // Recognized LinkML built-in scalar types that get a constrained widget.
+  // Anything not in this map (including unresolved custom types) falls back to plain text.
+  const BUILTIN_KIND_MAP = {
+    integer: "integer",
+    float: "decimal",
+    double: "decimal",
+    decimal: "decimal",
+    boolean: "boolean"
+  };
+
+  // Builds a queryable index out of a parsed LinkML schema:
+  // - classAttrCache: className -> flattened { attrName: slotDef } after resolving is_a/mixins
+  // - rootClassName: the class marked tree_root, if any (our structural walk starts here)
+  // - flatIndex: attrName -> [slotDef, ...] across every class, used as a fallback when
+  //   structural resolution loses track of which class a given YAML node belongs to
+  function buildSchemaIndex(schemaObj, fileName) {
+    const classes = schemaObj.classes || {};
+    const enums = schemaObj.enums || {};
+    const defaultRange = schemaObj.default_range || "string";
+    const classAttrCache = new Map();
+
+    function getEffectiveAttributes(className, seen) {
+      seen = seen || new Set();
+      if (classAttrCache.has(className)) return classAttrCache.get(className);
+      if (seen.has(className)) return {};
+      seen.add(className);
+      const cls = classes[className];
+      let attrs = {};
+      if (cls) {
+        if (cls.is_a) Object.assign(attrs, getEffectiveAttributes(cls.is_a, seen));
+        if (cls.mixins) cls.mixins.forEach((m) => Object.assign(attrs, getEffectiveAttributes(m, seen)));
+        if (cls.slots && schemaObj.slots) {
+          cls.slots.forEach((slotName) => {
+            if (schemaObj.slots[slotName]) {
+              attrs[slotName] = Object.assign(
+                {},
+                schemaObj.slots[slotName],
+                (cls.slot_usage && cls.slot_usage[slotName]) || {}
+              );
+            }
+          });
+        }
+        if (cls.attributes) Object.assign(attrs, cls.attributes);
+      }
+      classAttrCache.set(className, attrs);
+      return attrs;
+    }
+
+    Object.keys(classes).forEach((name) => getEffectiveAttributes(name));
+
+    let rootClassName = null;
+    Object.keys(classes).forEach((name) => {
+      if (classes[name] && classes[name].tree_root) rootClassName = name;
+    });
+
+    const flatIndex = new Map();
+    Object.keys(classes).forEach((className) => {
+      const attrs = classAttrCache.get(className) || {};
+      Object.keys(attrs).forEach((attrName) => {
+        if (!flatIndex.has(attrName)) flatIndex.set(attrName, []);
+        flatIndex.get(attrName).push(attrs[attrName]);
+      });
+    });
+
+    return { classes, enums, defaultRange, classAttrCache, rootClassName, flatIndex, fileName };
+  }
+
+  // Turns a raw slot definition into what the editor UI needs: which widget to show,
+  // whether multiple values are allowed, a description to display as a hint, and
+  // (for enums) the list of permissible values with their own descriptions.
+  function resolveSlotKind(slotDef, schema) {
+    if (!slotDef) return { kind: "string", multivalued: false, description: "", enumValues: [] };
+    const multivalued = !!slotDef.multivalued;
+    const description = slotDef.description || "";
+
+    if (slotDef.any_of) {
+      return { kind: "complex", multivalued, description, enumValues: [] };
+    }
+
+    const rangeName = slotDef.range || schema.defaultRange;
+
+    if (schema.enums[rangeName]) {
+      const enumDef = schema.enums[rangeName];
+      const permissible = enumDef.permissible_values || {};
+      const enumValues = Object.keys(permissible).map((key) => {
+        const pv = permissible[key];
+        return { value: key, description: pv && typeof pv === "object" ? pv.description || "" : "" };
+      });
+      return { kind: "enum", multivalued, description: description || enumDef.description || "", enumValues };
+    }
+
+    if (schema.classes[rangeName]) {
+      return { kind: "complex", multivalued, description, enumValues: [] };
+    }
+
+    const kind = BUILTIN_KIND_MAP[rangeName] || "string";
+    return { kind, multivalued, description, enumValues: [] };
+  }
+
+  function slotSignature(kindInfo) {
+    return kindInfo.kind + "|" + kindInfo.enumValues.map((e) => e.value).sort().join(",");
+  }
+
+  // Walks forward through `path`'s string segments (skipping array indices), starting
+  // from `startClass`, looking up each segment as an attribute of the "current" class
+  // and descending into whatever class its range points to. Succeeds only if every
+  // string segment resolved to a known attribute of the class reached so far.
+  function walkFromClass(startClass, path, schema) {
+    let currentClass = startClass;
+    let lastSlotDef = null;
+    let sawStringSeg = false;
+
+    for (let i = 0; i < path.length; i++) {
+      const seg = path[i];
+      if (typeof seg === "number") continue;
+      sawStringSeg = true;
+      if (!currentClass) return { success: false, slotDef: null };
+      const attrs = schema.classAttrCache.get(currentClass) || {};
+      const slotDef = attrs[seg];
+      if (!slotDef) return { success: false, slotDef: null };
+      lastSlotDef = slotDef;
+      if (slotDef.any_of) {
+        currentClass = null;
+      } else {
+        const rangeName = slotDef.range || schema.defaultRange;
+        currentClass = schema.classes[rangeName] ? rangeName : null;
+      }
+    }
+
+    if (!sawStringSeg) return { success: false, slotDef: null };
+    return { success: true, slotDef: lastSlotDef };
+  }
+
+  // Resolves the slot definition that applies to a given YAML leaf path, in three passes:
+  //
+  // 1. Walk the whole path from the schema's tree_root. Works when the YAML document's
+  //    nesting mirrors the schema's own attribute names all the way down.
+  // 2. If that fails partway (the document nests differently than the schema — e.g. data
+  //    grouped by domain/dataset name rather than by the schema's own container attributes),
+  //    look backward along the path for the nearest ancestor segment whose name
+  //    unambiguously identifies one specific class schema-wide (e.g. "origin" only ever
+  //    means Item.origin → the Origin class), and re-walk forward from there using just
+  //    the remaining segments. This lets deeply-specific attribute names (like "source"
+  //    under "origin") resolve correctly even when the outer structure doesn't match.
+  // 3. Last resort: a plain name-only lookup on the final attribute across the whole
+  //    schema — used only when every matching definition agrees, since two attributes
+  //    that share a name but mean different things (e.g. "type" on different classes)
+  //    can't be safely guessed from the name alone; that case falls back to plain text.
+  function resolveAttributeForPath(path) {
+    const schema = state.schema;
+    if (!schema) return null;
+
+    const rootWalk = walkFromClass(schema.rootClassName, path, schema);
+    if (rootWalk.success) {
+      return resolveSlotKind(rootWalk.slotDef, schema);
+    }
+
+    const stringPositions = [];
+    path.forEach((seg, idx) => {
+      if (typeof seg === "string") stringPositions.push(idx);
+    });
+
+    for (let anchorIdx = stringPositions.length - 2; anchorIdx >= 0; anchorIdx--) {
+      const posInPath = stringPositions[anchorIdx];
+      const anchorName = path[posInPath];
+      const candidateClasses = (schema.flatIndex.get(anchorName) || [])
+        .map((sd) => sd.range || schema.defaultRange)
+        .filter((rangeName) => schema.classes[rangeName]);
+      const uniqueClasses = Array.from(new Set(candidateClasses));
+      if (uniqueClasses.length === 1) {
+        const remainder = path.slice(posInPath + 1);
+        const walk = walkFromClass(uniqueClasses[0], remainder, schema);
+        if (walk.success) return resolveSlotKind(walk.slotDef, schema);
+      }
+    }
+
+    const lastAttrName = stringPositions.length ? path[stringPositions[stringPositions.length - 1]] : null;
+    if (lastAttrName && schema.flatIndex.has(lastAttrName)) {
+      const candidates = schema.flatIndex.get(lastAttrName).map((sd) => resolveSlotKind(sd, schema));
+      const sigs = new Set(candidates.map(slotSignature));
+      if (sigs.size === 1) return candidates[0];
+      // Genuinely ambiguous (e.g. "type" means something different on several classes) —
+      // fall back to a plain text box rather than guessing which constraint applies.
+      return { kind: "string", multivalued: candidates[0].multivalued, description: "", enumValues: [] };
+    }
+
+    return null;
+  }
+
+  // Given a full leaf path, returns the path to the attribute itself (the nearest
+  // enclosing string key) and that key's name — used to find/replace the whole
+  // value for multivalued attributes, since the leaf path may point at one array index.
+  function attributePathAndName(path) {
+    for (let i = path.length - 1; i >= 0; i--) {
+      if (typeof path[i] === "string") {
+        return { attrPath: path.slice(0, i + 1), attrName: path[i] };
+      }
+    }
+    return { attrPath: path.slice(), attrName: null };
+  }
+
+  // ---------- list rendering ----------
+
+  showResolvedToggle.addEventListener("change", () => {
+    state.showResolved = showResolvedToggle.checked;
+    renderList();
+  });
+
+  // ---------- tree helpers ----------
+
+  function formatSegment(seg) {
+    return typeof seg === "number" ? `[${seg}]` : String(seg);
+  }
+
+  // Build a tree of only the branches that lead to a displayed path.
+  // Each node: { seg, path, childMap: Map, childOrder: [key,...], isTerminal }
+  function buildTree(displayPaths) {
+    const root = { seg: null, path: [], childMap: new Map(), childOrder: [], isTerminal: false };
+    displayPaths.forEach((path) => {
+      let cur = root;
+      path.forEach((seg, idx) => {
+        const key = typeof seg + ":" + seg;
+        if (!cur.childMap.has(key)) {
+          const node = {
+            seg,
+            path: path.slice(0, idx + 1),
+            childMap: new Map(),
+            childOrder: [],
+            isTerminal: false
+          };
+          cur.childMap.set(key, node);
+          cur.childOrder.push(key);
+        }
+        cur = cur.childMap.get(key);
+      });
+      cur.isTerminal = true;
+    });
+    return root;
+  }
+
+  function countLeaves(node) {
+    let count = 0;
+    node.childOrder.forEach((key) => {
+      const child = node.childMap.get(key);
+      count += child.childOrder.length > 0 ? countLeaves(child) : 1;
+    });
+    return count;
+  }
+
+  // Collapses "index [0]" nodes when they are the sole element of an array,
+  // since the index carries no information in that case. The node keeps its
+  // own label (the real key above it) but adopts the single element's path
+  // and children/leaf status, so editing still targets the right value.
+  function compressSingleElementArrays(node) {
+    node.childOrder.forEach((key) => {
+      const child = node.childMap.get(key);
+      compressSingleElementArrays(child);
+      node.childMap.set(key, child);
+    });
+    if (node.childOrder.length === 1) {
+      const onlyChild = node.childMap.get(node.childOrder[0]);
+      if (typeof onlyChild.seg === "number") {
+        node.path = onlyChild.path;
+        node.isTerminal = onlyChild.isTerminal;
+        node.childMap = onlyChild.childMap;
+        node.childOrder = onlyChild.childOrder;
+      }
+    }
+    return node;
+  }
+
+  function renderTreeLevel(node, placeholderKeys, depth) {
+    depth = depth || 0;
+    const ul = document.createElement("ul");
+    ul.className = "tree-level";
+
+    node.childOrder.forEach((key) => {
+      const child = node.childMap.get(key);
+      const li = document.createElement("li");
+
+      if (child.childOrder.length > 0) {
+        // Branch node: collapsible, shows children indented one level deeper.
+        const nodeKey = pathKey(child.path);
+        const expanded = state.expandedKeys.has(nodeKey);
+        li.classList.add("tree-branch");
+
+        const row = document.createElement("div");
+        row.className = "tree-row";
+        row.style.paddingLeft = (14 + depth * 22) + "px";
+        row.style.background = depth % 2 === 0 ? "var(--panel-2)" : "var(--panel-alt)";
+        if (depth > 0) {
+          row.style.borderLeft = `3px solid rgba(20, 70, 120, ${Math.min(0.12 + depth * 0.06, 0.4)})`;
+        }
+
+        const left = document.createElement("span");
+        left.className = "tree-row-left";
+
+        const arrow = document.createElement("span");
+        arrow.className = "arrow" + (expanded ? " expanded" : "");
+        arrow.textContent = "▸";
+
+        const label = document.createElement("span");
+        label.className = "tree-label";
+        label.textContent = formatSegment(child.seg);
+
+        left.appendChild(arrow);
+        left.appendChild(label);
+
+        const count = document.createElement("span");
+        count.className = "tree-count";
+        const n = countLeaves(child);
+        count.textContent = `${n} placeholder${n === 1 ? "" : "s"}`;
+
+        row.appendChild(left);
+        row.appendChild(count);
+        row.addEventListener("click", () => {
+          if (expanded) state.expandedKeys.delete(nodeKey);
+          else state.expandedKeys.add(nodeKey);
+          renderList();
+        });
+
+        li.appendChild(row);
+        if (expanded) {
+          li.appendChild(renderTreeLevel(child, placeholderKeys, depth + 1));
+        }
+      } else {
+        // Leaf node: an actual placeholder (or resolved) value, editable.
+        const isPlaceholder = placeholderKeys.has(pathKey(child.path));
+        const value = getAtPath(state.data, child.path);
+        li.classList.add("tree-leaf");
+        if (!isPlaceholder) li.classList.add("resolved");
+
+        const row = document.createElement("div");
+        row.className = "tree-row";
+        row.style.paddingLeft = (14 + depth * 22) + "px";
+        row.style.background = depth % 2 === 0 ? "var(--panel-2)" : "var(--panel-alt)";
+        if (depth > 0) {
+          row.style.borderLeft = `3px solid rgba(20, 70, 120, ${Math.min(0.12 + depth * 0.06, 0.4)})`;
+        }
+
+        const left = document.createElement("span");
+        left.className = "tree-row-left";
+
+        const spacer = document.createElement("span");
+        spacer.className = "arrow leaf-spacer";
+
+        const label = document.createElement("span");
+        label.className = "tree-label";
+        label.textContent = formatSegment(child.seg);
+
+        left.appendChild(spacer);
+        left.appendChild(label);
+
+        const right = document.createElement("span");
+        right.className = "path-value " + (isPlaceholder ? "is-placeholder" : "is-resolved");
+        right.textContent = isPlaceholder ? PLACEHOLDER : String(value);
+
+        row.appendChild(left);
+        row.appendChild(right);
+        row.addEventListener("click", () => openEditModal(child.path));
+
+        li.appendChild(row);
+      }
+
+      ul.appendChild(li);
+    });
+
+    return ul;
+  }
+
+  function renderList() {
+    const placeholderPaths = findPlaceholders(state.data);
+    const placeholderKeys = new Set(placeholderPaths.map(pathKey));
+
+    // Build the display set: always show current placeholders.
+    // If "keep resolved" is on, also show previously-resolved paths with their new value.
+    let displayPaths = placeholderPaths.slice();
+    if (state.showResolved) {
+      state.resolvedPaths.forEach((key) => {
+        if (!placeholderKeys.has(key)) {
+          displayPaths.push(JSON.parse(key));
+        }
+      });
+    }
+
+    countLabel.innerHTML = `<strong>${placeholderPaths.length}</strong> placeholder${placeholderPaths.length === 1 ? "" : "s"} remaining`;
+
+    listContainer.innerHTML = "";
+
+    if (displayPaths.length === 0) {
+      const empty = document.createElement("div");
+      empty.className = "empty-state";
+      empty.textContent = placeholderPaths.length === 0
+        ? "No __PLACEHOLDER__ values found. You're all set — click Finish & save."
+        : "Nothing to show.";
+      listContainer.appendChild(empty);
+      return;
+    }
+
+    const tree = compressSingleElementArrays(buildTree(displayPaths));
+    const wrap = document.createElement("div");
+    wrap.className = "tree-wrap";
+    wrap.appendChild(renderTreeLevel(tree, placeholderKeys, 0));
+    listContainer.appendChild(wrap);
+  }
+
+  // ---------- edit modal ----------
+
+  let modalCtx = null; // { leafPath, attrPath, kind, multivalued, enumValues, values, getSingleValue, currentAddControl }
+
+  function showFieldError(message) {
+    editError.textContent = message;
+    editError.style.display = "block";
+  }
+
+  function clearFieldError() {
+    editError.textContent = "";
+    editError.style.display = "none";
+  }
+
+  // Builds one input control for a given "kind" (integer/decimal/boolean/enum/string/complex).
+  // Returns { element, getValue(), focusEl } — getValue() throws with a friendly message on
+  // invalid input, so callers can surface it without duplicating validation logic per kind.
+  function buildFieldControl(kind, enumValues, seedValue) {
+    if (kind === "enum") return buildEnumControl(enumValues, seedValue);
+
+    if (kind === "boolean") {
+      const select = document.createElement("select");
+      select.className = "field-select";
+      ["true", "false"].forEach((v) => {
+        const opt = document.createElement("option");
+        opt.value = v;
+        opt.textContent = v;
+        if (seedValue === v) opt.selected = true;
+        select.appendChild(opt);
+      });
+      return { element: select, getValue: () => select.value === "true", focusEl: select };
+    }
+
+    if (kind === "integer") {
+      const input = document.createElement("input");
+      input.type = "text";
+      input.inputMode = "numeric";
+      input.className = "field-input";
+      input.placeholder = "Whole number";
+      input.value = seedValue || "";
+      return {
+        element: input,
+        getValue: () => {
+          const t = input.value.trim();
+          if (!/^-?\d+$/.test(t)) throw new Error("Enter a whole number (e.g. 3 or -12).");
+          return parseInt(t, 10);
+        },
+        focusEl: input
+      };
+    }
+
+    if (kind === "decimal") {
+      const input = document.createElement("input");
+      input.type = "text";
+      input.inputMode = "decimal";
+      input.className = "field-input";
+      input.placeholder = "Number";
+      input.value = seedValue || "";
+      return {
+        element: input,
+        getValue: () => {
+          const t = input.value.trim();
+          const n = Number(t);
+          if (t === "" || Number.isNaN(n)) throw new Error("Enter a valid number.");
+          return n;
+        },
+        focusEl: input
+      };
+    }
+
+    // string / complex / unknown — same plain text box as before
+    const input = document.createElement("input");
+    input.type = "text";
+    input.className = "field-input";
+    input.value = seedValue || "";
+    return { element: input, getValue: () => input.value, focusEl: input };
+  }
+
+  function buildEnumControl(enumValues, seedValue) {
+    const DROPDOWN_THRESHOLD = 8;
+
+    if (enumValues.length <= DROPDOWN_THRESHOLD) {
+      const select = document.createElement("select");
+      select.className = "field-select";
+      enumValues.forEach((ev) => {
+        const opt = document.createElement("option");
+        opt.value = ev.value;
+        opt.textContent = ev.value;
+        if (ev.description) opt.title = ev.description;
+        if (ev.value === seedValue) opt.selected = true;
+        select.appendChild(opt);
+      });
+      return { element: select, getValue: () => select.value, focusEl: select };
+    }
+
+    // Long enum: filterable scrollable list instead of an unusable 80-item dropdown.
+    const wrap = document.createElement("div");
+    wrap.className = "enum-list-wrap";
+    const filterInput = document.createElement("input");
+    filterInput.type = "text";
+    filterInput.className = "field-input enum-filter";
+    filterInput.placeholder = "Filter options…";
+    const listDiv = document.createElement("div");
+    listDiv.className = "enum-list";
+    let selected = seedValue || null;
+
+    function renderOptions(filterText) {
+      listDiv.innerHTML = "";
+      const ft = (filterText || "").toLowerCase();
+      enumValues
+        .filter((ev) => !ft || ev.value.toLowerCase().includes(ft))
+        .forEach((ev) => {
+          const opt = document.createElement("div");
+          opt.className = "enum-option" + (ev.value === selected ? " selected" : "");
+          opt.textContent = ev.value;
+          if (ev.description) opt.title = ev.description;
+          opt.addEventListener("click", () => {
+            selected = ev.value;
+            renderOptions(filterInput.value);
+          });
+          listDiv.appendChild(opt);
+        });
+    }
+
+    filterInput.addEventListener("input", () => renderOptions(filterInput.value));
+    renderOptions("");
+
+    wrap.appendChild(filterInput);
+    wrap.appendChild(listDiv);
+    return {
+      element: wrap,
+      getValue: () => {
+        if (!selected) throw new Error("Choose a value from the list.");
+        return selected;
+      },
+      focusEl: filterInput
+    };
+  }
+
+  function renderSingleField(seedValue) {
+    editFieldArea.innerHTML = "";
+    const control = buildFieldControl(modalCtx.kind, modalCtx.enumValues, seedValue);
+    editFieldArea.appendChild(control.element);
+    modalCtx.getSingleValue = control.getValue;
+    if (control.focusEl) {
+      control.focusEl.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && control.element.tagName !== "SELECT") okEditBtn.click();
+      });
+      setTimeout(() => control.focusEl.focus(), 0);
+    }
+  }
+
+  function renderMultiField() {
+    editFieldArea.innerHTML = "";
+    const container = document.createElement("div");
+    container.className = "multi-wrap";
+
+    const chipList = document.createElement("div");
+    chipList.className = "multi-chip-list";
+
+    const addRow = document.createElement("div");
+    addRow.className = "multi-add-row";
+
+    const addBtn = document.createElement("button");
+    addBtn.type = "button";
+    addBtn.className = "btn-secondary multi-add-btn";
+    addBtn.textContent = "Add";
+
+    function renderChips() {
+      chipList.innerHTML = "";
+      if (modalCtx.values.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "multi-empty";
+        empty.textContent = "No values yet — add one below.";
+        chipList.appendChild(empty);
+      }
+      modalCtx.values.forEach((v, idx) => {
+        const chip = document.createElement("span");
+        chip.className = "multi-chip";
+        const text = document.createElement("span");
+        text.textContent = v;
+        const removeBtn = document.createElement("button");
+        removeBtn.type = "button";
+        removeBtn.className = "multi-chip-remove";
+        removeBtn.textContent = "×";
+        removeBtn.title = "Remove";
+        removeBtn.addEventListener("click", () => {
+          modalCtx.values.splice(idx, 1);
+          renderChips();
+        });
+        chip.appendChild(text);
+        chip.appendChild(removeBtn);
+        chipList.appendChild(chip);
+      });
+    }
+
+    function rebuildAddControl() {
+      addRow.innerHTML = "";
+      const control = buildFieldControl(modalCtx.kind, modalCtx.enumValues, "");
+      modalCtx.currentAddControl = control;
+      addRow.appendChild(control.element);
+      addRow.appendChild(addBtn);
+      if (control.focusEl) {
+        control.focusEl.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" && control.element.tagName !== "SELECT") {
+            e.preventDefault();
+            addBtn.click();
+          }
+        });
+        setTimeout(() => control.focusEl.focus(), 0);
+      }
+    }
+
+    addBtn.addEventListener("click", () => {
+      clearFieldError();
+      try {
+        const v = modalCtx.currentAddControl.getValue();
+        if (v === "" || v === null || v === undefined) return;
+        modalCtx.values.push(String(v));
+        renderChips();
+        rebuildAddControl();
+      } catch (err) {
+        showFieldError(err.message);
+      }
+    });
+
+    renderChips();
+    rebuildAddControl();
+
+    container.appendChild(chipList);
+    container.appendChild(addRow);
+    editFieldArea.appendChild(container);
+  }
+
+  function coerceStoredString(str, kind) {
+    if (kind === "integer") return parseInt(str, 10);
+    if (kind === "decimal") return Number(str);
+    if (kind === "boolean") return str === "true";
+    return str;
+  }
+
+  function openEditModal(leafPath) {
+    state.activePath = leafPath;
+    editPathLabel.textContent = pathToString(leafPath);
+    clearFieldError();
+
+    const { attrPath } = attributePathAndName(leafPath);
+    const slotInfo = resolveAttributeForPath(leafPath) || {
+      kind: "string",
+      multivalued: false,
+      description: "",
+      enumValues: []
+    };
+
+    modalCtx = {
+      leafPath,
+      attrPath,
+      kind: slotInfo.kind,
+      multivalued: slotInfo.multivalued,
+      enumValues: slotInfo.enumValues,
+      values: [],
+      getSingleValue: null,
+      currentAddControl: null
+    };
+
+    editHint.style.display = slotInfo.description ? "block" : "none";
+    editHint.textContent = slotInfo.description || "";
+
+    if (modalCtx.multivalued) {
+      const currentVal = getAtPath(state.data, attrPath);
+      modalCtx.values = Array.isArray(currentVal)
+        ? currentVal.filter((v) => v !== PLACEHOLDER).map((v) => String(v))
+        : [];
+      renderMultiField();
+    } else {
+      const currentVal = getAtPath(state.data, leafPath);
+      const seed = currentVal === PLACEHOLDER ? "" : String(currentVal);
+      renderSingleField(seed);
+    }
+
+    editOverlay.style.display = "flex";
+  }
+
+  function closeEditModal() {
+    editOverlay.style.display = "none";
+    state.activePath = null;
+    modalCtx = null;
+  }
+
+  cancelEditBtn.addEventListener("click", closeEditModal);
+
+  editOverlay.addEventListener("click", (e) => {
+    if (e.target === editOverlay) closeEditModal();
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && editOverlay.style.display === "flex") closeEditModal();
+  });
+
+  okEditBtn.addEventListener("click", () => {
+    if (!modalCtx) return;
+    clearFieldError();
+    try {
+      if (modalCtx.multivalued) {
+        const finalArray = modalCtx.values.map((v) => coerceStoredString(v, modalCtx.kind));
+        setAtPath(state.data, modalCtx.attrPath, finalArray);
+      } else {
+        const raw = modalCtx.getSingleValue();
+        setAtPath(state.data, modalCtx.leafPath, raw);
+        state.resolvedPaths.add(pathKey(modalCtx.leafPath));
+      }
+      closeEditModal();
+      renderList();
+    } catch (err) {
+      showFieldError(err.message);
+    }
+  });
+
+  // ---------- finish / save ----------
+
+  finishBtn.addEventListener("click", async () => {
+    const remaining = findPlaceholders(state.data).length;
+    if (remaining > 0) {
+      const proceed = confirm(
+        `There ${remaining === 1 ? "is" : "are"} still ${remaining} unresolved PLACEHOLDER value${remaining === 1 ? "" : "s"}. Save anyway?`
+      );
+      if (!proceed) return;
+    }
+    await saveFile();
+  });
+
+  async function saveFile() {
+    let yamlText;
+    try {
+      yamlText = jsyaml.dump(state.data, { lineWidth: -1 });
+    } catch (err) {
+      showToast("Failed to serialize YAML: " + err.message, "err");
+      return;
+    }
+
+    if (state.fileHandle) {
+      try {
+        const writable = await state.fileHandle.createWritable();
+        await writable.write(yamlText);
+        await writable.close();
+        showToast("Saved " + state.fileName, "ok");
+        return;
+      } catch (err) {
+        showToast("Could not write to file directly, downloading instead.", "err");
+        // fall through to download
+      }
+    }
+
+    // Fallback: trigger a download
+    const blob = new Blob([yamlText], { type: "text/yaml" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = state.fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast("Downloaded " + state.fileName, "ok");
+  }
+
+  // ---------- toast ----------
+
+  let toastTimer = null;
+  function showToast(message, type) {
+    let toast = document.querySelector(".toast");
+    if (toast) toast.remove();
+    toast = document.createElement("div");
+    toast.className = "toast " + (type || "");
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.remove(), 3500);
+  }
+})();
+</script>
+
+</body>
+</html>
