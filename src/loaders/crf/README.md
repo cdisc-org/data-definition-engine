@@ -149,7 +149,7 @@ forms for each visit.
 cd src/loaders/crf && pytest
 ```
 
-100 tests, no network access — the Library client is a `MagicMock` throughout. Fixtures
+117 tests, no network access — the Library client is a `MagicMock` throughout. Fixtures
 in `tests/fixtures/` cover the four group-selection priorities, CDASHIG class-level
 fallback, codelist subsetting, form/section/concept nesting and order, timing mapping,
 the empty-`activityIds` warning, patch round-tripping, and profile validation.

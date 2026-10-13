@@ -35,7 +35,7 @@ following Define-XML element types under `MetaDataVersion`:
 ## Prerequisites
 - **Python 3.10 or higher** (the code uses `X | None` union type hints).
 - The [odmlib](https://github.com/swhume/odmlib) package (installed via `requirements.txt` below).
-- A DDS JSON input file. A canonical sample is provided at `tests/fixtures/dds.json` or `tests/fixtures/define.json`.
+- A DDS JSON input file. A canonical sample is provided at `tests/fixtures/define-360i.json`.
 
 ## Setup
 The generator half lives in `src/generators/define/` and has its **own** `requirements.txt`, independent of the
@@ -83,7 +83,8 @@ loader half in `src/define-xml/`. Run all commands from the `src/generators/defi
 
 ## Usage
 Basic invocation requires only the input DDS JSON file (`-t`); the output path (`-d`) defaults to
-`tests/fixtures/define-360i.xml`:
+`tests/fixtures/define-360i.xml`. That default is a committed test fixture, so pass `-d` whenever the input is
+anything other than `tests/fixtures/define-360i.json`:
 
 ```commandline
 python define_generator.py -t ./tests/fixtures/define-360i.json -d ./tests/fixtures/define-360i.xml
@@ -155,9 +156,11 @@ python define_generator.py -t ./tests/fixtures/define-360i.json -d ./output/defi
 
 ## Input and output
 - **Input:** a DDS JSON file whose top-level lists (`itemGroups`, `conditions`, `whereClauses`, `codeLists`,
-  `methods`, `standards`, `annotatedCRF`, `concepts`, `conceptProperties`, `dictionaries`, `comments`,
+  `methods`, `standards`, `annotatedCRFs`, `concepts`, `conceptProperties`, `dictionaries`, `comments`,
   `documents`) are dispatched to dedicated loaders, and whose scalar fields populate the Study/MetaDataVersion
-  attributes. See `tests/fixtures/define-360i.json` for the canonical example.
+  attributes. The older singular key `annotatedCRF` is still accepted. A combined DDS written by the CRF loader
+  is also accepted; its CRF item groups (`Form`, `Section`, `Concept`) and study events are skipped. See
+  `tests/fixtures/define-360i.json` for the canonical example.
 - **Output:** a Define-XML v2.1 XML file at the path given by `-d`.
 - **Log file:** `define_generator.log` is written to the working directory on every run.
 
@@ -192,10 +195,11 @@ python3 -m defineutils.definehtml -d define-360i.xml -o define-360i.html
 ```
 
 ### xmllint command-line tool
-`xmllint` can validate the Define-XML file against the schema (adjust the schema path for your environment):
+`xmllint` can validate the Define-XML file against the Define-XML v2.1 schema vendored in the repository's
+`schemas/` directory:
 
 ```commandline
-xmllint --schema ~/src/schemas/DefineV219/schema/cdisc-define-2.1/define2-1-0.xsd ./tests/fixtures/define-360i.xml --noout
+xmllint --schema ../../../schemas/define/2.1/define2-1-0.xsd ./tests/fixtures/define-360i.xml --noout
 ```
 
 `xmllint` can also pretty-print the Define-XML file:

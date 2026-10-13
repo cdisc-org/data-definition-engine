@@ -6,7 +6,9 @@ Input and reference data for the data-definition-engine. Files are organized by 
 
 ```
 data/
-|           
+├── crf_specializations/            # CRF Specializations read by the CRF loader
+│   ├── cdisc_crf_specializations_draft.csv    # Draft CDISC CRF Specializations
+│   └── PROVENANCE.md                          # Where the CSV came from and its coverage gaps
 ├── metadata_xlsx/                  # Excel-based metadata specifications
 │   ├── LZZT/
 │   │   ├── CDISCPILOT01-ADaM-2026-02-23.xlsx  # ADaM metadata for CDISC Pilot 01 (LZZT)
@@ -14,17 +16,16 @@ data/
 │   └── templates/
 │       └── Define-Excel-Spec.xlsx             # Template for the Define-XML Excel spec format
 └── protocols/
-        ├── NCT01797120/            # Study NCT01797120
-           ├── NCT01797120-latest.json          # USDM 4.0 protocol export
-           └── NCT01797120-dds-latest.json      # DDS/Define JSON export
-        
+    └── NCT01797120/                # Study NCT01797120
+        ├── NCT01797120-latest.json          # USDM 4.0 protocol export
+        └── NCT01797120-dds-latest.json      # DDS (Define-JSON) written by the Define loader
 ```
 
 ## Subdirectories
 
-### `archive/`
+### `crf_specializations/`
 
-Older or superseded files retained for historical reference. Not used as active inputs.
+The draft CDISC CRF Specializations that `src/loaders/crf/crf_loader.py` reads with `--crf_spec_file`. The CDISC Library has no CRF Specialization endpoint yet, so this file stands in for it. See [PROVENANCE.md](crf_specializations/PROVENANCE.md) for its source, shape, and known coverage gaps.
 
 ### `metadata_xlsx/`
 
@@ -32,12 +33,14 @@ Excel workbooks containing SDTM and ADaM dataset/variable metadata in the Define
 
 ### `protocols/`
 
-JSON exports from the [SOA Workbench](https://soa-workbench.cdisc.org) tool, organized by study identifier. Each study folder contains two file types:
+USDM JSON exports from the [SOA Workbench](https://soa-workbench.cdisc.org) tool, organized by study identifier, with the DDS the Define loader produced from them. Each study folder contains two file types:
 
 | Suffix | Format | Description |
 |---|---|---|
 | `{studyId}-latest.json` | USDM 4.0 | Protocol-level study definition (schedule of activities, visits, arms) |
-| `{studyId}-define-latest.json` | Define-JSON | Dataset/variable definitions in Define-JSON format |
+| `{studyId}-dds-latest.json` | DDS (Define-JSON) | Dataset/variable definitions written by `src/define-xml/create_define_json.py` |
+
+The committed `NCT01797120-dds-latest.json` was written by an earlier version of the Define loader: its `studyName` is null and its `concepts` section is in a shape the Define generator does not read. Regenerate it from `NCT01797120-latest.json` with the current loader rather than passing it to a generator.
 
 ISO 8601 timestamp (`YYYYMMDDTHHMM`) is recordied in the USDM identifying when the export was generated. 
 

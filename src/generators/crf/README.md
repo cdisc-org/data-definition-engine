@@ -102,9 +102,14 @@ root.
 
 ## Known gaps
 
-- **Stylesheets are not here yet.** `--html` and `render.py` are wired up, but the two
-  XSLT 2.0 stylesheets are milestone M6. Until they land, `--html` needs `--stylesheet`
-  pointing at your own. The ODM output is the deliverable; the HTML is a view of it.
+- **Stylesheets are not adapted yet.** The Phase 1 POC stylesheets are now in the repository's
+  top-level [`stylesheets/`](../../../stylesheets) directory (`odm_1-3-2_transform.xsl`,
+  `odm_2-0_transform.xsl`), but `render.py` still looks for `stylesheets/odm_*_crf.xsl` in this
+  package, so `--html` needs them passed explicitly, e.g.
+  `--html ../../../output --stylesheet ../../../stylesheets/odm_2-0_transform.xsl`, plus
+  `pip install saxonche`. They have not been adapted to this generator's Alias contexts, so
+  form-level SDTM annotations and section completion instructions are not rendered. The ODM
+  output is the deliverable; the HTML is a view of it.
 - **`CrfObject` duplicates ~40 lines of `define_object.DefineObject`.** Extracting a
   shared base would mean converting the Define generator away from flat top-level imports
   (`import items`), which is out of scope. Unlike that package, this one is a real Python
