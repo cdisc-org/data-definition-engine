@@ -8,7 +8,7 @@ This script transforms a [USDM](https://www.cdisc.org/standards/foundational/usd
 
 ### Python version
 
-Python 3.11 or later is required (`pandas` 3.x requires it).
+Python 3.11 or later is required, because `requirements.txt` pins pandas 3.x. pandas is used only to write the Excel validation report (`--validation_report`).
 
 ### Required packages
 

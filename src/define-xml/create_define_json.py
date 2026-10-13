@@ -3037,7 +3037,7 @@ def main():
 
     parser = argparse.ArgumentParser(
         description="Process USDM JSON file to generate Define-JSON with slices.",
-        epilog="Example: python create_define_json_NEW.py --usdm_file data/study.json --output_template output.json --sdtmct 2025-03-28"
+        epilog="Example: python create_define_json.py --usdm_file data/study.json --output_template output.json --sdtmct 2025-03-28"
     )
     parser.add_argument(
         "--usdm_file",
