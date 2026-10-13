@@ -3,12 +3,28 @@ from odmlib.define_2_1 import model as DEFINE
 import define_object
 
 
+def first_coding(obj: dict[str, Any]) -> dict[str, Any] | None:
+    """Return an object's first Coding, whether it is stored as a list or a bare dict.
+
+    ``coding`` is multivalued in the DDS model and ``create_define_json.py`` writes a
+    list, but some hand-built files (including this package's own canonical fixture)
+    carry a single dict. Accepting both is what lets the generator read the loader's
+    real output.
+    """
+    coding = obj.get("coding")
+    if isinstance(coding, list):
+        return coding[0] if coding else None
+    if isinstance(coding, dict):
+        return coding
+    return None
+
+
 class CodeLists(define_object.DefineObject):
     """Create Define-XML v2.1 CodeList element objects."""
 
     def __init__(self) -> None:
         super().__init__()
-        self.igd: Any | None = None
+        # self.igd: Any | None = None
 
     def create_define_objects(
         self,
@@ -46,17 +62,7 @@ class CodeLists(define_object.DefineObject):
                 else:
                     en_item = self._create_enumerateditem_object(term, is_non_standard)
                     cl_defn.EnumeratedItem.append(en_item)
-            # TODO no indicator that a codelist is a dictionary with an external codelist reference
-            if len(cl["codeListItems"]) == 0:
-                self._create_external_code_list(cl_defn, cl)
             self._add_codelist_to_objects(cl_c_code, cl_defn, define_objects)
-
-    @staticmethod
-    def _create_external_code_list(cl, obj):
-        # TODO temp to create the external codelist content - not yet available in define.json
-        attr = {"Dictionary": obj["name"], "Version": "1.0", "href": "https://www.iso.org"}
-        exd = DEFINE.ExternalCodeList(**attr)
-        cl.ExternalCodeList = exd
 
     @staticmethod
     def _add_codelist_to_objects(cl_c_code, cl, objects):
@@ -83,7 +89,7 @@ class CodeLists(define_object.DefineObject):
         coded_value = self.require_key(obj, "codedValue", "CodeListItem")
         attr = {"CodedValue": coded_value}
         en_item = DEFINE.EnumeratedItem(**attr)
-        coding = obj.get("coding", {})
+        coding = first_coding(obj)
         if coding:
             alias = DEFINE.Alias(Context="nci:ExtCodeID", Name=coding.get("code"))
             en_item.Alias.append(alias)
@@ -104,7 +110,7 @@ class CodeLists(define_object.DefineObject):
             tt = DEFINE.TranslatedText(_content=coded_value, lang="en")
         decode.TranslatedText.append(tt)
         cl_item.Decode = decode
-        coding = obj.get("coding", {})
+        coding = first_coding(obj)
         if coding:
             alias = DEFINE.Alias(Context="nci:ExtCodeID", Name=coding.get("code"))
             cl_item.Alias.append(alias)

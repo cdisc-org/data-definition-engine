@@ -1,0 +1,1432 @@
+id: https://cdisc.org/dta2sdtm
+name: dta_lab_transmission_model
+title: DTA Logical Data Model
+description: >-
+  A logical data model (LDM) covering BOTH senses of "DTA" in the CDISC 360i lab
+  flow. The token "DTA" is overloaded: the Data Transfer **Agreement** (the
+  governance contract) vs. the Data **Transfer** payload (the data that fulfils
+  it). This schema models both as related layers — contract vs. fulfilment —
+  joined through the shared BiomedicalConcept hub. Three layers:
+
+    * AGREEMENT LAYER — DataTransferAgreement > Study, DtaVersion, BcSelection,
+      TestSpecification, TransferDataset, Party, TransferRequirements,
+      VisitMapping, TimepointMapping, Source. The Data Transfer Agreement
+      document, prepopulated from an upstream USDM protocol: WHAT data is
+      promised, by whom, in what format, mapped to which visits, and — new in
+      v0.2.0 — WHICH TESTS arrive and in what dataset structure. Slot names use
+      snake_case so a serialized agreement payload validates directly with
+      `-C DataTransferAgreement`.
+
+    * SEMANTIC LAYER — BiomedicalConcept, DatasetSpecialization,
+      VariableSpecialization. The linkage connecting an upstream USDM protocol
+      (which references Biomedical Concepts on its Activities) to the downstream
+      SDTM-LB dataset (which a Dataset Specialization projects each BC into).
+
+    * INSTANCE LAYER — Transmission > TransferRecord. The delivered payload, one
+      flat record per lab result, typed from the DTA MVP Inventory's
+      Data_Structure sheet.
+
+  BiomedicalConcept is the hub joining all three layers: USDM references it
+  (Activity.biomedicalConceptIds), the Agreement scopes it in (is_used_by_dta +
+  BcSelection, and per-test via TestSpecification.bc_id), and the payload
+  delivers it.
+
+  AGREEMENT <-> INSTANCE. Two edges make contract-vs-fulfilment real rather than
+  merely asserted:
+    - file level: Transmission.dta_version_ref names the DTA version a delivery
+      fulfils;
+    - test level: a natural-key join, TestSpecification (test_panel_name +
+      data_provider_test_code, falling back to data_provider_test_name) <->
+      TransferRecord (lbpanel + ctestcd / ctest). No surrogate key is used: no
+      real transfer file carries one.
+
+  Primary purpose: a typed *transformation source* for DTA -> SDTM-LB, kept
+  traceable in both directions (USDM upstream, SDTM-LB downstream). The SDTM
+  derivation is a function of (TransferRecord x TestSpecification): the payload
+  carries the value, the agreement carries the per-test facts no payload can
+  (unit conversion, result form, BC identity).
+
+  DESIGN RULE — permissive payload, strict agreement. Enumerations are bound on
+  the agreement side, where the sponsor controls the values. Payload slots that
+  a vendor populates (units, status, dates) stay unconstrained strings so a
+  conformant-but-unanticipated file is not rejected at the door; discrepancies
+  surface in the transform by comparing payload against agreement.
+
+license: MIT
+version: 0.2.0
+
+# ──────────────────────────────────────────────────────────────────────────────
+# PREFIXES — so every CURIE used below resolves to a real URI:
+#   ncit:  enum `meaning` codelist bindings (NCI Thesaurus, e.g. ncit:C64848)
+#   labtx: `exact_mappings` to LAB Transmission Model v2.0 variables (identity).
+#          Retained in v0.2.0: LAB v2 is no longer the transfer structure, but it
+#          remains the vocabulary the inventory's Test_Specification sheet maps
+#          every column back to, so it is still a valid mapping target.
+#   dta:   this schema's own namespace (default_prefix)
+# ──────────────────────────────────────────────────────────────────────────────
+prefixes:
+  linkml: https://w3id.org/linkml/
+  dta: https://cdisc.org/dta2sdtm/
+  ncit: http://purl.obolibrary.org/obo/NCIT_
+  labtx: https://wiki.cdisc.org/spaces/LAB2DOT0/pages/351701120/LAB+Transmission+Model+Metadata+Table#
+default_prefix: dta
+default_range: string
+imports:
+  - linkml:types
+
+# ──────────────────────────────────────────────────────────────────────────────
+# CLASSES
+# ──────────────────────────────────────────────────────────────────────────────
+classes:
+
+  # ═══════════════════ AGREEMENT LAYER (the governance contract) ═══════════════════
+  # Validate a serialized agreement with:
+  #   linkml-validate -s dta.linkml.yaml -C DataTransferAgreement <agreement>.yaml
+
+  DataTransferAgreement:
+    description: >-
+      The Data Transfer Agreement document: the governance contract that declares
+      WHAT lab data will be transferred, by WHOM, in what FORMAT, mapped to which
+      VISITS, comprising WHICH TESTS, in WHICH DATASET STRUCTURE. Root of the
+      agreement graph; the contract a Transmission later fulfils.
+    slots:
+      - app_name
+      - source
+      - study
+      - dta_version
+      - data_types
+      - data_type_details
+      - test_specification
+      - data_structure
+      - parties
+      - transfer
+      - visit_mapping
+      - timepoint_mapping
+    slot_usage:
+      source:
+        description: Provenance of the inputs the agreement was generated from.
+        range: Source
+        inlined: true
+    annotations:
+      fulfilled_by: "Transmission (instance layer), named explicitly by Transmission.dta_version_ref"
+
+  Study:
+    description: >-
+      USDM-sourced study context prepopulated into the agreement. Read-only
+      projection of the upstream USDM protocol.
+    slots:
+      - study_name
+      - study_identifier
+      - study_title
+      - version_identifier
+      - version_id
+      - design_id
+      - description
+      - summary
+    annotations:
+      usdm_source: "Study / StudyVersion / StudyDesign"
+      dta_section: 1
+
+  StudySummary:
+    description: Roll-up counts of the USDM source the agreement was derived from.
+    slots:
+      - organizations
+      - roles
+      - assigned_persons
+      - encounters
+      - biomedical_concepts
+      - bc_surrogates
+
+  DtaVersion:
+    description: One row of the DTA version history (document version number + date).
+    slots:
+      - version_number
+      - version_date
+      - version_change_narrative
+    annotations:
+      dta_section: 3
+
+  BcSelection:
+    description: >-
+      A biomedical concept SELECTED into the agreement scope (the `data_type_details`
+      of an agreement). The agreement-side projection of a BiomedicalConcept: carries
+      the NCI C-code, short name, and the faceted classification rows that backed the
+      selection. Join to the canonical BiomedicalConcept on
+      `bc_id` == BiomedicalConcept.nciCode.
+    slots:
+      - key
+      - bc_id
+      - short_name
+      - facets
+    annotations:
+      joins_to: "BiomedicalConcept (bc_id -> nciCode) — agreement-scoped BC selection"
+      dta_section: 2
+
+  TestSpecification:
+    description: >-
+      One agreed TEST in the DTA test specification table: the per-test heart of the
+      agreement. Declares how a single test will arrive — vendor and standard codes,
+      method, specimen, LOINC, data type, the three unit representations, blinding —
+      before any data exists.
+
+      Deliberately FLAT: the source sheet directs "There can be multiple test panels
+      listed in the same DTA test specification table. Therefore keep at record level
+      although it is at the grouping level in Lab v2." Panel name is a field here, not
+      a grouping class.
+
+      This class carries the per-test facts the payload structurally cannot: the unit
+      conversion basis (reported vs conventional vs SI), the result form (`data_type`,
+      which tells the SDTM transform whether LBORRES is castable to LBSTRESN), and the
+      BC identity. The SDTM-LB derivation is a function of (TransferRecord x this).
+    slots:
+      - test_panel_name
+      - category
+      - subcategory
+      - bc_id
+      - data_provider_test_code
+      - data_provider_test_name
+      - data_provider_test_description
+      - test_name
+      - test_code
+      - method
+      - specimen
+      - loinc_code
+      - data_type
+      - display_format
+      - reported_unit
+      - result_values
+      - conventional_unit
+      - si_unit
+      - blinding_flag
+      - agreement_status
+    annotations:
+      source_sheet: "DTA_MVP_Inventory.xlsx / Test_Specification"
+      joins_to_instance: >-
+        TransferRecord on (test_panel_name -> lbpanel, data_provider_test_code ->
+        ctestcd), falling back to (test_panel_name -> lbpanel,
+        data_provider_test_name -> ctest) where the vendor code is absent.
+      joins_to_concept: "BiomedicalConcept (bc_id -> nciCode)"
+
+  TransferDataset:
+    description: >-
+      The dataset structure the agreement PROMISES: the declared variable list of the
+      transferred file, with per-variable format, length, controlled terminology,
+      core/mandatory status and vendor-side naming. The agreement-side statement of
+      the structure that TransferRecord instances conform to.
+    slots:
+      - dataset_name
+      - dataset_description
+      - variables
+    annotations:
+      source_sheet: "DTA_MVP_Inventory.xlsx / Data_Structure"
+      conformed_to_by: TransferRecord
+
+  TransferVariable:
+    description: >-
+      One declared variable of the TransferDataset: its label, description, format,
+      length, controlled terminology, value list, example values, core/mandatory
+      status, unblinded flag, and the vendor's own name/label/terminology for it.
+    slots:
+      - variable_name
+      - variable_label
+      - variable_description
+      - variable_format
+      - variable_length
+      - significant_digits
+      - controlled_terminology
+      - value_lists
+      - example_values
+      - core_variable
+      - mandatory_variable_flag
+      - mandatory_value
+      - variable_unblinded
+      - vendor_variable_name
+      - vendor_variable_label
+      - vendor_controlled_terminology
+
+  Party:
+    description: >-
+      A party in the DTA signature table. Each carries its data-exchange role
+      (Data Provider vs Data Recipient) and organization type.
+    slots:
+      - id
+      - name
+      - role
+      - organization
+      - organization_type
+      - data_exchange_role
+      - email
+      - signature_date
+      - source
+    slot_usage:
+      source:
+        description: Field-level provenance of this party's data (USDM / UI / both).
+        range: ProvenanceEnum
+      role:
+        description: >-
+          Role of the assigned person within the organization. NOT bound to
+          StudyRoleEnum: the inventory's four values are recorded there as the
+          agreed vocabulary, but the list is open (it ends in a trailing separator),
+          USDM's AssignedPerson.jobTitle is free text, and real agreements carry
+          titles outside it. Rejecting an agreement over a job title would block a
+          transfer for no data-quality benefit.
+        annotations:
+          usdm_property: AssignedPerson.jobTitle
+          recommended_codelist: StudyRoleEnum
+    annotations:
+      dta_section: 4
+
+  TransferRequirements:
+    description: >-
+      The file-transfer mechanics agreed for the transmission: format, encoding,
+      delimiter, method, cumulative/incremental, schedule, environment, blinding,
+      and the provider/recipient folder names.
+    slots:
+      - file_name
+      - file_format
+      - encoding_system
+      - delimiter
+      - transmission_method
+      - transmission_type
+      - transfer_schedule
+      - transfer_environment
+      - transfer_blinding
+      - folder_name_provider
+      - folder_name_recipient
+    annotations:
+      dta_section: 5
+
+  VisitMapping:
+    description: >-
+      One row of the protocol<->data-provider visit crosswalk. Protocol visit
+      number/name are USDM-locked; the data-provider values are authored by the lab.
+      This crosswalk is what the DTA->SDTM transform uses to recover VISIT / VISITNUM.
+    slots:
+      - protocol_visit_number
+      - protocol_visit_name
+      - data_provider_visit_number
+      - data_provider_visit_name
+      - source
+    slot_usage:
+      source:
+        description: >-
+          Field-level provenance of the row: protocol columns are USDM-locked and the
+          data-provider columns are lab-authored, so a populated row is typically
+          "USDM + UI".
+        range: ProvenanceEnum
+    annotations:
+      sdtm_use: "recovers VISIT / VISITNUM; pairs with TransferRecord.visit / .visitnum"
+      dta_section: 6
+
+  TimepointMapping:
+    description: >-
+      One row of the optional protocol<->data-provider timepoint crosswalk. Omitted
+      from the agreement when left blank.
+    slots:
+      - protocol_timepoint_number
+      - protocol_timepoint_name
+      - data_provider_timepoint_number
+      - data_provider_timepoint_name
+      - source
+    slot_usage:
+      source:
+        description: Field-level provenance of the row (USDM / UI / both).
+        range: ProvenanceEnum
+    annotations:
+      dta_section: 7
+
+  Source:
+    description: >-
+      Provenance of the inputs the agreement was generated from (source-control
+      indication): the USDM protocol, the MVP metadata, and any DTA template.
+    slots:
+      - usdm
+      - mvp
+      - template
+
+  # ════════════════════════ SEMANTIC LAYER (the linkage) ════════════════════════
+
+  BiomedicalConcept:
+    description: >-
+      A CDISC Biomedical Concept (BC): a machine-readable definition of a clinical
+      idea (e.g. "Hemoglobin Concentration in Blood"), independent of any dataset.
+      USDM v4 references BCs from study Activities via `biomedicalConceptIds`; this
+      class is the join target for that reference.
+    slots:
+      - conceptId
+      - conceptName
+      - nciCode
+      - loincCodes
+      - usdmReference
+      - classifications
+    annotations:
+      usdm_entity: BiomedicalConcept
+      usdm_link: "Activity.biomedicalConceptIds -> BiomedicalConcept.id"
+
+  BcClassification:
+    description: >-
+      One faceted classification row for a BiomedicalConcept (from the MVP metadata
+      lookup): a `group_name` (the facet dimension — category, disease_area,
+      is_used_by_form, is_used_by_dta) plus its `value`. The `is_used_by_dta` facet
+      is the explicit, queryable BC->DTA membership edge. Shared by
+      BiomedicalConcept.classifications and BcSelection.facets.
+    slots:
+      - group_name
+      - value
+    annotations:
+      mvp_source: "MVP metadata lookup rows (bc_id, group_name, value)"
+
+  DatasetSpecialization:
+    description: >-
+      A CDISC SDTM Dataset Specialization (COSMoS): the projection of one
+      BiomedicalConcept into a specific SDTM domain (here, LB), expressed as
+      value-level metadata over a set of VariableSpecializations. This is the
+      authoritative bridge: BC concept -> concrete SDTM-LB variables/codelists.
+      System of record: cdisc-org/COSMoS export.
+    slots:
+      - specializationId
+      - biomedicalConcept
+      - vlmGroupId
+      - domain
+      - sdtmigStartVersion
+      - packageDate
+      - source
+      - variableSpecializations
+    annotations:
+      cdisc_artifact: SDTM Dataset Specialization
+      system_of_record: "cdisc-org/COSMoS export/cdisc_sdtm_dataset_specializations_latest.csv"
+
+  VariableSpecialization:
+    description: >-
+      One value-level-metadata row of a DatasetSpecialization: how a single SDTM-LB
+      variable is constrained for this concept (assigned term, codelist, value list,
+      role, type, origin).
+    slots:
+      - sdtmVariable
+      - role
+      - assignedValue
+      - codelistCode
+      - codelistName
+      - valueList
+      - decId
+      - dataType
+      - mandatoryVariable
+      - originType
+
+  # ════════════════════════ INSTANCE LAYER (the delivered payload) ══════════════
+
+  Transmission:
+    tree_root: true
+    description: >-
+      File-level header for one transmitted DTA file, plus the records it carries.
+
+      `dta_version_ref` is the agreement<->instance edge at file level: it names the
+      DTA document version this delivery fulfils, so a received file can always be
+      traced to the contract that authorized it.
+
+      NOTE ON PROVENANCE: the Data_Structure sheet specifies dataset variables only
+      and declares no file-level metadata, so this header is not derived from it.
+      `igvrsn`, `fcrdtc`, `trssid` and `trstyp` are retained from the LAB
+      Transmission Model, where they are grounded; `transfer_structure_version` and
+      `dta_version_ref` are project-defined (see their own annotations) and are NOT
+      CDISC-registered variables.
+    slots:
+      - transfer_structure_version
+      - igvrsn
+      - fcrdtc
+      - trssid
+      - trstyp
+      - dta_version_ref
+      - records
+
+  TransferRecord:
+    description: >-
+      THE GRAIN: one flat record per lab result, as agreed in the Data_Structure
+      sheet of the DTA MVP Inventory. Replaces the v0.1.0 nested LAB v2 graph
+      (Subject > Collection > Specimen > Panel > LabTestResult > Result).
+
+      This is a change of transfer VOCABULARY, not merely of shape: the removed graph
+      modelled LAB v2 variables (LTVRSN, ACCSNID, SPECID, PLBTID, PLRCRS...); this
+      class models SDTM-shaped columns plus vendor passthrough (CTESTCD, CTEST,
+      CUNIT, CSPEC, CMETHOD, CPANEL) and ten AUX escape hatches. The two share
+      essentially only STUDYID.
+
+      Per the schema's permissive-payload rule, vendor-populated slots (lborresu,
+      lbstat, lbdtc, all C* passthrough) are unconstrained strings. Only the four
+      variables the source sheet types as numeric are typed numerically — which is
+      what stops a categorical result such as "STRAW" being cast to LBSTRESN.
+    slots:
+      - studyid
+      - domain
+      - usubjid
+      - subjid
+      - lbgrpid
+      - lbrefid
+      - lbtestcd
+      - lbtest
+      - lbtstdtl
+      - lbcat
+      - lbscat
+      - lborres
+      - lborresu
+      - lbrescat
+      - lbstat
+      - lbreasnd
+      - lbnam
+      - lbloinc
+      - lbspec
+      - lbspccnd
+      - lbmethod
+      - lbrunid
+      - lbanmeth
+      - lblloq
+      - visitnum
+      - visit
+      - lbdtc
+      - lbtpt
+      - lbtptnum
+      - lbcode
+      - lbdupnum
+      - lbtstcnd
+      - lbcndagt
+      - lbanstat
+      - lbpanel
+      - lbgate
+      - lbmrkstr
+      - lbclmeth
+      - lbtmthsn
+      - lbreagnt
+      - lbmthdds
+      - lbbdagnt
+      - lbrqual
+      - aux1
+      - aux2
+      - aux3
+      - aux4
+      - aux5
+      - aux6
+      - aux7
+      - aux8
+      - aux9
+      - aux10
+      - lbvrefid
+      - ctestcd
+      - ctest
+      - cunit
+      - cspec
+      - cmethod
+      - cpanel
+    annotations:
+      source_sheet: "DTA_MVP_Inventory.xlsx / Data_Structure"
+      conforms_to: TransferDataset
+      joins_to_agreement: >-
+        TestSpecification on (lbpanel -> test_panel_name, ctestcd ->
+        data_provider_test_code), falling back to ctest -> data_provider_test_name.
+      known_gap: >-
+        The Data_Structure sheet declares no per-record transaction type, so an
+        incremental transfer cannot express a record-level delete; only the
+        file-level TransferRequirements.transmission_type (Cumulative/Incremental)
+        and Transmission.trstyp are available.
+
+# ──────────────────────────────────────────────────────────────────────────────
+# SLOTS
+# ──────────────────────────────────────────────────────────────────────────────
+slots:
+
+  # ── agreement layer (DataTransferAgreement; slot names == agreement JSON keys) ──
+  app_name:
+    description: Identifier of the application/build that produced the agreement payload.
+  study:
+    description: USDM-sourced study context for the agreement.
+    range: Study
+    inlined: true
+  dta_version:
+    description: DTA document version (number + date).
+    range: DtaVersion
+    inlined: true
+  data_types:
+    description: Human-readable labels of the biomedical concepts selected into scope.
+    multivalued: true
+  data_type_details:
+    description: The biomedical concepts selected into the agreement scope, with facets.
+    range: BcSelection
+    multivalued: true
+    inlined_as_list: true
+  test_specification:
+    description: The agreed tests — one row per test in the DTA test specification table.
+    range: TestSpecification
+    multivalued: true
+    inlined_as_list: true
+  data_structure:
+    description: The declared structure of the transferred dataset.
+    range: TransferDataset
+    inlined: true
+  parties:
+    description: Parties included in the DTA signature table.
+    range: Party
+    multivalued: true
+    inlined_as_list: true
+  transfer:
+    description: Agreed file-transfer mechanics.
+    range: TransferRequirements
+    inlined: true
+  visit_mapping:
+    description: Protocol<->data-provider visit crosswalk rows.
+    range: VisitMapping
+    multivalued: true
+    inlined_as_list: true
+  timepoint_mapping:
+    description: Optional protocol<->data-provider timepoint crosswalk rows.
+    range: TimepointMapping
+    multivalued: true
+    inlined_as_list: true
+
+  # ── Study (agreement-side, USDM projection) ──
+  study_name:
+    description: USDM study name (e.g. NCT number).
+  study_identifier:
+    description: Study identifier (USDM StudyIdentifier).
+    annotations: { usdm_property: Study.id }
+  study_title:
+    description: Study / protocol title. The original title, not an acronym.
+    annotations: { usdm_property: "StudyTitle.text (type = official)" }
+  version_identifier:
+    description: USDM study version identifier.
+    annotations: { usdm_property: StudyVersion.versionIdentifier }
+  version_id:
+    description: USDM StudyVersion id.
+  design_id:
+    description: USDM StudyDesign id.
+  description:
+    description: Study description / synopsis.
+  summary:
+    description: Roll-up counts of the USDM source.
+    range: StudySummary
+    inlined: true
+
+  # ── StudySummary ──
+  organizations:    { description: Count of USDM organizations., range: integer }
+  roles:            { description: Count of USDM study roles., range: integer }
+  assigned_persons: { description: Count of assigned persons across roles., range: integer }
+  encounters:       { description: Count of USDM encounters (visits)., range: integer }
+  biomedical_concepts: { description: Count of USDM biomedical concepts., range: integer }
+  bc_surrogates:    { description: Count of BC surrogates., range: integer }
+
+  # ── DtaVersion ──
+  version_number: { description: DTA document version number (e.g. 1.0). }
+  version_date:   { description: DTA document version date (ISO 8601). }
+  version_change_narrative:
+    description: Description of the change and the rationale for this DTA version.
+
+  # ── BcSelection (data_type_details) ──
+  key:
+    description: Stable selection key ("<bc_id>||<short_name>") from the lookup.
+  bc_id:
+    description: >-
+      NCI Thesaurus C-code of the concept. Joins to BiomedicalConcept.nciCode. Used by
+      BcSelection (concept scope) and TestSpecification (per-test concept identity).
+    annotations: { usdm_property: "BiomedicalConceptCategory / BC Group" }
+  short_name:
+    description: Concept short name (e.g. "Leukocyte Count").
+  facets:
+    description: The faceted classification rows backing this selection.
+    range: BcClassification
+    multivalued: true
+    inlined_as_list: true
+
+  # ── TestSpecification (the agreed test table) ──
+  test_panel_name:
+    description: >-
+      Test panel name. Kept at record level per the source sheet, even though Lab v2
+      treats panel as a grouping level. Part of the natural key to TransferRecord.lbpanel.
+    annotations: { mandatory: R, natural_key: true }
+  category:
+    description: SDTM category for the test (Lab v2 "Data Recipient Test Category").
+    exact_mappings: [labtx:DTRTCT]
+    annotations: { mandatory: R, sdtm_lb_target: LBCAT }
+  subcategory:
+    description: Further categorization of the test (e.g. used for Flow Cytometry, Genetics).
+    annotations: { mandatory: O, sdtm_lb_target: LBSCAT }
+  data_provider_test_code:
+    description: The performing laboratory's own test code. Part of the natural key.
+    exact_mappings: [labtx:PLBTID]
+    annotations: { mandatory: R, natural_key: true, instance_slot: ctestcd }
+  data_provider_test_name:
+    description: >-
+      The performing laboratory's own test name. Natural-key fallback where the
+      vendor test code is absent — which it is for 9 of the 11 example rows in the
+      source sheet (flow cytometry and IHC panels name tests without coding them).
+    exact_mappings: [labtx:PLBTNM]
+    annotations: { mandatory: R, natural_key: fallback, instance_slot: ctest }
+  data_provider_test_description:
+    description: >-
+      Long text description of the test. Retained for traceability where the provider
+      test differs from the intended BC.
+    exact_mappings: [labtx:PLBTDS]
+    annotations: { mandatory: O }
+  test_name:
+    description: Standard (data recipient) test name.
+    exact_mappings: [labtx:DTRTNM]
+    annotations: { mandatory: R, sdtm_lb_target: LBTEST }
+  test_code:
+    description: Standard (data recipient) test identifier.
+    exact_mappings: [labtx:DTRTID]
+    annotations: { mandatory: R, sdtm_lb_target: LBTESTCD }
+  method:
+    description: Method of the test or examination (e.g. HPLC, DIPSTICK, FLOW CYTOMETRY, IHC).
+    annotations: { mandatory: R, sdtm_lb_target: LBMETHOD }
+  specimen:
+    description: Specimen type the test is performed on (e.g. BLOOD, URINE, Cryo PBMC).
+    annotations: { mandatory: R, sdtm_lb_target: LBSPEC }
+  loinc_code:
+    description: LOINC code uniquely identifying the lab test.
+    annotations: { mandatory: O, sdtm_lb_target: LBLOINC }
+  data_type:
+    description: >-
+      Declared form of the result (e.g. numeric, "<text 200>"). THE KEY SDTM INPUT:
+      it tells the transform whether LBORRES can be cast to LBSTRESN. Without it a
+      categorical result such as a urinalysis colour is attempted as a number.
+    annotations: { mandatory: R, sdtm_use: "gates the LBSTRESC/LBSTRESN derivation" }
+  display_format:
+    description: Display format for the result.
+    annotations: { mandatory: O }
+  reported_unit:
+    description: >-
+      Unit the result is reported in by the data provider. Recommended source is CDISC
+      CT codelist UNIT (C71620); not bound as an enum because agreements legitimately
+      use units outside any fixed subset.
+    annotations: { mandatory: R, recommended_codelist: "UNIT (C71620)", sdtm_lb_target: LBORRESU }
+  result_values:
+    description: Permitted result values or the codelist name governing them.
+    annotations: { mandatory: O }
+  conventional_unit:
+    description: Conventional unit for the test.
+    annotations: { mandatory: R, recommended_codelist: "UNIT (C71620)" }
+  si_unit:
+    description: SI unit for the test.
+    annotations: { mandatory: R, recommended_codelist: "UNIT (C71620)", sdtm_lb_target: LBSTRESU }
+  blinding_flag:
+    description: Whether this test's results are blinded.
+    range: boolean
+    annotations: { mandatory: R }
+  agreement_status:
+    description: >-
+      Negotiation state of this test row between the two parties (observed examples:
+      Ordered, Final, Received). PROVISIONAL — TeamComments records that the source
+      column "Status" is to be renamed and its examples reworked; no codelist is bound
+      until the workstream specifies one.
+    annotations: { mandatory: O, source_column: Status, provisional: "name and value list pending" }
+
+  # ── TransferDataset / TransferVariable (declared structure) ──
+  dataset_name:
+    description: Name of the transferred dataset.
+  dataset_description:
+    description: Description of the transferred dataset.
+  variables:
+    description: The declared variables of this dataset.
+    range: TransferVariable
+    multivalued: true
+    inlined_as_list: true
+  variable_name:
+    description: Variable name as it appears in the transferred file.
+    identifier: true
+  variable_label:
+    description: Variable label.
+  variable_description:
+    description: Description of what the variable holds.
+  variable_format:
+    description: Declared format (text, numeric, datetime).
+  variable_length:
+    description: Declared maximum length.
+    range: integer
+  significant_digits:
+    description: Significant digits, where numeric.
+    range: integer
+  controlled_terminology:
+    description: Controlled terminology governing the variable.
+  value_lists:
+    description: Permitted value list for the variable.
+    multivalued: true
+  example_values:
+    description: Example values for the variable.
+    multivalued: true
+  core_variable:
+    description: >-
+      Core designation suggested by the agreement (the sheet notes this is deliberately
+      not the SDTM core value).
+  mandatory_variable_flag:
+    description: Whether the variable itself must be present in the transfer.
+    range: boolean
+  mandatory_value:
+    description: Whether the variable must be populated.
+    range: boolean
+  variable_unblinded:
+    description: Whether the variable is unblinded.
+    range: boolean
+  vendor_variable_name:
+    description: The data provider's own name for this variable.
+  vendor_variable_label:
+    description: The data provider's own label for this variable.
+  vendor_controlled_terminology:
+    description: The data provider's own controlled terminology for this variable.
+
+  # ── Party ──
+  id:
+    description: Stable party id (e.g. StudyRole_11_Person_8).
+  name:
+    description: Party person name (blank for organization-only rows).
+    annotations: { usdm_property: AssignedPerson.name }
+  organization:
+    description: Party organization name.
+    annotations: { usdm_property: Organization.name }
+  organization_type:
+    description: Type of the party organization.
+    range: OrganizationTypeEnum
+    annotations: { usdm_property: Organization.type }
+  data_exchange_role:
+    description: Whether the party sends (Data Provider) or receives (Data Recipient).
+    range: DataExchangeRoleEnum
+  email:
+    description: Party contact email.
+  signature_date:
+    description: Signature date for the party (ISO 8601).
+
+  # ── TransferRequirements ──
+  file_name:        { description: Transferred file base name. }
+  file_format:      { description: File format., range: FileFormatEnum }
+  encoding_system:  { description: Character encoding., range: EncodingEnum }
+  delimiter:        { description: Field delimiter., range: DelimiterEnum }
+  transmission_method: { description: Transmission method., range: TransmissionMethodEnum }
+  transmission_type:   { description: Cumulative vs incremental transfer., range: TransferModeEnum }
+  transfer_schedule:   { description: Planned frequency of transfers. }
+  transfer_environment: { description: Target environment., range: TransferEnvironmentEnum }
+  transfer_blinding:
+    description: >-
+      Blinding status of the transfer as a whole. The inventory describes this as an
+      indicator with no controlled terminology; the three-value enum is retained
+      because it is a strict superset of the boolean reading, and because the source
+      note "Do we have a different attribute name for it?" is unresolved.
+    range: BlindingEnum
+  folder_name_provider:  { description: Data Provider folder name. }
+  folder_name_recipient: { description: Data Recipient folder name. }
+
+  # ── VisitMapping / TimepointMapping ──
+  protocol_visit_number:
+    description: Protocol visit number as used in the SoA (USDM-locked).
+    annotations: { usdm_property: Encounter.name }
+  protocol_visit_name:
+    description: Protocol visit name as used in the SoA (USDM-locked).
+    annotations: { usdm_property: Encounter.label }
+  data_provider_visit_number:
+    description: >-
+      Data-provider visit number (lab-authored). Kept as a STRING despite the
+      inventory giving Data Format = number: observed values are zero-padded codes
+      ("01", "02"), and integer typing silently discards the padding. This is an
+      identifier used to match the lab's own system, not a quantity — and it is the
+      crosswalk the DTA->SDTM transform uses to recover VISIT / VISITNUM, so a lossy
+      round-trip here breaks visit derivation.
+    annotations:
+      inventory_conflict: >-
+        DTA_Attributes row 32 specifies Data Format = number; modelled as string for
+        the reason above. Worth confirming with the workstream.
+  data_provider_visit_name:    { description: Data-provider visit name (lab-authored). }
+  protocol_timepoint_number:      { description: Protocol timepoint number. }
+  protocol_timepoint_name:        { description: Protocol timepoint name. }
+  data_provider_timepoint_number: { description: Data-provider timepoint number. }
+  data_provider_timepoint_name:   { description: Data-provider timepoint name. }
+
+  # ── Source ──
+  usdm:     { description: USDM source label/filename. }
+  mvp:      { description: MVP metadata source label/filename. }
+  template: { description: DTA template source label/filename. }
+
+  # ── BcClassification (shared facet row) ──
+  group_name:
+    description: Facet dimension of the classification.
+    range: BcFacetGroupEnum
+  value:
+    description: Facet value within the group (e.g. "Complete Blood Count (CBC)").
+  classifications:
+    description: Faceted classification rows for this concept (incl. is_used_by_dta).
+    range: BcClassification
+    multivalued: true
+    inlined_as_list: true
+
+  # ── semantic layer ──
+  conceptId:
+    identifier: true
+    description: BC identifier (e.g. USDM BiomedicalConcept_152, or COSMoS bc_id).
+  conceptName:
+    description: Human-readable concept name.
+    required: true
+  nciCode:
+    description: NCI Thesaurus C-code for the concept.
+  loincCodes:
+    description: LOINC code(s) the concept may be identified by.
+    multivalued: true
+  usdmReference:
+    description: The USDM BiomedicalConcept id this BC corresponds to in the source protocol.
+    annotations:
+      usdm_property: "Study.versions[].biomedicalConcepts[].id"
+
+  specializationId:
+    identifier: true
+    description: Dataset specialization id (COSMoS vlm_group_id, e.g. HGBBLD).
+  biomedicalConcept:
+    description: The BiomedicalConcept this specialization projects into SDTM-LB.
+    range: BiomedicalConcept
+    inlined: true
+    required: true
+  vlmGroupId:
+    description: COSMoS VLM group id.
+  sdtmigStartVersion:
+    description: First SDTMIG version this specialization applies to (e.g. 3-2).
+  packageDate:
+    description: COSMoS package date of the vendored specialization.
+  source:
+    description: >-
+      Source/provenance. On a DatasetSpecialization this is the system-of-record
+      URL/citation; on a Party it is the field-provenance label (e.g. "USDM + UI").
+      DataTransferAgreement overrides the range to the Source class via slot_usage.
+  variableSpecializations:
+    description: The value-level-metadata rows of this specialization.
+    range: VariableSpecialization
+    multivalued: true
+    inlined_as_list: true
+
+  sdtmVariable:
+    description: SDTM-LB variable name constrained by this row (e.g. LBORRESU).
+    required: true
+  role:
+    description: >-
+      Role label. On a VariableSpecialization this is the SDTM role (Topic,
+      Qualifier, Timing, ...); on a Party it is the study role, narrowed to
+      StudyRoleEnum by slot_usage.
+  assignedValue:
+    description: Fixed/assigned value, if the specialization pins one (e.g. LBTESTCD=HGB).
+  codelistCode:
+    description: NCI C-code of the bound codelist (e.g. C71620 for UNIT).
+  codelistName:
+    description: Codelist submission name (e.g. UNIT, LBTESTCD).
+  valueList:
+    description: Permitted value list for this variable in this specialization.
+    multivalued: true
+  decId:
+    description: COSMoS data element concept id (dec_id).
+  dataType:
+    description: Declared SDTM data type (text, float, ...).
+  mandatoryVariable:
+    description: Whether the specialization marks the variable mandatory.
+    range: boolean
+  originType:
+    description: SDTM origin (Assigned, Collected, Derived, ...).
+
+  # ── Transmission (file header) ──
+  transfer_structure_version:
+    description: >-
+      Version of the agreed transfer data structure this file conforms to. PROJECT-
+      DEFINED, not a CDISC-registered variable: it replaces the LAB v2 LTVRSN, which
+      became incoherent once the transfer structure ceased to be the LAB Transmission
+      Model. Retained because vendor and sponsor must agree on which structure version
+      a file follows for a transfer to be machine-processable.
+    annotations: { provenance: project-defined, replaces: "labtx:LTVRSN" }
+  igvrsn:
+    description: SDTMIG Version.
+    aliases: [IGVRSN]
+    exact_mappings: [labtx:IGVRSN]
+    annotations: { lab_tx_var: IGVRSN, cdisc_core: Perm }
+  fcrdtc:
+    description: File Creation Date/Time (ISO 8601).
+    required: true
+    aliases: [FCRDTC]
+    exact_mappings: [labtx:FCRDTC]
+    annotations: { lab_tx_var: FCRDTC, cdisc_core: Req }
+  trssid:
+    description: Transmission Source ID (the sending organization).
+    required: true
+    aliases: [TRSSID]
+    exact_mappings: [labtx:TRSSID]
+    annotations: { lab_tx_var: TRSSID, cdisc_core: Req }
+  trstyp:
+    description: Transmission Type (initial / update / delete).
+    range: TransmissionTypeEnum
+    aliases: [TRSTYP]
+    exact_mappings: [labtx:TRSTYP]
+    annotations: { lab_tx_var: TRSTYP, cdisc_core: Perm }
+  dta_version_ref:
+    description: >-
+      The DTA document version this transmission fulfils, matching
+      DataTransferAgreement.dta_version.version_number. THE AGREEMENT<->INSTANCE EDGE
+      AT FILE LEVEL: it lets a received delivery be traced to the contract that
+      authorized it. PROJECT-DEFINED, not a CDISC-registered variable. Carried once
+      per file rather than per record, so a real transfer file can populate it —
+      unlike a per-row specification key, which no transfer format carries.
+    annotations: { provenance: project-defined, references: "DtaVersion.version_number" }
+  records:
+    description: The lab result records carried in this transmission.
+    range: TransferRecord
+    multivalued: true
+    inlined_as_list: true
+
+  # ── TransferRecord (generated from DTA_MVP_Inventory / Data_Structure) ──
+  studyid:
+    description: Unique identifier for a study.
+    aliases: [STUDYID]
+    annotations:
+      transfer_var: STUDYID
+      transfer_format: text
+      transfer_length: 40
+      usdm_property: "Study.versions[].studyIdentifiers"
+      sdtm_lb_target: STUDYID
+  domain:
+    description: >-
+      SDTM domain abbreviation. On a DatasetSpecialization, the domain the
+      specialization targets; on a TransferRecord, the DOMAIN column of the
+      transferred dataset (two-character abbreviation).
+    ifabsent: string(LB)
+    aliases: [DOMAIN]
+    annotations:
+      transfer_var: DOMAIN
+      transfer_format: text
+      transfer_length: 2
+      controlled_terminology: DOMAIN
+      core_variable: "Mandatory/Conditional"
+      sdtm_lb_target: DOMAIN
+  usubjid:
+    description: Identifier used to uniquely identify a subject.
+    aliases: [USUBJID]
+    annotations: { transfer_var: USUBJID, transfer_format: text, transfer_length: 60 }
+  subjid:
+    description: >-
+      Populated with the subject ID. Can be used to store a screening number if different from USUBJID.
+    aliases: [SUBJID]
+    annotations: { transfer_var: SUBJID, transfer_format: text, transfer_length: 30 }
+  lbgrpid:
+    description: >-
+      Optional group identifier, used to link together a block of related records within a subject in a domain.
+    aliases: [LBGRPID]
+    annotations: { transfer_var: LBGRPID, transfer_format: text, transfer_length: 30 }
+  lbrefid:
+    description: >-
+      Internal or external identifier, such as the sample ID for a subject, from which a lab test result was generated.
+    aliases: [LBREFID]
+    annotations: { transfer_var: LBREFID, transfer_format: text, transfer_length: 25 }
+  lbtestcd:
+    description: >-
+      Short name of the measurement, test, or examination described in LBTEST.
+    aliases: [LBTESTCD]
+    annotations: { transfer_var: LBTESTCD, transfer_format: text, transfer_length: 8 }
+  lbtest:
+    description: >-
+      Name of the test or examination used to obtain the measurement or finding.
+    aliases: [LBTEST]
+    annotations: { transfer_var: LBTEST, transfer_format: text, transfer_length: 40 }
+  lbtstdtl:
+    description: >-
+      Further description of the lab test (LBTESTCD and LBTEST). Example values: DETECTION, IDENTIFICATION, TITRATION, QUANTIFICATION, NORMALITY IMPRESSION
+    aliases: [LBTSTDTL]
+    annotations: { transfer_var: LBTSTDTL, transfer_format: text, transfer_length: 200 }
+  lbcat:
+    description: Used to define a category of topic-variable values.
+    aliases: [LBCAT]
+    annotations: { transfer_var: LBCAT, transfer_format: text, transfer_length: 200 }
+  lbscat:
+    description: Used to define a further categorization of LBCAT values.
+    aliases: [LBSCAT]
+    annotations: { transfer_var: LBSCAT, transfer_format: text, transfer_length: 200 }
+  lborres:
+    description: >-
+      Original result of the measurement or finding. This holds the result as reported to the sites.
+    aliases: [LBORRES]
+    annotations: { transfer_var: LBORRES, transfer_format: text, transfer_length: 200 }
+  lborresu:
+    description: >-
+      Original unit of the measurement. This holds the unit as reported to the sites.
+    aliases: [LBORRESU]
+    annotations: { transfer_var: LBORRESU, transfer_format: text, transfer_length: 50 }
+  lbrescat:
+    description: >-
+      Used to group or categorize the results of an assessment (e.g., based on pre-defined categories, scale, and/or cut-off values).
+    aliases: [LBRESCAT]
+    annotations: { transfer_var: LBRESCAT, transfer_format: text, transfer_length: 100 }
+  lbstat:
+    description: >-
+      Used to indicate that a test was not done or a test was attempted but did not generate a result (e.g., test failed, test not performed due to sampl...
+    aliases: [LBSTAT]
+    annotations: { transfer_var: LBSTAT, transfer_format: text, transfer_length: 8 }
+  lbreasnd:
+    description: >-
+      Describes the reason why the test was not done or did not generate a result (i.e., when LBSTAT is NOT DONE).
+    aliases: [LBREASND]
+    annotations: { transfer_var: LBREASND, transfer_format: text, transfer_length: 200 }
+  lbnam:
+    description: >-
+      Name or identifier of the lab vendor that provided the test results. If an additional reference lab has been used for any given test(s) that will b...
+    aliases: [LBNAM]
+    annotations: { transfer_var: LBNAM, transfer_format: char, transfer_length: 200 }
+  lbloinc:
+    description: >-
+      Logical Observation Identifiers Names and Codes (LOINC) code for the lab test.
+    aliases: [LBLOINC]
+    annotations: { transfer_var: LBLOINC, transfer_format: text, transfer_length: 200 }
+  lbspec:
+    description: Indicates the type of specimen used for the measurement.
+    aliases: [LBSPEC]
+    annotations: { transfer_var: LBSPEC, transfer_format: text, transfer_length: 100 }
+  lbspccnd:
+    description: >-
+      Free or standardized text that describes the condition of the specimen.
+    aliases: [LBSPCCND]
+    annotations: { transfer_var: LBSPCCND, transfer_format: text, transfer_length: 100 }
+  lbmethod:
+    description: Method of the test or examination.
+    aliases: [LBMETHOD]
+    annotations: { transfer_var: LBMETHOD, transfer_format: text, transfer_length: 200 }
+  lbrunid:
+    description: >-
+      A unique identifier for a particular run of a test performed by the lab on a particular batch of samples. This identifier can be used to distinguis...
+    aliases: [LBRUNID]
+    annotations: { transfer_var: LBRUNID, transfer_format: text, transfer_length: 25 }
+  lbanmeth:
+    description: >-
+      Analysis method applied to obtain a summarized result. Analysis method describes the method of secondary processing applied to a complex observatio...
+    aliases: [LBANMETH]
+    annotations: { transfer_var: LBANMETH, transfer_format: text, transfer_length: 200 }
+  lblloq:
+    description: >-
+      Indicates the lower limit of quantitation for an assay. Units will be those used for LBORRESU. Note: may contain a qualifier (e.g. < or >).
+    aliases: [LBLLOQ]
+    annotations: { transfer_var: LBLLOQ, transfer_format: text, transfer_length: 20 }
+  visitnum:
+    description: Clinical encounter number. Numeric version of VISIT, used for sorting.
+    range: float
+    aliases: [VISITNUM]
+    annotations: { transfer_var: VISITNUM, transfer_format: numeric, transfer_length: 8 }
+  visit:
+    description: Protocol-defined description of a clinical encounter.
+    aliases: [VISIT]
+    annotations: { transfer_var: VISIT, transfer_format: text, transfer_length: 60 }
+  lbdtc:
+    description: >-
+      Specimen collection date or date and time is represented in LBDTC using ISO 8601 datetime format (YYYY-MM-DDThh:mm). This variable represents when...
+    aliases: [LBDTC]
+    annotations: { transfer_var: LBDTC, transfer_format: datetime, transfer_length: 19 }
+  lbtpt:
+    description: >-
+      Text description of planned time point when a measurement or observation should occur as defined in the protocol.
+    aliases: [LBTPT]
+    annotations: { transfer_var: LBTPT, transfer_format: text, transfer_length: 40 }
+  lbtptnum:
+    description: Numeric version of planned time point used in sorting.
+    range: float
+    aliases: [LBTPTNUM]
+    annotations: { transfer_var: LBTPTNUM, transfer_format: numeric, transfer_length: 8 }
+  lbcode:
+    description: Populated with the LUDWIG numeric code for the test concept.
+    range: integer
+    aliases: [LBCODE]
+    annotations: { transfer_var: LBCODE, transfer_format: num, transfer_length: 8 }
+  lbdupnum:
+    description: >-
+      Used to differentiate unplanned duplicate tests and/or results. This variable should not be used for planned repeated instances of a test (see LBRE...
+    range: integer
+    aliases: [LBDUPNUM]
+    annotations: { transfer_var: LBDUPNUM, transfer_format: numeric, transfer_length: 8 }
+  lbtstcnd:
+    description: >-
+      Identifies any planned condition imposed by the assay system on the specimen at the time the test is performed.
+    aliases: [LBTSTCND]
+    annotations: { transfer_var: LBTSTCND, transfer_format: text, transfer_length: 35 }
+  lbcndagt:
+    description: >-
+      Description of the agent used to impose a test condition identified in LBTSTCND.
+    aliases: [LBCNDAGT]
+    annotations: { transfer_var: LBCNDAGT, transfer_format: text, transfer_length: 200 }
+  lbanstat:
+    description: >-
+      Describes the status of the target/receptor as either TOTAL, FREE, BOUND, UNBOUND.
+    aliases: [LBANSTAT]
+    annotations: { transfer_var: LBANSTAT, transfer_format: text, transfer_length: 35 }
+  lbpanel:
+    description: Vendor Test panel name, used to group tests run together.
+    aliases: [LBPANEL]
+    annotations: { transfer_var: LBPANEL, transfer_format: text, transfer_length: 200 }
+  lbgate:
+    description: Gating structure
+    aliases: [LBGATE]
+    annotations: { transfer_var: LBGATE, transfer_format: text, transfer_length: 200 }
+  lbmrkstr:
+    description: Marker string
+    aliases: [LBMRKSTR]
+    annotations: { transfer_var: LBMRKSTR, transfer_format: text, transfer_length: 200 }
+  lbclmeth:
+    description: Description of the method used to collect a specimen for testing.
+    aliases: [LBCLMETH]
+    annotations: { transfer_var: LBCLMETH, transfer_format: text, transfer_length: 200 }
+  lbtmthsn:
+    description: >-
+      Describes the sensitivity of the test methodology with respect to observation, detection, or quantification.
+    aliases: [LBTMTHSN]
+    annotations: { transfer_var: LBTMTHSN, transfer_format: text, transfer_length: 35 }
+  lbreagnt:
+    description: Describes the reagent used in the assay to obtain the result.
+    aliases: [LBREAGNT]
+    annotations: { transfer_var: LBREAGNT, transfer_format: text, transfer_length: 200 }
+  lbmthdds:
+    description: >-
+      Provides a more detailed description of the assay methodology beyond the LUDWIG dictionary controlled variables (e.g., LBANMETH, LBTMTHSN, LBDEVICE...
+    aliases: [LBMTHDDS]
+    annotations: { transfer_var: LBMTHDDS, transfer_format: text, transfer_length: 200 }
+  lbbdagnt:
+    description: Documents the binding agent.
+    aliases: [LBBDAGNT]
+    annotations: { transfer_var: LBBDAGNT, transfer_format: text, transfer_length: 200 }
+  lbrqual:
+    description: >-
+      Describes additional observations/narrative/comments about the result. Typically not used for numeric LB results.
+    aliases: [LBRQUAL]
+    annotations: { transfer_var: LBRQUAL, transfer_format: text, transfer_length: 200 }
+  aux1:
+    description: >-
+      To be used when none of the available standard transfer variables are fit for purpose.
+    aliases: [AUX1]
+    annotations: { transfer_var: AUX1, transfer_format: text, transfer_length: 200 }
+  aux2:
+    description: >-
+      To be used when none of the available standard transfer variables are fit for purpose.
+    aliases: [AUX2]
+    annotations: { transfer_var: AUX2, transfer_format: text, transfer_length: 200 }
+  aux3:
+    description: >-
+      To be used when none of the available standard transfer variables are fit for purpose.
+    aliases: [AUX3]
+    annotations: { transfer_var: AUX3, transfer_format: text, transfer_length: 200 }
+  aux4:
+    description: >-
+      To be used when none of the available standard transfer variables are fit for purpose.
+    aliases: [AUX4]
+    annotations: { transfer_var: AUX4, transfer_format: text, transfer_length: 200 }
+  aux5:
+    description: >-
+      To be used when none of the available standard transfer variables are fit for purpose.
+    aliases: [AUX5]
+    annotations: { transfer_var: AUX5, transfer_format: text, transfer_length: 200 }
+  aux6:
+    description: >-
+      To be used when none of the available standard transfer variables are fit for purpose.
+    aliases: [AUX6]
+    annotations: { transfer_var: AUX6, transfer_format: text, transfer_length: 200 }
+  aux7:
+    description: >-
+      To be used when none of the available standard transfer variables are fit for purpose.
+    aliases: [AUX7]
+    annotations: { transfer_var: AUX7, transfer_format: text, transfer_length: 200 }
+  aux8:
+    description: >-
+      To be used when none of the available standard transfer variables are fit for purpose.
+    aliases: [AUX8]
+    annotations: { transfer_var: AUX8, transfer_format: text, transfer_length: 200 }
+  aux9:
+    description: >-
+      To be used when none of the available standard transfer variables are fit for purpose.
+    aliases: [AUX9]
+    annotations: { transfer_var: AUX9, transfer_format: text, transfer_length: 200 }
+  aux10:
+    description: >-
+      To be used when none of the available standard transfer variables are fit for purpose.
+    aliases: [AUX10]
+    annotations: { transfer_var: AUX10, transfer_format: text, transfer_length: 200 }
+  lbvrefid:
+    description: >-
+      External identifier such as lab specimen ID, as per the External Data Providers sample management system
+    aliases: [LBVREFID]
+    annotations: { transfer_var: LBVREFID, transfer_format: text, transfer_length: 200 }
+  ctestcd:
+    description: Populated with the vendor internal test code.
+    aliases: [CTESTCD]
+    annotations: { transfer_var: CTESTCD, transfer_format: text, transfer_length: 200 }
+  ctest:
+    description: Populated with the vendor internal test name.
+    aliases: [CTEST]
+    annotations: { transfer_var: CTEST, transfer_format: text, transfer_length: 200 }
+  cunit:
+    description: Populated with the vendor internal Unit.
+    aliases: [CUNIT]
+    annotations: { transfer_var: CUNIT, transfer_format: text, transfer_length: 200 }
+  cspec:
+    description: Populated with the vendor internal specimen.
+    aliases: [CSPEC]
+    annotations: { transfer_var: CSPEC, transfer_format: text, transfer_length: 200 }
+  cmethod:
+    description: Populated with the vendor internal methodology.
+    aliases: [CMETHOD]
+    annotations: { transfer_var: CMETHOD, transfer_format: text, transfer_length: 200 }
+  cpanel:
+    description: Populated with the vendor internal Panel ID.
+    aliases: [CPANEL]
+    annotations: { transfer_var: CPANEL, transfer_format: text, transfer_length: 200 }
+
+# ──────────────────────────────────────────────────────────────────────────────
+# ENUMS  (subsets of CDISC Controlled Terminology; source: NCI EVS evs-2026-Q1)
+#
+# Bound on the AGREEMENT side only. Payload slots a vendor populates are left as
+# unconstrained strings so a conformant-but-unanticipated file is not rejected at
+# ingest; discrepancies are surfaced by the transform, which compares the payload
+# against the agreement. UnitEnum and LbTestCdEnum are documented reference
+# vocabularies, deliberately not bound to any slot.
+# ──────────────────────────────────────────────────────────────────────────────
+enums:
+
+  # ════════════════════════ AGREEMENT-LAYER ENUMS ════════════════════════
+
+  BcFacetGroupEnum:
+    description: Facet dimension of a BiomedicalConcept classification row.
+    permissible_values:
+      category:        { description: "Test grouping / panel membership (e.g. CBC, CMP, Lipid Panel)." }
+      disease_area:    { description: Clinical / disease area the concept is relevant to. }
+      is_used_by_form: { description: An EDC form that collects this concept. }
+      is_used_by_dta:  { description: A Data Transfer Agreement this concept is in scope for (BC->DTA edge). }
+
+  ProvenanceEnum:
+    description: >-
+      Field-level provenance: the KIND of source a value originated from, kept
+      deliberately app-agnostic. "UI" denotes any human-facing data-entry interface
+      (the specific application is recorded once at the agreement root via app_name,
+      never here), so the vocabulary survives changes of UI tooling.
+    permissible_values:
+      USDM:       { description: Auto-populated from the upstream USDM protocol. }
+      UI:         { description: Entered or edited by a human via a data-entry interface. }
+      USDM + UI:  { description: "Prepopulated from USDM, then human-edited." }
+      Derived:    { description: Computed or defaulted by the agreement generator. }
+
+  OrganizationTypeEnum:
+    description: Type of a party organization. Illustrative subset; extend as needed.
+    permissible_values:
+      Clinical Study Sponsor: { description: Study sponsor organization. }
+      Manufacturer:           { description: Investigational product / device manufacturer. }
+      Laboratory:             { description: Performing / central laboratory. }
+      CRO:                    { description: Contract research organization. }
+      Service Provider:       { description: "Service provider (the GCP term used going forward)." }
+
+  StudyRoleEnum:
+    description: >-
+      Role of an assigned person within their organization, per the DTA MVP Inventory
+      (DTA_Attributes row 14, Signatures section). Maps to USDM AssignedPerson.jobTitle.
+    permissible_values:
+      Data Manager Primary:   { description: Primary data manager for the transfer. }
+      Data Manager Secondary: { description: Secondary / backup data manager. }
+      Statistical Programmer: { description: Statistical programmer. }
+      Vendor Lead:            { description: Lead contact at the data provider. }
+
+  DataExchangeRoleEnum:
+    description: Direction of data exchange for a party.
+    permissible_values:
+      Data Provider:  { description: The party that sends the data (e.g. central lab). }
+      Data Recipient: { description: The party that receives the data (e.g. sponsor). }
+
+  FileFormatEnum:
+    description: Transferred file format.
+    permissible_values:
+      XPT:       { description: SAS Transport (XPORT) file. }
+      SAS 7bdat: { description: SAS dataset (sas7bdat). }
+      CSV:       { description: Comma-separated values. }
+      Text:      { description: Delimited text. }
+      JSON:      { description: JSON. }
+      XLSX:      { description: Excel (OOXML). }
+      XLS:       { description: Excel (legacy). }
+      Parquet:   { description: Apache Parquet. }
+
+  EncodingEnum:
+    description: Character encoding of the transferred file.
+    permissible_values:
+      UTF8:  { description: UTF-8. }
+      ASCII: { description: US-ASCII. }
+
+  DelimiterEnum:
+    description: Field delimiter (where applicable to the file format).
+    permissible_values:
+      Not Applicable: { description: No delimiter (non-delimited format). }
+      Comma:          { description: Comma. }
+      Tab:            { description: Tab. }
+      Pipe:           { description: Pipe (|). }
+      Semicolon:      { description: Semicolon. }
+
+  TransmissionMethodEnum:
+    description: Method by which the file is transmitted.
+    permissible_values:
+      sFTP:          { description: Secure FTP. }
+      Secure Portal: { description: Web secure-transfer portal. }
+      API:           { description: Programmatic API transfer. }
+      Manual:        { description: Manual / out-of-band transfer. }
+
+  TransferModeEnum:
+    description: >-
+      Whether each transmission carries the full dataset or only changes since the
+      last. Distinct from the file-level TransmissionTypeEnum (I/U/D).
+    permissible_values:
+      Cumulative:  { description: Each transfer contains the full cumulative dataset. }
+      Incremental: { description: Each transfer contains only new/changed records. }
+
+  TransferEnvironmentEnum:
+    description: Environment the transfer targets.
+    permissible_values:
+      Development: { description: Development environment. }
+      Test:        { description: Test / validation environment. }
+      Production:  { description: Production environment. }
+
+  BlindingEnum:
+    description: Blinding status of the transferred data.
+    permissible_values:
+      Blinded:           { description: Fully blinded transfer. }
+      Unblinded:         { description: Unblinded transfer. }
+      Partially blinded: { description: Partially blinded transfer. }
+
+  # ════════════════════════ INSTANCE-LAYER ENUM ════════════════════════
+
+  TransmissionTypeEnum:
+    description: File-level transmission type (LAB Tx TRSTYP). Subset; confirm against CDISC CT.
+    permissible_values:
+      I: { description: Initial transmission. }
+      U: { description: Update transmission. }
+      D: { description: Delete transmission. }
+
+  # ════════════════ REFERENCE VOCABULARIES (documented, not bound) ═══════════════
+
+  UnitEnum:
+    description: >-
+      Unit of measure. Subset of CDISC CT codelist UNIT (C71620), source NCI EVS
+      evs-2026-Q1. meaning CURIEs are NCIt C-codes. NOT bound to any slot: agreements
+      legitimately use units outside this subset (mIU/L, ng/mL and pg/mL have all been
+      observed in real transfers), and binding it would reject valid data. Referenced
+      by the `recommended_codelist` annotation on the TestSpecification unit slots.
+    permissible_values:
+      g/dL:    { description: Gram per Deciliter, meaning: ncit:C64783 }
+      g/L:     { description: Gram per Liter (EVS-mapped), meaning: ncit:C42576 }
+      mg/dL:   { description: Milligram per Deciliter, meaning: ncit:C67015 }
+      "10^6/uL": { description: Million per Microliter (no EVS code in cache). }
+      "10^12/L": { description: 10^12 per Liter, meaning: ncit:C67308 }
+      "10^9/L":  { description: Billion per Liter, meaning: ncit:C67255 }
+      "10^3/uL": { description: "Thousand per Microliter (no EVS code in cache)." }
+      "%":     { description: Percentage, meaning: ncit:C25613 }
+      fL:      { description: Femtoliter, meaning: ncit:C64780 }
+      pg:      { description: Picogram, meaning: ncit:C64551 }
+      U/L:     { description: "Enzyme Units per Liter (chemistry; no EVS code in cache)." }
+      mmol/L:  { description: Millimole per Liter, meaning: ncit:C64387 }
+      umol/L:  { description: Micromole per Liter, meaning: ncit:C64389 }
+      ng/dL:   { description: "Nanogram per Deciliter (no EVS code in cache)." }
+
+  LbTestCdEnum:
+    description: >-
+      Hematology subset of CDISC CT codelist LBTESTCD (C65047), source NCI EVS
+      evs-2026-Q1. Used by Dataset Specializations / mappings, not bound to a payload
+      slot (a transfer carries the vendor's code in ctestcd and the standard code in
+      lbtestcd, neither of which is constrained to this subset).
+    permissible_values:
+      HGB:  { description: Hemoglobin Measurement, meaning: ncit:C64848 }
+      RBC:  { description: Erythrocyte Count, meaning: ncit:C51946 }
+      WBC:  { description: Leukocyte Count, meaning: ncit:C51948 }
+      HCT:  { description: Hematocrit Measurement, meaning: ncit:C64796 }
+      PLAT: { description: Platelet Count, meaning: ncit:C51951 }
+      MCV:  { description: Erythrocyte Mean Corpuscular Volume, meaning: ncit:C64799 }
+      MCH:  { description: Erythrocyte Mean Corpuscular Hemoglobin, meaning: ncit:C64797 }
+      MCHC: { description: Erythrocyte Mean Corpuscular Hemoglobin Concentration, meaning: ncit:C64798 }

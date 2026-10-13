@@ -1,0 +1,111 @@
+{
+  "study": {
+    "versions": [
+      {
+        "titles": [
+          {
+            "type": {
+              "decode": "Official Study Title",
+              "code": "C207616"
+            },
+            "text": "A Randomised Study of LZZT"
+          }
+        ],
+        "documentVersionIds": [
+          "v001"
+        ],
+        "biomedicalConcepts": [
+          {
+            "id": "BiomedicalConcept_1",
+            "name": "Systolic Blood Pressure",
+            "reference": "/mdr/bc/biomedicalconcepts/C25298",
+            "extensionAttributes": [
+              {
+                "id": "ExtensionAttribute_1",
+                "url": "http://www.cdisc.org/usdm/extensions/specializations/sdtm",
+                "valueString": "/mdr/specializations/sdtm/datasetspecializations/SYSBP",
+                "instanceType": "ExtensionAttribute"
+              }
+            ],
+            "properties": [
+              {
+                "id": "BiomedicalConceptProperty_1",
+                "name": "VSTESTCD",
+                "responseCodes": [],
+                "code": {
+                  "standardCode": {
+                    "code": "C25298",
+                    "instanceType": "Code"
+                  },
+                  "instanceType": "AliasCode"
+                },
+                "instanceType": "BiomedicalConceptProperty"
+              }
+            ],
+            "instanceType": "BiomedicalConcept"
+          },
+          {
+            "id": "BiomedicalConcept_2",
+            "name": "Informed Consent Obtained",
+            "reference": "/mdr/specializations/sdtm/packages/2023-12-12/datasetspecializations/CONSENT",
+            "extensionAttributes": [],
+            "properties": [
+              {
+                "id": "BiomedicalConceptProperty_2",
+                "name": "DSDECOD",
+                "responseCodes": [],
+                "code": {
+                  "standardCode": {
+                    "code": "C82977",
+                    "instanceType": "Code"
+                  },
+                  "instanceType": "AliasCode"
+                },
+                "instanceType": "BiomedicalConceptProperty"
+              }
+            ],
+            "instanceType": "BiomedicalConcept"
+          }
+        ],
+        "organizations": [],
+        "studyInterventions": [],
+        "administrableProducts": [],
+        "referenceIdentifiers": [],
+        "roles": [],
+        "studyDesigns": [
+          {
+            "studyType": {
+              "code": "C98388",
+              "decode": "Interventional"
+            },
+            "characteristics": [],
+            "eligibilityCriteria": [],
+            "arms": [],
+            "epochs": [],
+            "elements": [],
+            "encounters": [],
+            "objectives": [],
+            "indications": [],
+            "therapeuticAreas": [],
+            "studyInterventionIds": [],
+            "scheduleTimelines": [],
+            "population": {
+              "cohorts": [],
+              "plannedSex": []
+            },
+            "biospecimenRetentions": [],
+            "subTypes": [],
+            "intentTypes": [],
+            "model": {},
+            "timePerspective": {},
+            "samplingMethod": {},
+            "studyPhase": {},
+            "blindingSchema": {}
+          }
+        ]
+      }
+    ],
+    "documentedBy": [],
+    "name": "NCT01797120"
+  }
+}

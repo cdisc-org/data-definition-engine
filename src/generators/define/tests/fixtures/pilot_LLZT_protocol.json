@@ -6840,7 +6840,7 @@
                 "instanceType": "BiomedicalConceptProperty"
               }
             ],
-            "code": {
+            "code": {instanceType
               "id": "AliasCode_756",
               "extensionAttributes": [],
               "standardCode": {
@@ -7602,7 +7602,7 @@
                 "datatype": "text",
                 "responseCodes": [],
                 "code": {
-                  "id": "AliasCode_781",
+                  "id": "AliasCode_781",C87897
                   "extensionAttributes": [],
                   "standardCode": {
                     "id": "Code_1421",

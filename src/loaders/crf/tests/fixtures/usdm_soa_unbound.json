@@ -1,0 +1,231 @@
+{
+  "study": {
+    "name": "PRE0102",
+    "versions": [
+      {
+        "titles": [
+          {
+            "type": {
+              "code": "C207616"
+            },
+            "text": "An Official Study Title"
+          }
+        ],
+        "studyIdentifiers": [
+          {
+            "text": "PRE0102"
+          }
+        ],
+        "biomedicalConcepts": [
+          {
+            "id": "BiomedicalConcept_7",
+            "name": "Systolic Blood Pressure",
+            "reference": "/mdr/bc/biomedicalconcepts/C25298",
+            "extensionAttributes": [
+              {
+                "url": "http://www.cdisc.org/usdm/extensions/specializations/sdtm",
+                "valueString": "/mdr/specializations/sdtm/datasetspecializations/SYSBP"
+              },
+              {
+                "url": "http://www.cdisc.org/usdm/extensions/specializations/crf",
+                "valueString": "/mdr/specializations/crf/specializations/SYSBP_DENORMALIZED"
+              }
+            ],
+            "properties": []
+          },
+          {
+            "id": "BiomedicalConcept_8",
+            "name": "Diastolic Blood Pressure",
+            "reference": "/mdr/bc/biomedicalconcepts/C25299",
+            "extensionAttributes": [
+              {
+                "url": "http://www.cdisc.org/usdm/extensions/specializations/sdtm",
+                "valueString": "/mdr/specializations/sdtm/datasetspecializations/DIABP"
+              }
+            ],
+            "properties": []
+          },
+          {
+            "id": "BiomedicalConcept_9",
+            "name": "Heart Rate",
+            "reference": "/mdr/bc/biomedicalconcepts/C49676",
+            "extensionAttributes": [
+              {
+                "url": "http://www.cdisc.org/usdm/extensions/specializations/sdtm",
+                "valueString": "/mdr/specializations/sdtm/datasetspecializations/HR"
+              }
+            ],
+            "properties": []
+          },
+          {
+            "id": "BiomedicalConcept_99",
+            "name": "Uncovered Concept",
+            "reference": "/mdr/bc/biomedicalconcepts/C999999",
+            "extensionAttributes": [
+              {
+                "url": "http://www.cdisc.org/usdm/extensions/specializations/sdtm",
+                "valueString": "/mdr/specializations/sdtm/datasetspecializations/NOTHING"
+              }
+            ],
+            "properties": []
+          }
+        ],
+        "studyDesigns": [
+          {
+            "id": "StudyDesign_1",
+            "name": "Design1",
+            "epochs": [
+              {
+                "id": "StudyEpoch_1",
+                "name": "Screening"
+              },
+              {
+                "id": "StudyEpoch_2",
+                "name": "Treatment"
+              }
+            ],
+            "activities": [
+              {
+                "id": "Activity_1",
+                "name": "VITAL SIGNS",
+                "label": "Vital Signs",
+                "description": "Collect vital signs",
+                "previousId": null,
+                "nextId": "Activity_2",
+                "childIds": [],
+                "biomedicalConceptIds": [
+                  "BiomedicalConcept_7",
+                  "BiomedicalConcept_8",
+                  "BiomedicalConcept_9"
+                ],
+                "timelineId": null
+              },
+              {
+                "id": "Activity_2",
+                "name": "UNCOVERED ACTIVITY",
+                "label": "Uncovered",
+                "description": "No CRF spec exists",
+                "previousId": "Activity_1",
+                "nextId": null,
+                "childIds": [],
+                "biomedicalConceptIds": [
+                  "BiomedicalConcept_99"
+                ],
+                "timelineId": null
+              }
+            ],
+            "encounters": [
+              {
+                "id": "Encounter_1",
+                "name": "SCREENING",
+                "label": "Screening",
+                "description": "Screening visit",
+                "type": {
+                  "code": "C25716",
+                  "codeSystem": "http://www.cdisc.org",
+                  "decode": "Visit"
+                },
+                "previousId": null,
+                "nextId": "Encounter_2",
+                "scheduledAtId": "Timing_1",
+                "extensionAttributes": []
+              },
+              {
+                "id": "Encounter_2",
+                "name": "C1D1",
+                "label": "Cycle 1 Day 1",
+                "description": "Cycle 1 Day 1 visit",
+                "type": {
+                  "code": "C25716",
+                  "codeSystem": "http://www.cdisc.org",
+                  "decode": "Visit"
+                },
+                "previousId": "Encounter_1",
+                "nextId": "Encounter_3",
+                "scheduledAtId": "Timing_2",
+                "extensionAttributes": []
+              },
+              {
+                "id": "Encounter_3",
+                "name": "C1D15",
+                "label": "Cycle 1 Day 15",
+                "description": "Cycle 1 Day 15 visit",
+                "type": {
+                  "code": "C25716",
+                  "codeSystem": "http://www.cdisc.org",
+                  "decode": "Visit"
+                },
+                "previousId": "Encounter_2",
+                "nextId": null,
+                "scheduledAtId": "Timing_3",
+                "extensionAttributes": []
+              }
+            ],
+            "scheduleTimelines": [
+              {
+                "id": "Timeline_1",
+                "name": "MAIN_TIMELINE",
+                "mainTimeline": true,
+                "instances": [
+                  {
+                    "id": "SAI_1",
+                    "encounterId": "Encounter_1",
+                    "epochId": "StudyEpoch_1",
+                    "activityIds": []
+                  },
+                  {
+                    "id": "SAI_2",
+                    "encounterId": "Encounter_2",
+                    "epochId": "StudyEpoch_2",
+                    "activityIds": []
+                  },
+                  {
+                    "id": "SAI_3",
+                    "encounterId": "Encounter_3",
+                    "epochId": "StudyEpoch_2",
+                    "activityIds": []
+                  }
+                ],
+                "timings": [
+                  {
+                    "id": "Timing_1",
+                    "name": "T1",
+                    "value": "P28D",
+                    "valueLabel": "28 days before",
+                    "type": {
+                      "code": "C201357",
+                      "decode": "Before"
+                    },
+                    "relativeToScheduledInstanceId": "SAI_1"
+                  },
+                  {
+                    "id": "Timing_2",
+                    "name": "T2",
+                    "value": "P0D",
+                    "valueLabel": "Day 1",
+                    "type": {
+                      "code": "C201358",
+                      "decode": "Fixed Reference"
+                    },
+                    "relativeToScheduledInstanceId": "SAI_2"
+                  },
+                  {
+                    "id": "Timing_3",
+                    "name": "T3",
+                    "value": "P14D",
+                    "valueLabel": "Day 15",
+                    "type": {
+                      "code": "C201356",
+                      "decode": "After"
+                    },
+                    "relativeToScheduledInstanceId": "SAI_3"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

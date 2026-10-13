@@ -1,0 +1,495 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Mock DTA transfer payload — CDISC Pilot study H2Q-MC-LZZT
+# Validates against dta.linkml.yaml v0.2.0 (root class: Transmission).
+#
+# Rewritten for v0.2.0: flat TransferRecord list per the DTA MVP Inventory's
+# Data_Structure sheet, replacing the v0.1.0 nested LAB v2 graph.
+#
+# Two subjects at their first collection (E1), each with a HEMATOLOGY and a
+# CHEMISTRY panel, plus two records that exercise specific downstream cases:
+#
+#   * the URINALYSIS record carries lborres "STRAW" — a categorical result. This
+#     is the exact shape that produces the 8,414 "LBSTRESN cast failed" rows in
+#     out/reports/gap_report.md. It is only safe to derive LBSTRESN when the
+#     matching TestSpecification.data_type says the test is numeric.
+#   * the NOT DONE record exercises lbstat / lbreasnd.
+#
+# Validate:
+#   linkml-validate -s dta.linkml.yaml -C Transmission transmission.example.yaml
+# ─────────────────────────────────────────────────────────────────────────────
+
+transfer_structure_version: DTA-MVP-1.0
+igvrsn: SDTMIG 3.4
+fcrdtc: "2025-01-01T00:00:00"
+trssid: CENTRALLAB-001
+trstyp: I
+dta_version_ref: "1.0"
+
+records:
+
+  # ═══════════════════ Subject STUDY-0001 ═══════════════════
+  - studyid: H2Q-MC-LZZT
+    domain: LB
+    usubjid: STUDY-0001
+    subjid: SCR-0001
+    lbgrpid: ACC-0001-V1
+    lbrefid: SPEC-0001-V1-1
+    lbtestcd: HGB
+    lbtest: Hemoglobin
+    lbcat: HEMATOLOGY
+    lborres: "16.98"
+    lborresu: "g/dL"
+    lbnam: Central Laboratory Services
+    lbspec: BLOOD
+    lbmethod: HPLC
+    lbrunid: RUN-2025-0102-A
+    visitnum: 1
+    visit: E1
+    lbdtc: "2025-01-02"
+    lbpanel: HEMATOLOGY
+    ctestcd: HGB
+    ctest: Hemoglobin
+    cunit: "g/dL"
+    cspec: BLOOD
+    cmethod: HPLC
+    cpanel: HEMATOLOGY
+
+  - studyid: H2Q-MC-LZZT
+    domain: LB
+    usubjid: STUDY-0001
+    subjid: SCR-0001
+    lbgrpid: ACC-0001-V1
+    lbrefid: SPEC-0001-V1-2
+    lbtestcd: RBC
+    lbtest: Erythrocytes
+    lbcat: HEMATOLOGY
+    lborres: "5.29"
+    lborresu: "10^6/uL"
+    lbnam: Central Laboratory Services
+    lbspec: BLOOD
+    lbmethod: FLOW CYTOMETRY
+    lbrunid: RUN-2025-0102-A
+    visitnum: 1
+    visit: E1
+    lbdtc: "2025-01-02"
+    lbpanel: HEMATOLOGY
+    ctestcd: RBC
+    ctest: Erythrocytes
+    cunit: "10^6/uL"
+    cspec: BLOOD
+    cmethod: FLOW CYTOMETRY
+    cpanel: HEMATOLOGY
+
+  - studyid: H2Q-MC-LZZT
+    domain: LB
+    usubjid: STUDY-0001
+    subjid: SCR-0001
+    lbgrpid: ACC-0001-V1
+    lbrefid: SPEC-0001-V1-3
+    lbtestcd: WBC
+    lbtest: Leukocytes
+    lbcat: HEMATOLOGY
+    lborres: "7.52"
+    lborresu: "10^9/L"
+    lbnam: Central Laboratory Services
+    lbspec: BLOOD
+    lbmethod: HPLC
+    lbrunid: RUN-2025-0102-A
+    visitnum: 1
+    visit: E1
+    lbdtc: "2025-01-02"
+    lbpanel: Blood Differential
+    ctestcd: WBC
+    ctest: Leukocytes
+    cunit: "10^9/L"
+    cspec: BLOOD
+    cmethod: HPLC
+    cpanel: Blood Differential
+
+  - studyid: H2Q-MC-LZZT
+    domain: LB
+    usubjid: STUDY-0001
+    subjid: SCR-0001
+    lbgrpid: ACC-0001-V1
+    lbrefid: SPEC-0001-V1-4
+    lbtestcd: PLAT
+    lbtest: Platelets
+    lbcat: HEMATOLOGY
+    lborres: "251"
+    lborresu: "10^9/L"
+    lbnam: Central Laboratory Services
+    lbspec: BLOOD
+    lbmethod: HPLC
+    lbrunid: RUN-2025-0102-A
+    visitnum: 1
+    visit: E1
+    lbdtc: "2025-01-02"
+    lbpanel: HEMATOLOGY
+    ctestcd: PLAT
+    ctest: Platelets
+    cunit: "10^9/L"
+    cspec: BLOOD
+    cmethod: HPLC
+    cpanel: HEMATOLOGY
+
+  - studyid: H2Q-MC-LZZT
+    domain: LB
+    usubjid: STUDY-0001
+    subjid: SCR-0001
+    lbgrpid: ACC-0001-V1
+    lbrefid: SPEC-0001-V1-5
+    lbtestcd: GLUC
+    lbtest: Glucose
+    lbcat: CHEMISTRY
+    lborres: "5.4"
+    lborresu: "mmol/L"
+    lbnam: Central Laboratory Services
+    lbspec: SERUM
+    lbmethod: ENZYMATIC
+    lbrunid: RUN-2025-0102-A
+    visitnum: 1
+    visit: E1
+    lbdtc: "2025-01-02"
+    lbpanel: CHEMISTRY
+    ctestcd: GLU
+    ctest: Glucose
+    cunit: "mmol/L"
+    cspec: SERUM
+    cmethod: ENZYMATIC
+    cpanel: CHEMISTRY
+
+  - studyid: H2Q-MC-LZZT
+    domain: LB
+    usubjid: STUDY-0001
+    subjid: SCR-0001
+    lbgrpid: ACC-0001-V1
+    lbrefid: SPEC-0001-V1-6
+    lbtestcd: CREAT
+    lbtest: Creatinine
+    lbcat: CHEMISTRY
+    lborres: "88.4"
+    lborresu: "umol/L"
+    lbnam: Central Laboratory Services
+    lbspec: SERUM
+    lbmethod: ENZYMATIC
+    lbrunid: RUN-2025-0102-A
+    visitnum: 1
+    visit: E1
+    lbdtc: "2025-01-02"
+    lbpanel: CHEMISTRY
+    ctestcd: CRE
+    ctest: Creatinine
+    cunit: "umol/L"
+    cspec: SERUM
+    cmethod: ENZYMATIC
+    cpanel: CHEMISTRY
+
+  - studyid: H2Q-MC-LZZT
+    domain: LB
+    usubjid: STUDY-0001
+    subjid: SCR-0001
+    lbgrpid: ACC-0001-V1
+    lbrefid: SPEC-0001-V1-7
+    lbtestcd: CHOL
+    lbtest: Cholesterol
+    lbcat: CHEMISTRY
+    lborres: "4.91"
+    lborresu: "mmol/L"
+    lbnam: Central Laboratory Services
+    lbspec: SERUM
+    lbmethod: ENZYMATIC
+    lbrunid: RUN-2025-0102-A
+    visitnum: 1
+    visit: E1
+    lbdtc: "2025-01-02"
+    lbpanel: CHEMISTRY
+    ctestcd: CHOL
+    ctest: Cholesterol
+    cunit: "mmol/L"
+    cspec: SERUM
+    cmethod: ENZYMATIC
+    cpanel: CHEMISTRY
+
+  - studyid: H2Q-MC-LZZT
+    domain: LB
+    usubjid: STUDY-0001
+    subjid: SCR-0001
+    lbgrpid: ACC-0001-V1
+    lbrefid: SPEC-0001-V1-8
+    lbtestcd: ALT
+    lbtest: Alanine Aminotransferase
+    lbcat: CHEMISTRY
+    lborres: "22"
+    lborresu: "U/L"
+    lbnam: Central Laboratory Services
+    lbspec: SERUM
+    lbmethod: ENZYMATIC
+    lbrunid: RUN-2025-0102-A
+    visitnum: 1
+    visit: E1
+    lbdtc: "2025-01-02"
+    lbpanel: CHEMISTRY
+    ctestcd: ALT
+    ctest: ALT
+    cunit: "U/L"
+    cspec: SERUM
+    cmethod: ENZYMATIC
+    cpanel: CHEMISTRY
+
+  # ═══════════════════ Subject STUDY-0002 ═══════════════════
+  - studyid: H2Q-MC-LZZT
+    domain: LB
+    usubjid: STUDY-0002
+    subjid: SCR-0002
+    lbgrpid: ACC-0002-V1
+    lbrefid: SPEC-0002-V1-1
+    lbtestcd: HGB
+    lbtest: Hemoglobin
+    lbcat: HEMATOLOGY
+    lborres: "16.98"
+    lborresu: "g/dL"
+    lbnam: Central Laboratory Services
+    lbspec: BLOOD
+    lbmethod: HPLC
+    lbrunid: RUN-2025-0102-A
+    visitnum: 1
+    visit: E1
+    lbdtc: "2025-01-02"
+    lbpanel: HEMATOLOGY
+    ctestcd: HGB
+    ctest: Hemoglobin
+    cunit: "g/dL"
+    cspec: BLOOD
+    cmethod: HPLC
+    cpanel: HEMATOLOGY
+
+  - studyid: H2Q-MC-LZZT
+    domain: LB
+    usubjid: STUDY-0002
+    subjid: SCR-0002
+    lbgrpid: ACC-0002-V1
+    lbrefid: SPEC-0002-V1-2
+    lbtestcd: RBC
+    lbtest: Erythrocytes
+    lbcat: HEMATOLOGY
+    lborres: "5.29"
+    lborresu: "10^6/uL"
+    lbnam: Central Laboratory Services
+    lbspec: BLOOD
+    lbmethod: FLOW CYTOMETRY
+    lbrunid: RUN-2025-0102-A
+    visitnum: 1
+    visit: E1
+    lbdtc: "2025-01-02"
+    lbpanel: HEMATOLOGY
+    ctestcd: RBC
+    ctest: Erythrocytes
+    cunit: "10^6/uL"
+    cspec: BLOOD
+    cmethod: FLOW CYTOMETRY
+    cpanel: HEMATOLOGY
+
+  - studyid: H2Q-MC-LZZT
+    domain: LB
+    usubjid: STUDY-0002
+    subjid: SCR-0002
+    lbgrpid: ACC-0002-V1
+    lbrefid: SPEC-0002-V1-3
+    lbtestcd: WBC
+    lbtest: Leukocytes
+    lbcat: HEMATOLOGY
+    lborres: "7.52"
+    lborresu: "10^9/L"
+    lbnam: Central Laboratory Services
+    lbspec: BLOOD
+    lbmethod: HPLC
+    lbrunid: RUN-2025-0102-A
+    visitnum: 1
+    visit: E1
+    lbdtc: "2025-01-02"
+    lbpanel: Blood Differential
+    ctestcd: WBC
+    ctest: Leukocytes
+    cunit: "10^9/L"
+    cspec: BLOOD
+    cmethod: HPLC
+    cpanel: Blood Differential
+
+  - studyid: H2Q-MC-LZZT
+    domain: LB
+    usubjid: STUDY-0002
+    subjid: SCR-0002
+    lbgrpid: ACC-0002-V1
+    lbrefid: SPEC-0002-V1-4
+    lbtestcd: PLAT
+    lbtest: Platelets
+    lbcat: HEMATOLOGY
+    lborres: "251"
+    lborresu: "10^9/L"
+    lbnam: Central Laboratory Services
+    lbspec: BLOOD
+    lbmethod: HPLC
+    lbrunid: RUN-2025-0102-A
+    visitnum: 1
+    visit: E1
+    lbdtc: "2025-01-02"
+    lbpanel: HEMATOLOGY
+    ctestcd: PLAT
+    ctest: Platelets
+    cunit: "10^9/L"
+    cspec: BLOOD
+    cmethod: HPLC
+    cpanel: HEMATOLOGY
+
+  - studyid: H2Q-MC-LZZT
+    domain: LB
+    usubjid: STUDY-0002
+    subjid: SCR-0002
+    lbgrpid: ACC-0002-V1
+    lbrefid: SPEC-0002-V1-5
+    lbtestcd: GLUC
+    lbtest: Glucose
+    lbcat: CHEMISTRY
+    lborres: "5.4"
+    lborresu: "mmol/L"
+    lbnam: Central Laboratory Services
+    lbspec: SERUM
+    lbmethod: ENZYMATIC
+    lbrunid: RUN-2025-0102-A
+    visitnum: 1
+    visit: E1
+    lbdtc: "2025-01-02"
+    lbpanel: CHEMISTRY
+    ctestcd: GLU
+    ctest: Glucose
+    cunit: "mmol/L"
+    cspec: SERUM
+    cmethod: ENZYMATIC
+    cpanel: CHEMISTRY
+
+  - studyid: H2Q-MC-LZZT
+    domain: LB
+    usubjid: STUDY-0002
+    subjid: SCR-0002
+    lbgrpid: ACC-0002-V1
+    lbrefid: SPEC-0002-V1-6
+    lbtestcd: CREAT
+    lbtest: Creatinine
+    lbcat: CHEMISTRY
+    lborres: "88.4"
+    lborresu: "umol/L"
+    lbnam: Central Laboratory Services
+    lbspec: SERUM
+    lbmethod: ENZYMATIC
+    lbrunid: RUN-2025-0102-A
+    visitnum: 1
+    visit: E1
+    lbdtc: "2025-01-02"
+    lbpanel: CHEMISTRY
+    ctestcd: CRE
+    ctest: Creatinine
+    cunit: "umol/L"
+    cspec: SERUM
+    cmethod: ENZYMATIC
+    cpanel: CHEMISTRY
+
+  - studyid: H2Q-MC-LZZT
+    domain: LB
+    usubjid: STUDY-0002
+    subjid: SCR-0002
+    lbgrpid: ACC-0002-V1
+    lbrefid: SPEC-0002-V1-7
+    lbtestcd: CHOL
+    lbtest: Cholesterol
+    lbcat: CHEMISTRY
+    lborres: "4.91"
+    lborresu: "mmol/L"
+    lbnam: Central Laboratory Services
+    lbspec: SERUM
+    lbmethod: ENZYMATIC
+    lbrunid: RUN-2025-0102-A
+    visitnum: 1
+    visit: E1
+    lbdtc: "2025-01-02"
+    lbpanel: CHEMISTRY
+    ctestcd: CHOL
+    ctest: Cholesterol
+    cunit: "mmol/L"
+    cspec: SERUM
+    cmethod: ENZYMATIC
+    cpanel: CHEMISTRY
+
+  - studyid: H2Q-MC-LZZT
+    domain: LB
+    usubjid: STUDY-0002
+    subjid: SCR-0002
+    lbgrpid: ACC-0002-V1
+    lbrefid: SPEC-0002-V1-8
+    lbtestcd: ALT
+    lbtest: Alanine Aminotransferase
+    lbcat: CHEMISTRY
+    lborres: "22"
+    lborresu: "U/L"
+    lbnam: Central Laboratory Services
+    lbspec: SERUM
+    lbmethod: ENZYMATIC
+    lbrunid: RUN-2025-0102-A
+    visitnum: 1
+    visit: E1
+    lbdtc: "2025-01-02"
+    lbpanel: CHEMISTRY
+    ctestcd: ALT
+    ctest: ALT
+    cunit: "U/L"
+    cspec: SERUM
+    cmethod: ENZYMATIC
+    cpanel: CHEMISTRY
+
+  # ── categorical result: NOT castable to LBSTRESN (see header note) ──
+  - studyid: H2Q-MC-LZZT
+    domain: LB
+    usubjid: STUDY-0001
+    subjid: SCR-0001
+    lbgrpid: ACC-0001-V1
+    lbrefid: SPEC-0001-V1-U1
+    lbtestcd: COLOR
+    lbtest: Color
+    lbcat: URINALYSIS
+    lborres: STRAW
+    lborresu: ""
+    lbrescat: NORMAL
+    lbnam: Central Laboratory Services
+    lbspec: URINE
+    lbmethod: DIPSTICK
+    visitnum: 1
+    visit: E1
+    lbdtc: "2025-01-02"
+    lbpanel: URINALYSIS
+    ctestcd: WBCU
+    ctest: Color Urine
+    cspec: URINE
+    cmethod: DIPSTICK
+    cpanel: URINALYSIS
+
+  # ── test not done ──
+  - studyid: H2Q-MC-LZZT
+    domain: LB
+    usubjid: STUDY-0002
+    subjid: SCR-0002
+    lbgrpid: ACC-0002-V1
+    lbrefid: SPEC-0002-V1-9
+    lbtestcd: HCT
+    lbtest: Hematocrit
+    lbcat: HEMATOLOGY
+    lborres: ""
+    lbstat: NOT DONE
+    lbreasnd: Insufficient sample volume.
+    lbnam: Central Laboratory Services
+    lbspec: BLOOD
+    visitnum: 1
+    visit: E1
+    lbdtc: "2025-01-02"
+    lbpanel: HEMATOLOGY
+    ctestcd: HCT
+    ctest: Hematocrit
+    cpanel: HEMATOLOGY

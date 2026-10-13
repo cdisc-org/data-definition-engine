@@ -1,0 +1,9 @@
+# 0.2.1 is the floor: it is the first release whose odm_2_0 model matches the ODM 2.0
+# XSD (Protocol/StudyEventGroupRef -> StudyEventGroupDef/StudyEventRef, required
+# Standard/@Status and TranslatedText/@Type) and whose to_xml_string() declares
+# namespaces. On 0.2.0 the ODM 2.0 output is not schema-valid.
+odmlib>=0.2.1
+xmlschema>=1.10.0
+pytest>=7.0.0
+# optional: only needed for --html rendering (XSLT 2.0)
+# saxonche>=12.8.0

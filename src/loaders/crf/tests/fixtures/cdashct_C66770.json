@@ -1,0 +1,27 @@
+{
+  "conceptId": "C66770",
+  "submissionValue": "VSRESU",
+  "preferredTerm": "Units for Vital Signs Results",
+  "terms": [
+    {
+      "conceptId": "C49670",
+      "submissionValue": "mmHg",
+      "preferredTerm": "Millimeter of Mercury"
+    },
+    {
+      "conceptId": "C49673",
+      "submissionValue": "BEATS/MIN",
+      "preferredTerm": "Beats per Minute"
+    },
+    {
+      "conceptId": "C42559",
+      "submissionValue": "C",
+      "preferredTerm": "Degree Celsius"
+    },
+    {
+      "conceptId": "C44277",
+      "submissionValue": "F",
+      "preferredTerm": "Degree Fahrenheit"
+    }
+  ]
+}

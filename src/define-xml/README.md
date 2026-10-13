@@ -39,6 +39,10 @@ The script requires a valid CDISC Library API key. Provide it in one of two ways
 
 ---
 
+Usage of a CDISC Library proxy with caching can significantly speed up
+the development and testing process. Use `--base_api_url <http(s)://address:port/api>` to specify the proxy URL and port.
+
+
 ## Usage
 
 Run the script from the `src/define-xml/` directory:
@@ -59,6 +63,7 @@ python create_define_json.py --usdm_file <path> --output_template <path> --sdtmc
 | `--studydesign` | No | `0` | Index of the study design within the USDM file |
 | `--docversion` | No | `0` | Index of the document version within the USDM file |
 | `--cdisc_api_key` | No | env var | CDISC Library API key (overrides `CDISC_API_KEY` env var) |
+| `--base_api_url` | No | — | CDISC Library API base URL (overrides default value of CDISCLibraryClient) |
 | `--cosmosversion` | No | `v2` | CDISC Cosmos API version |
 | `--validate [schema]` | No | `define.yaml` | Validate output against a YAML schema file. If omitted the default `define.yaml` is used. Requires `--validation_report` when specified. |
 | `--validation_report` | Conditional | — | Path to the Excel validation report (required when `--validate` is used) |

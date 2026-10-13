@@ -1,0 +1,59 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Mock SEMANTIC-LAYER instance — Hemoglobin (HGBBLD)
+# Validates against dta.linkml.yaml (root class: DatasetSpecialization).
+#
+# Exercises the linkage layer the other fixtures only reference by id:
+#   DatasetSpecialization -> BiomedicalConcept (incl. faceted `classifications`,
+#   with the is_used_by_dta BC->DTA edge) -> VariableSpecialization rows.
+#
+# Specialization/variable values are the real vendored COSMoS HGBBLD spec
+# (see cosmos/hgbbld.specialization.yaml). The `classifications` facets are
+# illustrative MVP-metadata lookup rows (not COSMoS data).
+#
+# Validate:
+#   linkml-validate -s dta.linkml.yaml -C DatasetSpecialization dataset_specialization.example.yaml
+# ─────────────────────────────────────────────────────────────────────────────
+
+specializationId: HGBBLD
+vlmGroupId: HGBBLD
+domain: LB
+sdtmigStartVersion: "3-2"
+packageDate: "2026-05-26"
+source: "https://github.com/cdisc-org/COSMoS export/cdisc_sdtm_dataset_specializations_latest.csv @ 2026-05-26"
+
+biomedicalConcept:
+  conceptId: C64848
+  conceptName: Hemoglobin Concentration in Blood
+  nciCode: C64848
+  loincCodes: ["718-7", "59260-0"]
+  usdmReference: BiomedicalConcept_152
+  classifications:
+    - { group_name: category,        value: "Hematology Tests" }
+    - { group_name: category,        value: "Complete Blood Count (CBC)" }
+    - { group_name: disease_area,    value: "Anemia" }
+    - { group_name: is_used_by_form, value: "EDC Form Local Lab - Hematology" }
+    - { group_name: is_used_by_dta,  value: "Data Transfer Agreement Central Lab" }
+
+variableSpecializations:
+  - sdtmVariable: LBTESTCD
+    role: Topic
+    assignedValue: HGB
+    codelistCode: C65047
+    codelistName: LBTESTCD
+    mandatoryVariable: true
+    originType: Assigned
+  - sdtmVariable: LBORRESU
+    role: Qualifier
+    decId: C64571
+    codelistCode: C71620
+    codelistName: UNIT
+    valueList: ["g/dL", "g/L", "mg/dL"]
+    dataType: text
+    mandatoryVariable: true
+    originType: Collected
+  - sdtmVariable: LBORRES
+    role: Qualifier
+    decId: C70856
+    dataType: float
+    mandatoryVariable: true
+    originType: Collected

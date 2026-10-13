@@ -1,0 +1,109 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# VENDORED CDISC COSMoS SDTM Dataset Specialization — Hemoglobin (HGBBLD)
+#
+# System of record : cdisc-org/COSMoS
+# Source file       : export/cdisc_sdtm_dataset_specializations_latest.csv
+# Source URL        : https://raw.githubusercontent.com/cdisc-org/COSMoS/main/export/cdisc_sdtm_dataset_specializations_latest.csv
+# COSMoS package_date: 2026-05-26
+# Retrieved         : 2026-06-04
+# Selection         : domain == LB AND vlm_group_id == HGBBLD  (12 rows)
+#
+# This is a faithful copy of the published specialization, restructured into the
+# VariableSpecialization shape of dta.linkml.yaml. Values are NOT invented; every
+# field below traces to a cell in the source CSV. See cosmos/PROVENANCE.md.
+# ─────────────────────────────────────────────────────────────────────────────
+
+specializationId: HGBBLD
+vlmGroupId: HGBBLD
+domain: LB
+sdtmigStartVersion: "3-2"
+packageDate: "2026-05-26"
+source: "https://github.com/cdisc-org/COSMoS export/cdisc_sdtm_dataset_specializations_latest.csv @ 2026-05-26"
+
+biomedicalConcept:
+  conceptId: C64848
+  conceptName: Hemoglobin Concentration in Blood
+  nciCode: C64848
+  loincCodes: ["718-7", "59260-0"]
+  # In the LZZT USDM (pilot_LLZT_protocol.json) the corresponding BC surrogate is
+  # BiomedicalConcept_152 ("Hemoglobin in Blood by Dipstick" family); the canonical
+  # plain-blood concept is COSMoS bc_id C64848.
+  usdmReference: BiomedicalConcept_152
+
+variableSpecializations:
+  - sdtmVariable: LBTESTCD
+    role: Topic
+    assignedValue: HGB
+    codelistCode: C65047
+    codelistName: LBTESTCD
+    mandatoryVariable: true
+    originType: Assigned
+  - sdtmVariable: LBTEST
+    role: Qualifier
+    assignedValue: Hemoglobin
+    codelistCode: C67154
+    codelistName: LBTEST
+    mandatoryVariable: true
+    originType: Assigned
+  - sdtmVariable: LBCAT
+    role: Qualifier
+    assignedValue: HEMATOLOGY
+    mandatoryVariable: true
+  - sdtmVariable: LBORRES
+    role: Qualifier
+    decId: C70856
+    dataType: float
+    mandatoryVariable: true
+    originType: Collected
+  - sdtmVariable: LBORRESU
+    role: Qualifier
+    decId: C64571
+    codelistCode: C71620
+    codelistName: UNIT
+    valueList: ["g/dL", "g/L", "mg/dL"]
+    dataType: text
+    mandatoryVariable: true
+    originType: Collected
+  - sdtmVariable: LBSTRESC
+    role: Qualifier
+    decId: C70856
+    dataType: float
+    mandatoryVariable: true
+    originType: Derived
+  - sdtmVariable: LBSTRESN
+    role: Qualifier
+    decId: C70856
+    dataType: float
+    mandatoryVariable: true
+    originType: Derived
+  - sdtmVariable: LBSTRESU
+    role: Qualifier
+    decId: C64571
+    codelistCode: C71620
+    codelistName: UNIT
+    assignedValue: g/L
+    dataType: text
+    mandatoryVariable: true
+    originType: Assigned
+  - sdtmVariable: LBLOINC
+    role: Qualifier
+    valueList: ["718-7", "59260-0"]
+    mandatoryVariable: false
+  - sdtmVariable: LBSPEC
+    role: Qualifier
+    decId: C70713
+    assignedValue: BLOOD
+    codelistCode: C78734
+    codelistName: SPECTYPE
+    mandatoryVariable: true
+  - sdtmVariable: LBFAST
+    role: Qualifier
+    decId: C93566
+    codelistCode: C66742
+    codelistName: NY
+    valueList: ["N", "Y"]
+    mandatoryVariable: false
+  - sdtmVariable: LBDTC
+    role: Timing
+    decId: C82515
+    mandatoryVariable: true

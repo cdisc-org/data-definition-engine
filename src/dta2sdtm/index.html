@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>dta_automation_mvp_usdm_v1_static_html_demo_v2</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root{
+      --blue:#174ea6; --blue2:#0b57d0; --navy:#10233f; --teal:#00897b;
+      --bg:#f4f7fb; --panel:#ffffff; --muted:#5b667a; --line:#d9e1ee; --gray:#e2e6ec;
+      --good:#0f7b42; --warn:#b26a00; --bad:#b00020;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);font-family:Arial,Helvetica,sans-serif;color:#172033}
+    header{background:linear-gradient(135deg,var(--navy),var(--blue));color:white;padding:26px 34px 22px;box-shadow:0 3px 18px rgba(0,0,0,.18)}
+    header h1{font-size:30px;line-height:1.15;margin:0 0 8px;font-weight:800}
+    header p{margin:0;color:#dce8ff;font-size:15px}
+    .shell{max-width:1320px;margin:0 auto;padding:24px}
+    .topgrid{display:grid;grid-template-columns:1.2fr .8fr;gap:18px}
+    @media(max-width:900px){.topgrid{grid-template-columns:1fr}}
+    .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 5px 18px rgba(22,34,51,.06);margin-bottom:18px}
+    .panel h2{font-size:26px;margin:0 0 12px;color:var(--navy)}
+    .panel h3{font-size:21px;margin:18px 0 10px;color:#1d3354}
+    .subtle{color:var(--muted);font-size:14px}
+    .workflow{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin:14px 0 22px}
+    @media(max-width:1100px){.workflow{grid-template-columns:repeat(3,1fr)}}
+    @media(max-width:680px){.workflow{grid-template-columns:1fr}}
+    .stepbtn{border:0;border-radius:14px;padding:16px 14px;background:#e9eef7;color:#17345e;text-align:left;cursor:pointer;min-height:94px;font-weight:800;font-size:20px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+    .stepbtn span{display:block;font-size:12px;line-height:1.25;margin-top:7px;color:#4c5a70;font-weight:600}
+    .stepbtn.active{background:linear-gradient(135deg,#1769e0,#0d47a1);color:white}
+    .stepbtn.active span{color:#e9f2ff}
+    .section-title{font-size:32px;margin:4px 0 14px;color:#0d2748}
+    .badge{display:inline-block;border-radius:999px;padding:4px 10px;background:#e6f4ea;color:#0f7b42;font-size:12px;font-weight:800;margin-left:8px}
+    .sourcebadge{display:inline-block;border-radius:999px;padding:3px 8px;background:#d9dde4;color:#25364f;font-size:11px;font-weight:800}
+
+    .lockedcell{background:#d8dde5;border:1px solid #b8c2d1;border-radius:10px;padding:10px 11px;font-weight:800;color:#14233a;min-height:41px}
+    .lockedcell small{display:block;margin-top:3px;color:#4a586d;font-size:11px;font-weight:800}
+    .usdmcol{background:#eef2f7}
+    th.usdmcol{background:#0b1f3a !important;color:#ffffff !important;font-size:14px;font-weight:900;border-bottom:2px solid #07152a}
+    th.usdmcol .sourcebadge{background:#ffffff;color:#0b1f3a;border:1px solid #cbd5e1}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    @media(max-width:900px){.grid2,.grid3{grid-template-columns:1fr}}
+    label{font-weight:800;display:block;margin:8px 0 6px;color:#1a2e4d;font-size:15px}
+    input,select,textarea{width:100%;border:1px solid #cbd5e1;border-radius:10px;padding:10px 11px;font-size:15px;background:white;color:#172033}
+    textarea{min-height:82px;resize:vertical}
+    .readonly{background:#d8dde5;border:1px solid #c1c8d4;border-radius:12px;padding:12px;min-height:43px;font-weight:700;color:#18263b}
+    .readonly small{display:block;color:#536173;font-weight:700;margin-top:4px}
+    .small{font-size:13px;color:#5e6a7e}
+    .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+    .checkcard{border:1px solid #d4dcea;border-radius:13px;background:#fbfcff;padding:12px;display:flex;gap:10px;align-items:flex-start}
+    .checkcard input{width:auto;margin-top:4px;transform:scale(1.2)}
+    .checkcard b{display:block;font-size:14px;color:#17345e;margin-bottom:3px}
+    table{width:100%;border-collapse:collapse;background:white;border-radius:12px;overflow:hidden}
+    th{background:#1c365f;color:white;text-align:left;font-size:13px;padding:10px}
+    td{border-bottom:1px solid #e6ebf2;padding:8px;vertical-align:top;font-size:13px}
+    td input,td select{padding:7px 8px;font-size:13px;border-radius:7px}
+    .toolbar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:10px 0}
+    .btn{border:0;border-radius:12px;padding:12px 16px;cursor:pointer;font-weight:800;font-size:15px}
+    .primary{background:var(--blue2);color:white}
+    .secondary{background:#e8eef8;color:#1a3763}
+    .exportbtn{font-size:20px;padding:18px 24px;background:linear-gradient(135deg,#00a86b,#087f5b);color:white;box-shadow:0 5px 16px rgba(0,128,80,.25)}
+    .exportjson{font-size:20px;padding:18px 24px;background:linear-gradient(135deg,#1769e0,#0b57d0);color:white;box-shadow:0 5px 16px rgba(23,105,224,.25)}
+    .danger{background:#fee2e2;color:#991b1b}
+    .notice{border-left:5px solid var(--blue2);background:#eef5ff;padding:12px;border-radius:10px;color:#17345e;margin:10px 0}
+    .warn{border-left-color:#f59e0b;background:#fff7ed;color:#7c3d00}
+    .good{border-left-color:#10b981;background:#ecfdf5;color:#065f46}
+    .preview{background:white;border:1px solid #d8e0ed;border-radius:14px;padding:22px;max-height:700px;overflow:auto;line-height:1.45}
+    .preview h1{font-size:26px;border-bottom:2px solid #1c365f;padding-bottom:6px}
+    .preview h2{font-size:20px;color:#1c365f;margin-top:22px}
+    .preview table{font-size:12px;margin:8px 0 18px}
+    .preview th{background:#e8eef8;color:#172033}
+    .hidden{display:none}
+    .source-controls details{background:#f8fafc;border:1px dashed #c6d2e3;border-radius:12px;padding:12px}
+    .source-controls summary{font-weight:800;cursor:pointer}
+
+    .filtergrid{display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:12px;margin:14px 0}
+    @media(max-width:850px){.filtergrid{grid-template-columns:1fr}}
+    .lookup-count{font-weight:800;color:#1c365f;margin:8px 0 12px}
+    .facet{display:inline-block;background:#edf2fb;color:#17345e;border:1px solid #cbd8ee;border-radius:999px;padding:3px 8px;font-size:11px;margin:3px 4px 0 0}
+    .v2flag{display:inline-block;background:#0f766e;color:white;border-radius:999px;padding:4px 10px;font-size:12px;font-weight:800;margin-left:8px}
+  </style>
+</head>
+<body>
+<header>
+  <h1>DTA Creation from MVP and USDM Version 1.0</h1>
+  <p>Static SharePoint demo v2 · LB biomedical concept lookup enabled · Browser-only workflow · Exports Word-compatible draft and JSON payload</p>
+</header>
+<div class="shell">
+  <div class="panel source-controls">
+    <details>
+      <summary>Source controls for demo data</summary>
+      <p class="subtle">This static HTML version runs fully in the browser. It can load a replacement USDM JSON for demo purposes. Word template parsing is not available in static HTML; use the Streamlit version for true DOCX template handling.</p>
+      <div class="grid3">
+        <div><label>Upload replacement USDM JSON</label><input type="file" id="usdmUpload" accept=".json"></div>
+        <div><label>Upload replacement MVP JSON metadata</label><input type="file" id="mvpUpload" accept=".json"><span class="small">Optional; retained for source-control indication only.</span></div>
+        <div><label>Upload DTA template</label><input type="file" id="templateUpload" accept=".doc,.docx"><span class="small">Captured for audit label only; not parsed in this HTML demo.</span></div>
+      </div>
+      <div id="sourceStatus" class="notice">Using bundled anonymized USDM sample data.</div>
+    </details>
+  </div>
+
+  <div class="workflow">
+    <button class="stepbtn active" data-step="study">① Study Selection<span>Select the USDM study/version and review prepopulated values.</span></button>
+    <button class="stepbtn" data-step="data">② Type of Data<span>Select biomedical concept and data category scope.</span></button>
+    <button class="stepbtn" data-step="parties">③ Parties & Signatures<span>Select responsible parties and add signature details.</span></button>
+    <button class="stepbtn" data-step="transfer">④ Transfer Requirements<span>Complete transfer method, format, folders, and blinding.</span></button>
+    <button class="stepbtn" data-step="mapping">⑤ Visit / Timepoint Mapping<span>Review visit mapping and add timepoints if needed.</span></button>
+    <button class="stepbtn" data-step="export">⑥ Export<span>Preview the DTA and download final outputs.</span></button>
+  </div>
+
+  <main>
+    <section id="study" class="panel screen">
+      <h2 class="section-title">Study Selection <span class="badge">USDM-prepopulated</span></h2>
+      <div class="grid2">
+        <div><label>Study / version from USDM JSON</label><div class="readonly" id="studySelectReadonly"></div></div>
+        <div><label>USDM source summary</label><div class="readonly" id="sourceSummary"></div></div>
+      </div>
+      <h3>Prepopulated USDM output</h3>
+      <div class="grid2">
+        <div><label>Study identifier</label><div class="readonly" id="studyIdentifier"></div></div>
+        <div><label>USDM study version</label><div class="readonly" id="studyVersion"></div></div>
+      </div>
+      <label>Study / protocol title</label>
+      <div class="readonly" id="studyTitle"></div>
+      <label>Study description</label>
+      <div class="readonly" id="studyDescription"></div>
+      <h3>DTA versioning</h3>
+      <div class="grid2">
+        <div><label>DTA version number</label><input id="dtaVersion" value="1.0"></div>
+        <div><label>DTA version date</label><input id="dtaDate" type="date"></div>
+      </div>
+      <div class="toolbar"><button class="btn primary" onclick="goStep('data')">Continue to Type of Data →</button></div>
+    </section>
+
+    <section id="data" class="panel screen hidden">
+      <h2 class="section-title">Type of Data <span class="v2flag">v2: LB lookup layer</span></h2>
+      <p class="notice"><b>Biomedical concept lookup layer:</b> select data types from the uploaded LB lookup structure rather than directly from the Schedule of Activities. Use <b>Group / use-case</b> to filter by <code>group_name</code>, then optionally filter the related <code>value</code> terms.</p>
+      <div class="filtergrid">
+        <div><label>Group / use-case filter</label><select id="bcGroupFilter"><option value="">All group_name values</option></select></div>
+        <div><label>Lookup value filter</label><select id="bcValueFilter"><option value="">All values</option></select></div>
+        <div><label>Keyword search</label><input id="bcSearch" placeholder="Search bc_id, short_name, group_name, or value"></div>
+      </div>
+      <div class="toolbar"><label style="margin:0"><input type="checkbox" id="selectAllData" style="width:auto;transform:scale(1.25);margin-right:8px"> Select all visible LB biomedical concepts</label></div>
+      <div id="dataLookupCount" class="lookup-count"></div>
+      <div id="dataCards" class="cards"></div>
+      <div class="toolbar"><button class="btn secondary" onclick="goStep('study')">← Back</button><button class="btn primary" onclick="goStep('parties')">Continue to Parties & Signatures →</button></div>
+    </section>
+
+    <section id="parties" class="panel screen hidden">
+      <h2 class="section-title">Parties & Signatures</h2>
+      <p class="notice">Select the parties that should be included in the DTA signature table. Nothing is selected by default.</p>
+      <div class="toolbar"><button class="btn secondary" onclick="setAllParties(true)">Select all visible</button><button class="btn secondary" onclick="setAllParties(false)">Clear selections</button></div>
+      <div style="overflow:auto"><table id="partyTable"></table></div>
+      <div class="toolbar"><button class="btn secondary" onclick="goStep('data')">← Back</button><button class="btn primary" onclick="goStep('transfer')">Continue to Transfer Requirements →</button></div>
+    </section>
+
+    <section id="transfer" class="panel screen hidden">
+      <h2 class="section-title">Transfer Requirements</h2>
+      <div class="grid3">
+        <div><label>File name</label><input id="fileName" value="Safety_Lab"></div>
+        <div><label>File format</label><select id="fileFormat"><option>XPT</option><option>SAS 7bdat</option><option>CSV</option><option>Txt</option><option>JSON</option><option>XLSX</option><option>XLS</option><option>Parquet</option></select></div>
+        <div><label>Encoding system</label><select id="encoding"><option>UTF8</option><option>ASCII</option></select></div>
+        <div><label>File delimiter</label><select id="delimiter"><option>Not Applicable</option><option>Comma</option><option>Tab</option><option>Pipe</option><option>Semicolon</option></select></div>
+        <div><label>Transmission method</label><select id="method"><option>sFTP</option><option>Secure Portal</option><option>API</option><option>Manual</option></select></div>
+        <div><label>Transmission type</label><select id="transmissionType"><option>Cumulative</option><option>Incremental</option></select></div>
+        <div><label>Transfer environment</label><select id="environment"><option>Development</option><option>Test</option><option>Production</option></select></div>
+        <div><label>Transfer blinding</label><select id="blinding"><option>Blinded</option><option>Unblinded</option><option>Partially blinded</option></select></div>
+      </div>
+      <div class="grid2">
+        <div><label>Folder name — Data Provider</label><input id="folderProvider"></div>
+        <div><label>Folder name — Data Recipient</label><input id="folderRecipient"></div>
+      </div>
+      <div class="toolbar"><button class="btn secondary" onclick="goStep('parties')">← Back</button><button class="btn primary" onclick="goStep('mapping')">Continue to Visit / Timepoint Mapping →</button></div>
+    </section>
+
+    <section id="mapping" class="panel screen hidden">
+      <h2 class="section-title">Visit / Timepoint Mapping</h2>
+      <h3>Visit Mapping <span class="badge">USDM + UI</span></h3>
+      <p class="notice">Protocol Visit Number and Protocol Visit Name are prepopulated from USDM and locked. Enter only the Data Provider visit mapping values.</p>
+      <div style="overflow:auto"><table id="visitTable"></table></div>
+      <h3>Timepoint Mapping</h3>
+      <p class="subtle">Leave all timepoint rows blank to omit this section from the generated DTA.</p>
+      <div class="toolbar"><button class="btn secondary" onclick="addTimepoint()">Add timepoint row</button><button class="btn danger" onclick="clearTimepoints()">Clear timepoints</button></div>
+      <div style="overflow:auto"><table id="timepointTable"></table></div>
+      <div class="toolbar"><button class="btn secondary" onclick="goStep('transfer')">← Back</button><button class="btn primary" onclick="goStep('export')">Continue to Export →</button></div>
+    </section>
+
+    <section id="export" class="panel screen hidden">
+      <h2 class="section-title">Export</h2>
+      <div id="checklist"></div>
+      <h3>DTA preview</h3>
+      <p class="subtle">This preview shows what will be exported. In the static HTML demo, the Word draft is exported as a Word-compatible HTML document.</p>
+      <div id="preview" class="preview"></div>
+      <div class="toolbar">
+        <button class="btn exportbtn" onclick="downloadDoc()">Download DTA draft</button>
+        <button class="btn exportjson" onclick="downloadJson()">Download JSON payload</button>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+const BUNDLED = {"study": {"study_name": "NCT01797120", "study_identifier": "NCT01797120", "study_title": "Study of Fulvestrant +/​- Everolimus in Post-Menopausal, Hormone-Receptor + Metastatic Breast Ca Resistant to AI (PrE0102)", "version_identifier": "1", "version_id": "StudyVersion_1", "design_id": "InterventionalStudyDesign_1", "description": "Post-menopausal women with hormone-receptor positive (HR+) metastatic breast cancer resistant to aromatase inhibitor (AI) therapy will be randomized to receive Fulvestrant (Faslodex) with Everolimus or Fulvestrant (Faslodex) with a placebo (no active ingredients).\r\n\r\nFulvestrant has demonstrated activity when used as first, second, or third line endocrine therapy, making it an attractive therapy for combination with other agents. In addition, it is commonly reserved for use following disease progression on AI therapy.\r\n\r\nEverolimus is an orally administered drug that blocks a signaling pathway called \"mTOR\". \"mTOR\" acts as a regulator for many processes in the body, including cell growth. Blocking this pathway may have an effect on cell growth.\r\n\r\nThe combination of a novel class of agents (mTOR inhibitors) and an established standard treatment for metastatic HR+ breast cancer may potentially increase the clinical benefit by targeting multiple different biological pathways.", "summary": {"organizations": 3, "roles": 12, "assigned_persons": 9, "encounters": 8, "biomedical_concepts": 50, "bc_surrogates": 14}}, "dataTypes": ["PT with INR", "Urinalysis Labs", "CBC with differentials, Platelets", "Serum Creatinine, Electrolytes (K, Na, Cl, CO2), Ca, BUN, Albumin, Total Protein, Phosphorus, AST (SGOT), ALT (SGPT), Alkaline Phosphatase, Total Bilirubin, Magnesium, Uric Acid.", "Fasting Glucose", "Fasting serum Lipid Profile (triglycerides, total cholesterol, HDL and LDL)", "HBV-DNA, HbsAg, HBsAb, HBcAb, HCV- RNA-PCR", "HBV DNA", "HCV RNA-PCR", "Total Bilirubin Measurement", "Creatinine Measurement", "Albumin Measurement", "Glucose Measurement", "Cholesterol Measurement", "High Density Lipoprotein Cholesterol Measurement", "Low Density Lipoprotein Cholesterol Measurement", "Leukocyte Count", "Platelet Count", "Magnesium Measurement (C64840)", "Hepatitis B DNA Measurement (C103404)", "Hepatitis B Virus Surface Antigen Measurement (C64850)", "Hepatitis B Surface Antibody Positive (C153243)", "Hepatitis B Surface Antibody Negative (C153244)", "HCV RNA Positive (C162042)", "Pulmonary function tests (PFTs) that include DLCO (Diffusing Capacity of the Lungs for Carbon Monoxide) (C38081)", "Dietary Phosphorus Measurement (C184481)", "Adherence (C25729)", "Patient Compliance (C39490)", "Compliance Monitoring (C62737)", "Non-Compliance With Study Drug (C49631)"], "parties": [{"id": "StudyRole_1_Organization_1", "name": "", "role": "Clinical Study Sponsor", "organization": "PrECOG, LLC", "organization_type": "Clinical Study Sponsor", "data_exchange_role": "Data Recipient", "email": "", "signature_date": "", "source": "USDM + UI"}, {"id": "StudyRole_2_Person_1", "name": "Noah Kornblum", "role": "Study Chair", "organization": "PrECOG, LLC", "organization_type": "Clinical Study Sponsor", "data_exchange_role": "Data Recipient", "email": "", "signature_date": "", "source": "USDM + UI"}, {"id": "StudyRole_3_Person_2", "name": "Joseph A. Sparano", "role": "Study Co-Chair", "organization": "PrECOG, LLC", "organization_type": "Clinical Study Sponsor", "data_exchange_role": "Data Recipient", "email": "", "signature_date": "", "source": "USDM + UI"}, {"id": "StudyRole_4_Person_3", "name": "Katherine M. Smith", "role": "Medical Monitor", "organization": "PrECOG, LLC", "organization_type": "Clinical Study Sponsor", "data_exchange_role": "Data Recipient", "email": "", "signature_date": "", "source": "USDM + UI"}, {"id": "StudyRole_5_Person_4", "name": "Judi Manola", "role": "Study Statistician", "organization": "PrECOG, LLC", "organization_type": "Clinical Study Sponsor", "data_exchange_role": "Data Recipient", "email": "", "signature_date": "", "source": "USDM + UI"}, {"id": "StudyRole_6_Person_5", "name": "Carolyn Andrews", "role": "PrECOG Study Contact", "organization": "PrECOG, LLC", "organization_type": "Clinical Study Sponsor", "data_exchange_role": "Data Recipient", "email": "", "signature_date": "", "source": "USDM + UI"}, {"id": "StudyRole_7_Organization_2", "name": "", "role": "Investigational Product Manufacturer", "organization": "Novartis Pharmaceuticals Corporation", "organization_type": "Manufacturer", "data_exchange_role": "Data Recipient", "email": "", "signature_date": "", "source": "USDM + UI"}, {"id": "StudyRole_8_Organization_2", "name": "", "role": "Pharmacovigilance Group", "organization": "Novartis Pharmaceuticals Corporation", "organization_type": "Manufacturer", "data_exchange_role": "Data Recipient", "email": "", "signature_date": "", "source": "USDM + UI"}, {"id": "StudyRole_9_Person_6", "name": "Jane Sample", "role": "Primary Data Manager", "organization": "PrECOG, LLC", "organization_type": "Clinical Study Sponsor", "data_exchange_role": "Data Recipient", "email": "", "signature_date": "", "source": "USDM + UI"}, {"id": "StudyRole_10_Person_7", "name": "Max Muller", "role": "Secondary Data Manager", "organization": "PrECOG, LLC", "organization_type": "Clinical Study Sponsor", "data_exchange_role": "Data Recipient", "email": "", "signature_date": "", "source": "USDM + UI"}, {"id": "StudyRole_11_Person_8", "name": "Mary Smith", "role": "Data Acquisition Lead", "organization": "VendorLab1", "organization_type": "Laboratory", "data_exchange_role": "Data Provider", "email": "", "signature_date": "", "source": "USDM + UI"}, {"id": "StudyRole_12_Person_9", "name": "Susan Johnson", "role": "Data Acquisition Lead", "organization": "VendorLab1", "organization_type": "Laboratory", "data_exchange_role": "Data Provider", "email": "", "signature_date": "", "source": "USDM + UI"}], "encounters": [{"protocol_visit_number": "PRE-STUDY", "protocol_visit_name": "Pre-Study", "data_provider_visit_number": "01", "data_provider_visit_name": "PRESTUDY"}, {"protocol_visit_number": "C1D1", "protocol_visit_name": "Cycle 1 Day 1", "data_provider_visit_number": "02", "data_provider_visit_name": "C1D1"}, {"protocol_visit_number": "C1D15", "protocol_visit_name": "Cycle 1 Day 15", "data_provider_visit_number": "03", "data_provider_visit_name": "C1D15"}, {"protocol_visit_number": "CXD1", "protocol_visit_name": "Next Cycle Day 1", "data_provider_visit_number": "04", "data_provider_visit_name": "CXD1"}, {"protocol_visit_number": "P12W", "protocol_visit_name": "Every 12 Weeks", "data_provider_visit_number": "05", "data_provider_visit_name": "P12W"}, {"protocol_visit_number": "EOT", "protocol_visit_name": "End of Treatment", "data_provider_visit_number": "06", "data_provider_visit_name": "EOT"}, {"protocol_visit_number": "CPHASE", "protocol_visit_name": "Continuation Phase", "data_provider_visit_number": "07", "data_provider_visit_name": "CPHASE"}, {"protocol_visit_number": "FU", "protocol_visit_name": "Follow-Up", "data_provider_visit_number": "08", "data_provider_visit_name": "FU"}], "bcLookup": [{"bc_id": "C51948", "short_name": "Leukocyte Count", "group_name": "category", "value": "Laboratory Tests"}, {"bc_id": "C51948", "short_name": "Leukocyte Count", "group_name": "category", "value": "Hematology Tests"}, {"bc_id": "C51948", "short_name": "Leukocyte Count", "group_name": "category", "value": "Blood Cell Counts"}, {"bc_id": "C51948", "short_name": "Leukocyte Count", "group_name": "category", "value": "Complete Blood Count (CBC)"}, {"bc_id": "C51948", "short_name": "Leukocyte Count", "group_name": "disease_area", "value": "Infection"}, {"bc_id": "C51948", "short_name": "Leukocyte Count", "group_name": "disease_area", "value": "Leukemia"}, {"bc_id": "C51948", "short_name": "Leukocyte Count", "group_name": "disease_area", "value": "Bone Marrow Disorders"}, {"bc_id": "C51948", "short_name": "Leukocyte Count", "group_name": "is_used_by_form", "value": "EDC Form Local Lab - Hematology"}, {"bc_id": "C51948", "short_name": "Leukocyte Count", "group_name": "is_used_by_dta", "value": "Data Transfer Agreement Central Lab"}, {"bc_id": "C64470", "short_name": "Absolute Basophil Count", "group_name": "category", "value": "Laboratory Tests"}, {"bc_id": "C64470", "short_name": "Absolute Basophil Count", "group_name": "category", "value": "Hematology Tests"}, {"bc_id": "C64470", "short_name": "Absolute Basophil Count", "group_name": "category", "value": "Blood Cell Counts"}, {"bc_id": "C64470", "short_name": "Absolute Basophil Count", "group_name": "category", "value": "White Blood Cell Counts"}, {"bc_id": "C64470", "short_name": "Absolute Basophil Count", "group_name": "category", "value": "Complete Blood Count (CBC)"}, {"bc_id": "C64470", "short_name": "Absolute Basophil Count", "group_name": "category", "value": "Complete Blood Count (CBC) with Differential"}, {"bc_id": "C64470", "short_name": "Absolute Basophil Count", "group_name": "disease_area", "value": "Hematologic Disorders"}, {"bc_id": "C64470", "short_name": "Absolute Basophil Count", "group_name": "is_used_by_form", "value": "EDC Form Local Lab - Hematology"}, {"bc_id": "C64470", "short_name": "Absolute Basophil Count", "group_name": "is_used_by_dta", "value": "Data Transfer Agreement Central Lab"}, {"bc_id": "C51946", "short_name": "Erythrocyte Count", "group_name": "category", "value": "Laboratory Tests"}, {"bc_id": "C51946", "short_name": "Erythrocyte Count", "group_name": "category", "value": "Hematology Tests"}, {"bc_id": "C51946", "short_name": "Erythrocyte Count", "group_name": "category", "value": "Blood Cell Counts"}, {"bc_id": "C51946", "short_name": "Erythrocyte Count", "group_name": "category", "value": "Complete Blood Count (CBC)"}, {"bc_id": "C51946", "short_name": "Erythrocyte Count", "group_name": "disease_area", "value": "Bone Marrow Disorders"}, {"bc_id": "C51946", "short_name": "Erythrocyte Count", "group_name": "is_used_by_form", "value": "EDC Form Local Lab - Hematology"}, {"bc_id": "C51946", "short_name": "Erythrocyte Count", "group_name": "is_used_by_dta", "value": "Data Transfer Agreement Central Lab"}, {"bc_id": "C64488", "short_name": "Calcium Measurement", "group_name": "category", "value": "Laboratory Tests"}, {"bc_id": "C64488", "short_name": "Calcium Measurement", "group_name": "category", "value": "Chemistry Tests"}, {"bc_id": "C64488", "short_name": "Calcium Measurement", "group_name": "category", "value": "Comprehensive Metabolic Panel (CMP)"}, {"bc_id": "C64488", "short_name": "Calcium Measurement", "group_name": "category", "value": "Basic Netabolic Panel (BMP)"}, {"bc_id": "C64488", "short_name": "Calcium Measurement", "group_name": "disease_area", "value": "Parathyroid dysfunction"}, {"bc_id": "C64488", "short_name": "Calcium Measurement", "group_name": "disease_area", "value": "Vitamin D Deficiency"}, {"bc_id": "C64488", "short_name": "Calcium Measurement", "group_name": "is_used_by_form", "value": "EDC Form Local Lab - Chemistry"}, {"bc_id": "C64488", "short_name": "Calcium Measurement", "group_name": "is_used_by_dta", "value": "Data Transfer Agreement Central Lab"}, {"bc_id": "C105586", "short_name": "Cholesterol Measurement", "group_name": "category", "value": "Laboratory Tests"}, {"bc_id": "C105586", "short_name": "Cholesterol Measurement", "group_name": "category", "value": "Chemistry Tests"}, {"bc_id": "C105586", "short_name": "Cholesterol Measurement", "group_name": "category", "value": "Lipid Measurements"}, {"bc_id": "C105586", "short_name": "Cholesterol Measurement", "group_name": "category", "value": "Lipid Panel"}, {"bc_id": "C105586", "short_name": "Cholesterol Measurement", "group_name": "disease_area", "value": "Atherosclerosis"}, {"bc_id": "C105586", "short_name": "Cholesterol Measurement", "group_name": "is_used_by_form", "value": "EDC Form Local Lab - Chemistry"}, {"bc_id": "C105586", "short_name": "Cholesterol Measurement", "group_name": "is_used_by_dta", "value": "Data Transfer Agreement Central Lab"}, {"bc_id": "C64432", "short_name": "Alkaline Phosphatase Measurement", "group_name": "category", "value": "Laboratory Tests"}, {"bc_id": "C64432", "short_name": "Alkaline Phosphatase Measurement", "group_name": "category", "value": "Chemistry Tests"}, {"bc_id": "C64432", "short_name": "Alkaline Phosphatase Measurement", "group_name": "category", "value": "Lipid Measurements"}, {"bc_id": "C64432", "short_name": "Alkaline Phosphatase Measurement", "group_name": "category", "value": "Comprehensive Metabolic Panel (CMP)"}, {"bc_id": "C64432", "short_name": "Alkaline Phosphatase Measurement", "group_name": "category", "value": "Lipid Panel"}, {"bc_id": "C64432", "short_name": "Alkaline Phosphatase Measurement", "group_name": "category", "value": "Liver Function Panel"}, {"bc_id": "C64432", "short_name": "Alkaline Phosphatase Measurement", "group_name": "category", "value": "Drug-Induced Liver Injury Panel (DILI)"}, {"bc_id": "C64432", "short_name": "Alkaline Phosphatase Measurement", "group_name": "disease_area", "value": "Liver Disease"}, {"bc_id": "C64432", "short_name": "Alkaline Phosphatase Measurement", "group_name": "is_used_by_form", "value": "EDC Form Local Lab - Chemistry"}, {"bc_id": "C64432", "short_name": "Alkaline Phosphatase Measurement", "group_name": "is_used_by_dta", "value": "Data Transfer Agreement Central Lab"}, {"bc_id": "C62656", "short_name": "Prothrombin Time", "group_name": "category", "value": "Laboratory Tests"}, {"bc_id": "C62656", "short_name": "Prothrombin Time", "group_name": "category", "value": "Hematology Tests"}, {"bc_id": "C62656", "short_name": "Prothrombin Time", "group_name": "category", "value": "Coagulation Study Tests"}, {"bc_id": "C62656", "short_name": "Prothrombin Time", "group_name": "category", "value": "Coagulation Panel"}, {"bc_id": "C62656", "short_name": "Prothrombin Time", "group_name": "category", "value": "Liver Function Panel"}, {"bc_id": "C62656", "short_name": "Prothrombin Time", "group_name": "category", "value": "Drug-Induced Liver Injury Panel (DILI)"}, {"bc_id": "C62656", "short_name": "Prothrombin Time", "group_name": "disease_area", "value": "Liver Disease"}, {"bc_id": "C62656", "short_name": "Prothrombin Time", "group_name": "disease_area", "value": "Bleeding Disorders"}, {"bc_id": "C62656", "short_name": "Prothrombin Time", "group_name": "is_used_by_form", "value": "EDC Form Local Lab - Chemistry"}, {"bc_id": "C62656", "short_name": "Prothrombin Time", "group_name": "is_used_by_dta", "value": "Data Transfer Agreement Central Lab"}, {"bc_id": "C64832", "short_name": "Specific Gravity", "group_name": "category", "value": "Laboratory Tests"}, {"bc_id": "C64832", "short_name": "Specific Gravity", "group_name": "category", "value": "Urinalysis"}, {"bc_id": "C64832", "short_name": "Specific Gravity", "group_name": "category", "value": "Urinalysis Panel"}, {"bc_id": "C64832", "short_name": "Specific Gravity", "group_name": "disease_area", "value": "Diabetes Insipidus"}, {"bc_id": "C64833", "short_name": "Specific Gravity", "group_name": "is_used_by_form", "value": "EDC Form Local Lab - Urinalysis"}, {"bc_id": "C64834", "short_name": "Specific Gravity", "group_name": "is_used_by_dta", "value": "Data Transfer Agreement Central Lab"}]};
+let appData = structuredClone(BUNDLED);
+let state = {
+  dataSelected: [],
+  parties: {},
+  visits: [],
+  timepoints: [],
+  source: {usdm:"Bundled anonymized USDM sample", mvp:"Bundled filtered MVP metadata", template:"No template parsed in static demo"}
+};
+
+function todayISO(){return new Date().toISOString().slice(0,10)}
+function escapeHtml(s){return String(s??"").replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));}
+function initState(){
+  state.dataSelected = [];
+  state.parties = {};
+  appData.parties.forEach((p,i)=>state.parties[p.id || i]={include:false, email:p.email||"", signature_date:""});
+  state.visits = structuredClone(appData.encounters||[]);
+  if(!document.getElementById("dtaDate").value) document.getElementById("dtaDate").value = todayISO();
+  populateBcFilters();
+  renderAll();
+}
+function bcConcepts(){
+  const rows = appData.bcLookup || [];
+  if(!rows.length){
+    return (appData.dataTypes||[]).map((name,i)=>({key:"legacy_"+i, bc_id:"", short_name:name, facets:[], search:name}));
+  }
+  const map = new Map();
+  rows.forEach(r=>{
+    const key = `${r.bc_id}||${r.short_name}`;
+    if(!map.has(key)) map.set(key,{key, bc_id:r.bc_id, short_name:r.short_name, facets:[]});
+    if(r.group_name || r.value) map.get(key).facets.push({group_name:r.group_name, value:r.value});
+  });
+  return Array.from(map.values()).map(c=>{
+    c.search = [c.bc_id,c.short_name,...c.facets.flatMap(f=>[f.group_name,f.value])].join(" ").toLowerCase();
+    return c;
+  });
+}
+function selectedBcDetails(){
+  const lookup = new Map(bcConcepts().map(c=>[c.key,c]));
+  return state.dataSelected.map(k=>lookup.get(k)).filter(Boolean);
+}
+function selectedDataLabels(){
+  return selectedBcDetails().map(c=>c.bc_id ? `${c.short_name} (${c.bc_id})` : c.short_name);
+}
+function populateBcFilters(){
+  const rows=appData.bcLookup||[];
+  const groupSelect=document.getElementById("bcGroupFilter");
+  const valueSelect=document.getElementById("bcValueFilter");
+  if(!groupSelect || !valueSelect) return;
+  const currentGroup=groupSelect.value||"";
+  const groups=[...new Set(rows.map(r=>r.group_name).filter(Boolean))].sort();
+  groupSelect.innerHTML='<option value="">All group_name values</option>'+groups.map(g=>`<option value="${escapeHtml(g)}">${escapeHtml(g)}</option>`).join("");
+  if(groups.includes(currentGroup)) groupSelect.value=currentGroup;
+  updateValueFilter();
+}
+function updateValueFilter(){
+  const rows=appData.bcLookup||[];
+  const group=document.getElementById("bcGroupFilter")?.value||"";
+  const valueSelect=document.getElementById("bcValueFilter");
+  if(!valueSelect) return;
+  const current=valueSelect.value||"";
+  const values=[...new Set(rows.filter(r=>!group || r.group_name===group).map(r=>r.value).filter(Boolean))].sort();
+  valueSelect.innerHTML='<option value="">All values</option>'+values.map(v=>`<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join("");
+  if(values.includes(current)) valueSelect.value=current;
+}
+function filteredBcConcepts(){
+  const group=document.getElementById("bcGroupFilter")?.value||"";
+  const value=document.getElementById("bcValueFilter")?.value||"";
+  const q=(document.getElementById("bcSearch")?.value||"").trim().toLowerCase();
+  return bcConcepts().filter(c=>{
+    const facetMatch = (!group && !value) || c.facets.some(f=>(!group || f.group_name===group) && (!value || f.value===value));
+    const searchMatch = !q || c.search.includes(q);
+    return facetMatch && searchMatch;
+  });
+}
+function renderAll(){
+  const s=appData.study;
+  document.getElementById("studySelectReadonly").innerHTML = `${escapeHtml(s.study_name)} / ${escapeHtml(s.version_id)}<small>Source: USDM JSON</small>`;
+  document.getElementById("sourceSummary").innerHTML = `Organizations: ${s.summary.organizations}<br>Roles: ${s.summary.roles}<br>Assigned persons: ${s.summary.assigned_persons}<br>Encounters: ${s.summary.encounters}<br>Biomedical concepts: ${s.summary.biomedical_concepts}<br>LB lookup rows: ${(appData.bcLookup||[]).length}`;
+  document.getElementById("studyIdentifier").innerHTML = `${escapeHtml(s.study_identifier)}<small>Source: StudyIdentifier</small>`;
+  document.getElementById("studyVersion").innerHTML = `${escapeHtml(s.version_identifier || s.version_id)}<small>Source: StudyVersion</small>`;
+  document.getElementById("studyTitle").innerHTML = `${escapeHtml(s.study_title)}<small>Source: StudyDesign.name / Study.title</small>`;
+  document.getElementById("studyDescription").innerHTML = `${escapeHtml(s.description || "").slice(0,1200)}${(s.description||"").length>1200?"…":""}<small>Source: Study.description</small>`;
+  renderDataCards(); renderPartyTable(); renderVisitTable(); renderTimepointTable(); renderExport();
+}
+function renderDataCards(){
+  const container=document.getElementById("dataCards"); container.innerHTML="";
+  const visible=filteredBcConcepts();
+  document.getElementById("dataLookupCount").textContent = `Showing ${visible.length} of ${bcConcepts().length} LB biomedical concepts. Selected: ${state.dataSelected.length}.`;
+  visible.forEach(c=>{
+    const checked=state.dataSelected.includes(c.key);
+    const facetHtml=(c.facets||[]).slice(0,8).map(f=>`<span class="facet">${escapeHtml(f.group_name)}: ${escapeHtml(f.value)}</span>`).join("");
+    const more=(c.facets||[]).length>8 ? `<span class="facet">+${(c.facets||[]).length-8} more</span>` : "";
+    const div=document.createElement("label"); div.className="checkcard";
+    div.innerHTML=`<input type="checkbox" ${checked?'checked':''} onchange="toggleDataKey('${encodeURIComponent(c.key)}', this.checked)"><span><b>${escapeHtml(c.short_name)} ${c.bc_id?`<span class="sourcebadge">${escapeHtml(c.bc_id)}</span>`:""}</b><span class="sourcebadge">LB lookup</span><div>${facetHtml}${more}</div></span>`;
+    container.appendChild(div);
+  });
+  document.getElementById("selectAllData").checked = visible.length>0 && visible.every(c=>state.dataSelected.includes(c.key));
+}
+function toggleDataKey(encoded, checked){
+  const key=decodeURIComponent(encoded);
+  if(checked && !state.dataSelected.includes(key)) state.dataSelected.push(key);
+  if(!checked) state.dataSelected=state.dataSelected.filter(x=>x!==key);
+  renderDataCards(); renderExport();
+}
+document.getElementById("selectAllData").addEventListener("change", e=>{
+  const visible=filteredBcConcepts().map(c=>c.key);
+  if(e.target.checked){
+    visible.forEach(k=>{if(!state.dataSelected.includes(k)) state.dataSelected.push(k);});
+  } else {
+    state.dataSelected=state.dataSelected.filter(k=>!visible.includes(k));
+  }
+  renderDataCards(); renderExport();
+});
+["bcGroupFilter","bcValueFilter","bcSearch"].forEach(id=>{
+  document.getElementById(id)?.addEventListener("input", ()=>{
+    if(id==="bcGroupFilter") updateValueFilter();
+    renderDataCards(); renderExport();
+  });
+  document.getElementById(id)?.addEventListener("change", ()=>{
+    if(id==="bcGroupFilter") updateValueFilter();
+    renderDataCards(); renderExport();
+  });
+});
+function renderPartyTable(){
+  const tbl=document.getElementById("partyTable");
+  tbl.innerHTML=`<thead><tr><th>Include</th><th>Name</th><th>Role</th><th>Organization</th><th>Organization Type</th><th>Data Exchange Role</th><th>Email</th><th>Signature Date</th></tr></thead><tbody></tbody>`;
+  const body=tbl.querySelector("tbody");
+  appData.parties.forEach((p,i)=>{
+    const key=p.id||String(i), ps=state.parties[key]||{include:false,email:"",signature_date:""};
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td><input type="checkbox" ${ps.include?'checked':''} onchange="state.parties['${key}'].include=this.checked;renderExport()"></td>
+      <td>${escapeHtml(p.name)}</td><td>${escapeHtml(p.role)}</td><td>${escapeHtml(p.organization)}</td><td>${escapeHtml(p.organization_type)}</td><td>${escapeHtml(p.data_exchange_role)}</td>
+      <td><input value="${escapeHtml(ps.email)}" oninput="state.parties['${key}'].email=this.value;renderExport()"></td>
+      <td><input type="date" value="${escapeHtml(ps.signature_date)}" oninput="state.parties['${key}'].signature_date=this.value;renderExport()"></td>`;
+    body.appendChild(tr);
+  });
+}
+function setAllParties(v){Object.keys(state.parties).forEach(k=>state.parties[k].include=v); renderPartyTable(); renderExport();}
+function renderVisitTable(){
+  const tbl=document.getElementById("visitTable");
+  tbl.innerHTML=`<thead><tr><th class="usdmcol">Protocol Visit Number<br><span class="sourcebadge">USDM locked</span></th><th class="usdmcol">Protocol Visit Name<br><span class="sourcebadge">USDM locked</span></th><th>Data Provider Visit Number<br><span class="sourcebadge">User input</span></th><th>Data Provider Visit Name<br><span class="sourcebadge">User input</span></th></tr></thead><tbody></tbody>`;
+  const body=tbl.querySelector("tbody");
+  state.visits.forEach((v,i)=>{
+    const tr=document.createElement("tr");
+    const protocolNumber=document.createElement("td");
+    protocolNumber.className="usdmcol";
+    protocolNumber.innerHTML=`<div class="lockedcell">${escapeHtml(v.protocol_visit_number || "")}<small>Prepopulated from USDM</small></div>`;
+    tr.appendChild(protocolNumber);
+
+    const protocolName=document.createElement("td");
+    protocolName.className="usdmcol";
+    protocolName.innerHTML=`<div class="lockedcell">${escapeHtml(v.protocol_visit_name || "")}<small>Prepopulated from USDM</small></div>`;
+    tr.appendChild(protocolName);
+
+    const providerNumber=document.createElement("td");
+    providerNumber.innerHTML=`<input value="${escapeHtml(v.data_provider_visit_number || "")}" placeholder="Enter provider visit number" oninput="state.visits[${i}].data_provider_visit_number=this.value;renderExport()">`;
+    tr.appendChild(providerNumber);
+
+    const providerName=document.createElement("td");
+    providerName.innerHTML=`<input value="${escapeHtml(v.data_provider_visit_name || "")}" placeholder="Enter provider visit name" oninput="state.visits[${i}].data_provider_visit_name=this.value;renderExport()">`;
+    tr.appendChild(providerName);
+
+    body.appendChild(tr);
+  });
+}
+function addTimepoint(){state.timepoints.push({protocol_timepoint_number:"", protocol_timepoint_name:"", data_provider_timepoint_number:"", data_provider_timepoint_name:""}); renderTimepointTable();}
+function clearTimepoints(){state.timepoints=[]; renderTimepointTable();}
+function renderTimepointTable(){
+  const tbl=document.getElementById("timepointTable");
+  tbl.innerHTML=`<thead><tr><th>Protocol Time Point Number</th><th>Protocol Time Point Name</th><th>Data Provider Time Point Number</th><th>Data Provider Time Point Name</th></tr></thead><tbody></tbody>`;
+  const body=tbl.querySelector("tbody");
+  if(state.timepoints.length===0){const tr=document.createElement("tr");tr.innerHTML=`<td colspan="4" class="subtle">No timepoint rows entered. This section will be omitted from export.</td>`;body.appendChild(tr);return;}
+  state.timepoints.forEach((v,i)=>{
+    const tr=document.createElement("tr");
+    ["protocol_timepoint_number","protocol_timepoint_name","data_provider_timepoint_number","data_provider_timepoint_name"].forEach(k=>{
+      const td=document.createElement("td");td.innerHTML=`<input value="${escapeHtml(v[k])}" oninput="state.timepoints[${i}]['${k}']=this.value;renderExport()">`;tr.appendChild(td);
+    });
+    body.appendChild(tr);
+  });
+}
+function goStep(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.add("hidden"));
+  document.getElementById(id).classList.remove("hidden");
+  document.querySelectorAll(".stepbtn").forEach(b=>b.classList.toggle("active", b.dataset.step===id));
+  if(id==="export") renderExport();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+document.querySelectorAll(".stepbtn").forEach(b=>b.addEventListener("click",()=>goStep(b.dataset.step)));
+
+function payload(){
+  const includedParties=appData.parties.map((p,i)=>({key:p.id||String(i),...p,...(state.parties[p.id||String(i)]||{})})).filter(p=>p.include);
+  return {
+    app_name:"dta_automation_mvp_usdm_v1_static_html_demo_v2",
+    source:state.source,
+    study:appData.study,
+    dta_version:{version_number:document.getElementById("dtaVersion").value, version_date:document.getElementById("dtaDate").value},
+    data_types:selectedDataLabels(),
+    data_type_details:selectedBcDetails(),
+    parties:includedParties,
+    transfer:{
+      file_name:document.getElementById("fileName").value, file_format:document.getElementById("fileFormat").value,
+      encoding_system:document.getElementById("encoding").value, delimiter:document.getElementById("delimiter").value,
+      transmission_method:document.getElementById("method").value, transmission_type:document.getElementById("transmissionType").value,
+      transfer_environment:document.getElementById("environment").value, transfer_blinding:document.getElementById("blinding").value,
+      folder_name_provider:document.getElementById("folderProvider").value, folder_name_recipient:document.getElementById("folderRecipient").value
+    },
+    visit_mapping:state.visits,
+    timepoint_mapping:state.timepoints.filter(r=>Object.values(r).some(v=>String(v||"").trim()))
+  };
+}
+function tableHtml(headers, rows){
+  if(!rows || rows.length===0) return "<p><em>No rows selected.</em></p>";
+  return `<table><thead><tr>${headers.map(h=>`<th>${escapeHtml(h.label)}</th>`).join("")}</tr></thead><tbody>`+
+    rows.map(r=>`<tr>${headers.map(h=>`<td>${escapeHtml(r[h.key]||"")}</td>`).join("")}</tr>`).join("")+"</tbody></table>";
+}
+function dtaHtml(){
+  const p=payload();
+  let html=`<h1>Data Transfer Agreement</h1>`;
+  html+=`<h2>1. Protocol Title</h2><p>${escapeHtml(p.study.study_title)}</p>`;
+  html+=`<h2>2. Type of Data</h2><p>${p.data_types.length? p.data_types.map(escapeHtml).join(", ") : "<em>No data types selected.</em>"}</p>`;
+  html+=`<h2>3. DTA Version History</h2>${tableHtml([{label:"Document Version Number",key:"version_number"},{label:"Date",key:"version_date"}],[p.dta_version])}`;
+  html+=`<h2>4. Signatures</h2>${tableHtml([{label:"Name",key:"name"},{label:"Role",key:"role"},{label:"Organization",key:"organization"},{label:"Organization Type",key:"organization_type"},{label:"Data Exchange Role",key:"data_exchange_role"},{label:"Email",key:"email"},{label:"Signature Date",key:"signature_date"},{label:"Signature",key:"signature"}],p.parties)}`;
+  html+=`<h2>5. File Transfer Information</h2>${tableHtml([{label:"Parameter",key:"parameter"},{label:"Value",key:"value"}],[
+    {parameter:"File Name",value:p.transfer.file_name},{parameter:"File Format",value:p.transfer.file_format},{parameter:"Encoding System",value:p.transfer.encoding_system},{parameter:"File Delimiter",value:p.transfer.delimiter},{parameter:"Transmission Method",value:p.transfer.transmission_method},{parameter:"Folder Name Data Provider",value:p.transfer.folder_name_provider},{parameter:"Folder Name Data Recipient",value:p.transfer.folder_name_recipient},{parameter:"Transmission Type",value:p.transfer.transmission_type},{parameter:"Transfer Environment",value:p.transfer.transfer_environment},{parameter:"Transfer Blinding",value:p.transfer.transfer_blinding}
+  ])}`;
+  html+=`<h2>6. Visit Mapping</h2>${tableHtml([{label:"Protocol Visit Number",key:"protocol_visit_number"},{label:"Protocol Visit Name",key:"protocol_visit_name"},{label:"Data Provider Visit Number",key:"data_provider_visit_number"},{label:"Data Provider Visit Name",key:"data_provider_visit_name"}],p.visit_mapping)}`;
+  if(p.timepoint_mapping.length){html+=`<h2>7. Timepoint Mapping</h2>${tableHtml([{label:"Protocol Time Point Number",key:"protocol_timepoint_number"},{label:"Protocol Time Point Name",key:"protocol_timepoint_name"},{label:"Data Provider Time Point Number",key:"data_provider_timepoint_number"},{label:"Data Provider Time Point Name",key:"data_provider_timepoint_name"}],p.timepoint_mapping)}`;}
+  return html;
+}
+function renderExport(){
+  const p=payload(), missing=[];
+  if(!p.dta_version.version_number || !p.dta_version.version_date) missing.push("DTA version number/date");
+  if(p.data_types.length===0) missing.push("Type of Data");
+  if(p.parties.length===0) missing.push("Parties & Signatures");
+  if(!p.transfer.file_name || !p.transfer.file_format || !p.transfer.transmission_method) missing.push("Transfer Requirements");
+  const cls=missing.length?"notice warn":"notice good";
+  document.getElementById("checklist").innerHTML=`<div class="${cls}"><b>${missing.length?"Sections requiring attention":"All core sections look ready"}</b><br>${missing.length?missing.map(escapeHtml).join("<br>"):"The DTA preview can be reviewed below before download."}</div>`;
+  document.getElementById("preview").innerHTML=dtaHtml();
+}
+function download(filename, mime, content){
+  const blob=new Blob([content],{type:mime});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=filename; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+function downloadJson(){download("dta_payload_usdm_v1.json","application/json;charset=utf-8",JSON.stringify(payload(),null,2));}
+function downloadDoc(){
+  const doc=`<!doctype html><html><head><meta charset="utf-8"><title>DTA Draft</title><style>body{font-family:Arial}h1{font-size:22pt}h2{font-size:15pt;color:#1c365f}table{border-collapse:collapse;width:100%;margin:8px 0 18px}th,td{border:1px solid #777;padding:6px;font-size:10pt}th{background:#e8eef8}</style></head><body>${dtaHtml()}</body></html>`;
+  download("DTA_Draft_USDM_MVP_v1.doc","application/msword;charset=utf-8",doc);
+}
+
+document.getElementById("usdmUpload").addEventListener("change", async e=>{
+  const file=e.target.files[0]; if(!file) return;
+  try{
+    const obj=JSON.parse(await file.text());
+    // Static quick parser expects a USDM shape similar to the sample.
+    const study=obj.study||{}; const version=(study.versions||[])[0]||{}; const design=(version.studyDesigns||[])[0]||{};
+    appData.study.study_name=study.name||"Uploaded study";
+    appData.study.study_identifier=((version.studyIdentifiers||[])[0]||{}).text||study.name||"";
+    appData.study.study_title=design.name||study.label||study.name||"";
+    appData.study.version_identifier=version.versionIdentifier||version.id||"";
+    appData.study.version_id=version.id||"";
+    appData.study.design_id=design.id||"";
+    appData.study.description=study.description||"";
+    appData.study.summary={organizations:(version.organizations||[]).length,roles:(version.roles||[]).length,assigned_persons:(version.roles||[]).reduce((a,r)=>a+((r.assignedPersons||[]).length),0),encounters:(design.encounters||[]).length,biomedical_concepts:(version.biomedicalConcepts||[]).length,bc_surrogates:(version.bcSurrogates||[]).length};
+    state.source.usdm=file.name;
+    document.getElementById("sourceStatus").innerHTML=`Loaded replacement USDM JSON: <b>${escapeHtml(file.name)}</b>. For full role/BC parsing, use the Streamlit version.`;
+    renderAll();
+  }catch(err){alert("Could not read uploaded USDM JSON: "+err.message);}
+});
+document.getElementById("mvpUpload").addEventListener("change", e=>{if(e.target.files[0]){state.source.mvp=e.target.files[0].name;document.getElementById("sourceStatus").innerHTML=`MVP metadata selected: <b>${escapeHtml(state.source.mvp)}</b>.`;renderExport();}});
+document.getElementById("templateUpload").addEventListener("change", e=>{if(e.target.files[0]){state.source.template=e.target.files[0].name;document.getElementById("sourceStatus").innerHTML=`Template selected: <b>${escapeHtml(state.source.template)}</b>. Static demo will not parse DOCX template.`;renderExport();}});
+
+initState();
+</script>
+</body>
+</html>

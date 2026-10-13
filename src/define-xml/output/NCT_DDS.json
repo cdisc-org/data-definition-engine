@@ -1,0 +1,4048 @@
+{
+  "OID": "MDV.None.Version1.Design1",
+  "name": "MDV None",
+  "description": "Data Definitions for None",
+  "fileOID": "ODM.DEFINE-JSON.None.Version1.Design1",
+  "creationDateTime": "2026-08-04T13:47:15.197720+00:00",
+  "odmVersion": "1.3.2",
+  "fileType": "Snapshot",
+  "originator": "Define-JSON Processor",
+  "context": "Other",
+  "defineVersion": "2.1.0",
+  "studyOID": "ODM.None.Version1.Design1",
+  "studyName": null,
+  "studyDescription": "Randomized, Double-Blind, Placebo-Controlled Phase II Trial of Fulvestrant (Faslodex) plus Everolimus in Post-Menopausal Patients with Hormone-Receptor Positive Metastatic Breast Cancer Resistant to Aromatase Inhibitor Therapy",
+  "protocolName": null,
+  "itemGroups": [
+    {
+      "OID": "IG.DS",
+      "name": "DS",
+      "description": "Disposition",
+      "domain": "DS",
+      "purpose": "Tabulation",
+      "structure": "One record per disposition status or protocol milestone per subject",
+      "isReferenceData": false,
+      "keySequence": [
+        "__PLACEHOLDER__"
+      ],
+      "standard": "STD.SDTMIG",
+      "observationClass": {
+        "name": "EVENTS"
+      },
+      "items": [
+        {
+          "OID": "IT.DS.STUDYID",
+          "mandatory": true,
+          "name": "STUDYID",
+          "description": "Study Identifier",
+          "role": "Identifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.DS.DOMAIN",
+          "mandatory": true,
+          "name": "DOMAIN",
+          "description": "Domain Abbreviation",
+          "role": "Identifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.DS.USUBJID",
+          "mandatory": true,
+          "name": "USUBJID",
+          "description": "Unique Subject Identifier",
+          "role": "Identifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.DS.DSSEQ",
+          "mandatory": true,
+          "name": "DSSEQ",
+          "description": "Sequence Number",
+          "role": "Identifier",
+          "dataType": "integer",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.DS.DSTERM",
+          "mandatory": true,
+          "name": "DSTERM",
+          "description": "Reported Term for the Disposition Event",
+          "role": "Topic",
+          "dataType": "text",
+          "length": 200,
+          "origin": [
+            {
+              "type": "Collected",
+              "source": "Investigator"
+            }
+          ]
+        },
+        {
+          "OID": "IT.DS.DSDECOD",
+          "mandatory": true,
+          "name": "DSDECOD",
+          "description": "Standardized Disposition Term",
+          "role": "Synonym Qualifier",
+          "dataType": "text",
+          "length": 200,
+          "origin": [
+            {
+              "type": "Assigned",
+              "source": "Sponsor"
+            }
+          ],
+          "codeList": "CL.NCOMPLT"
+        },
+        {
+          "OID": "IT.DS.DSCAT",
+          "mandatory": false,
+          "name": "DSCAT",
+          "description": "Category for Disposition Event",
+          "role": "Grouping Qualifier",
+          "dataType": "text",
+          "length": 200,
+          "origin": [
+            {
+              "type": "Assigned",
+              "source": "Sponsor"
+            }
+          ],
+          "codeList": "CL.DSCAT"
+        },
+        {
+          "OID": "IT.DS.DSSCAT",
+          "mandatory": false,
+          "name": "DSSCAT",
+          "description": "Subcategory for Disposition Event",
+          "role": "Grouping Qualifier",
+          "dataType": "text",
+          "length": 200,
+          "origin": [
+            {
+              "type": "Assigned",
+              "source": "Sponsor"
+            }
+          ],
+          "codeList": "CL.DSSCAT"
+        },
+        {
+          "OID": "IT.DS.DSSTDTC",
+          "mandatory": false,
+          "name": "DSSTDTC",
+          "description": "Start Date/Time of Disposition Event",
+          "role": "Timing",
+          "dataType": "datetime",
+          "origin": [
+            {
+              "type": "Collected",
+              "source": "Investigator"
+            }
+          ]
+        },
+        {
+          "OID": "IT.DS.DSSTDY",
+          "mandatory": false,
+          "name": "DSSTDY",
+          "description": "Study Day of Start of Disposition Event",
+          "role": "Timing",
+          "dataType": "integer",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "OID": "IG.RS",
+      "name": "RS",
+      "description": "Disease Response and Clin Classification",
+      "domain": "RS",
+      "purpose": "Tabulation",
+      "structure": "One record per response assessment or clinical classification assessment per time point per visit per subject per assessor per medical evaluator",
+      "isReferenceData": false,
+      "keySequence": [
+        "__PLACEHOLDER__"
+      ],
+      "standard": "STD.SDTMIG",
+      "observationClass": {
+        "name": "FINDINGS"
+      },
+      "items": [
+        {
+          "OID": "IT.RS.STUDYID",
+          "mandatory": true,
+          "name": "STUDYID",
+          "description": "Study Identifier",
+          "role": "Identifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.RS.DOMAIN",
+          "mandatory": true,
+          "name": "DOMAIN",
+          "description": "Domain Abbreviation",
+          "role": "Identifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.RS.USUBJID",
+          "mandatory": true,
+          "name": "USUBJID",
+          "description": "Unique Subject Identifier",
+          "role": "Identifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.RS.RSSEQ",
+          "mandatory": true,
+          "name": "RSSEQ",
+          "description": "Sequence Number",
+          "role": "Identifier",
+          "dataType": "integer",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.RS.RSLNKGRP",
+          "mandatory": false,
+          "name": "RSLNKGRP",
+          "description": "Link Group ID",
+          "role": "Identifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "Derived",
+              "source": "Sponsor"
+            }
+          ]
+        },
+        {
+          "OID": "IT.RS.RSTESTCD",
+          "mandatory": true,
+          "name": "RSTESTCD",
+          "description": "Assessment Short Name",
+          "role": "Topic",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ],
+          "codeList": "CL.ONCRTSCD"
+        },
+        {
+          "OID": "IT.RS.RSTEST",
+          "mandatory": true,
+          "name": "RSTEST",
+          "description": "Assessment Name",
+          "role": "Synonym Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ],
+          "codeList": "CL.ONCRTS"
+        },
+        {
+          "OID": "IT.RS.RSCAT",
+          "mandatory": false,
+          "name": "RSCAT",
+          "description": "Category for Assessment",
+          "role": "Grouping Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ],
+          "codeList": "CL.ONCRSCAT"
+        },
+        {
+          "OID": "IT.RS.RSORRES",
+          "mandatory": false,
+          "name": "RSORRES",
+          "description": "Result or Finding in Original Units",
+          "role": "Result Qualifier",
+          "dataType": "text",
+          "length": 20,
+          "origin": [
+            {
+              "type": "Collected",
+              "source": "Investigator"
+            }
+          ]
+        },
+        {
+          "OID": "IT.RS.RSSTRESC",
+          "mandatory": false,
+          "name": "RSSTRESC",
+          "description": "Character Result/Finding in Std Format",
+          "role": "Result Qualifier",
+          "dataType": "integer",
+          "length": 1,
+          "origin": [
+            {
+              "type": "Derived",
+              "source": "Sponsor"
+            }
+          ],
+          "codeList": "CL.ONCRSR"
+        },
+        {
+          "OID": "IT.RS.RSSTRESN",
+          "mandatory": false,
+          "name": "RSSTRESN",
+          "description": "Numeric Result/Finding in Standard Units",
+          "role": "Result Qualifier",
+          "dataType": "integer",
+          "length": 1,
+          "origin": [
+            {
+              "type": "Derived",
+              "source": "Sponsor"
+            }
+          ]
+        },
+        {
+          "OID": "IT.RS.RSEVAL",
+          "mandatory": false,
+          "name": "RSEVAL",
+          "description": "Evaluator",
+          "role": "Record Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "Assigned",
+              "source": "Sponsor"
+            }
+          ],
+          "codeList": "CL.EVAL"
+        },
+        {
+          "OID": "IT.RS.RSEVALID",
+          "mandatory": false,
+          "name": "RSEVALID",
+          "description": "Evaluator Identifier",
+          "role": "Variable Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "Collected",
+              "source": "Vendor"
+            }
+          ],
+          "codeList": "CL.MEDEVAL"
+        },
+        {
+          "OID": "IT.RS.VISITNUM",
+          "mandatory": false,
+          "name": "VISITNUM",
+          "description": "Visit Number",
+          "role": "Timing",
+          "dataType": "integer",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.RS.RSDTC",
+          "mandatory": false,
+          "name": "RSDTC",
+          "description": "Date/Time of Assessment",
+          "role": "Timing",
+          "dataType": "datetime",
+          "origin": [
+            {
+              "type": "Collected",
+              "source": "Investigator"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "OID": "IG.VS",
+      "name": "VS",
+      "description": "Vital Signs",
+      "domain": "VS",
+      "purpose": "Tabulation",
+      "structure": "One record per vital sign measurement per time point per visit per subject",
+      "isReferenceData": false,
+      "keySequence": [
+        "__PLACEHOLDER__"
+      ],
+      "standard": "STD.SDTMIG",
+      "observationClass": {
+        "name": "FINDINGS"
+      },
+      "items": [
+        {
+          "OID": "IT.VS.STUDYID",
+          "mandatory": true,
+          "name": "STUDYID",
+          "description": "Study Identifier",
+          "role": "Identifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.VS.DOMAIN",
+          "mandatory": true,
+          "name": "DOMAIN",
+          "description": "Domain Abbreviation",
+          "role": "Identifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.VS.USUBJID",
+          "mandatory": true,
+          "name": "USUBJID",
+          "description": "Unique Subject Identifier",
+          "role": "Identifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.VS.VSSEQ",
+          "mandatory": true,
+          "name": "VSSEQ",
+          "description": "Sequence Number",
+          "role": "Identifier",
+          "dataType": "integer",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.VS.VSTESTCD",
+          "mandatory": true,
+          "name": "VSTESTCD",
+          "description": "Vital Signs Test Short Name",
+          "role": "Topic",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ],
+          "codeList": "CL.VSTESTCD"
+        },
+        {
+          "OID": "IT.VS.VSTEST",
+          "mandatory": true,
+          "name": "VSTEST",
+          "description": "Vital Signs Test Name",
+          "role": "Synonym Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ],
+          "codeList": "CL.VSTEST"
+        },
+        {
+          "OID": "IT.VS.VSPOS",
+          "mandatory": false,
+          "name": "VSPOS",
+          "description": "Vital Signs Position of Subject",
+          "role": "Record Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ],
+          "codeList": "CL.POSITION"
+        },
+        {
+          "OID": "IT.VS.VSORRES",
+          "mandatory": false,
+          "name": "VSORRES",
+          "description": "Result or Finding in Original Units",
+          "role": "Result Qualifier",
+          "dataType": "integer",
+          "length": 3,
+          "origin": [
+            {
+              "type": "Collected",
+              "source": "Investigator"
+            }
+          ]
+        },
+        {
+          "OID": "IT.VS.VSORRESU",
+          "mandatory": false,
+          "name": "VSORRESU",
+          "description": "Original Units",
+          "role": "Variable Qualifier",
+          "dataType": "text",
+          "length": 20,
+          "origin": [
+            {
+              "type": "Collected",
+              "source": "Investigator"
+            }
+          ],
+          "codeList": "CL.VSRESU"
+        },
+        {
+          "OID": "IT.VS.VSSTRESC",
+          "mandatory": false,
+          "name": "VSSTRESC",
+          "description": "Character Result/Finding in Std Format",
+          "role": "Result Qualifier",
+          "dataType": "integer",
+          "length": 3,
+          "origin": [
+            {
+              "type": "Derived",
+              "source": "Sponsor"
+            }
+          ]
+        },
+        {
+          "OID": "IT.VS.VSSTRESN",
+          "mandatory": false,
+          "name": "VSSTRESN",
+          "description": "Numeric Result/Finding in Standard Units",
+          "role": "Result Qualifier",
+          "dataType": "integer",
+          "length": 3,
+          "origin": [
+            {
+              "type": "Derived",
+              "source": "Sponsor"
+            }
+          ]
+        },
+        {
+          "OID": "IT.VS.VSSTRESU",
+          "mandatory": false,
+          "name": "VSSTRESU",
+          "description": "Standard Units",
+          "role": "Variable Qualifier",
+          "dataType": "text",
+          "length": 20,
+          "origin": [
+            {
+              "type": "Assigned",
+              "source": "Sponsor"
+            }
+          ],
+          "codeList": "CL.VSRESU"
+        },
+        {
+          "OID": "IT.VS.VSLOC",
+          "mandatory": false,
+          "name": "VSLOC",
+          "description": "Location of Vital Signs Measurement",
+          "role": "Record Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ],
+          "codeList": "CL.LOC"
+        },
+        {
+          "OID": "IT.VS.VSLAT",
+          "mandatory": false,
+          "name": "VSLAT",
+          "description": "Laterality",
+          "role": "Result Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ],
+          "codeList": "CL.LAT"
+        },
+        {
+          "OID": "IT.VS.VSLOBXFL",
+          "mandatory": false,
+          "name": "VSLOBXFL",
+          "description": "Last Observation Before Exposure Flag",
+          "role": "Record Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ],
+          "codeList": "CL.NY"
+        },
+        {
+          "OID": "IT.VS.VISITNUM",
+          "mandatory": false,
+          "name": "VISITNUM",
+          "description": "Visit Number",
+          "role": "Timing",
+          "dataType": "integer",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.VS.VSDTC",
+          "mandatory": false,
+          "name": "VSDTC",
+          "description": "Date/Time of Measurements",
+          "role": "Timing",
+          "dataType": "datetime",
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "OID": "IG.LB",
+      "name": "LB",
+      "description": "Laboratory Test Results",
+      "domain": "LB",
+      "purpose": "Tabulation",
+      "structure": "One record per lab test per time point per visit per subject",
+      "isReferenceData": false,
+      "keySequence": [
+        "__PLACEHOLDER__"
+      ],
+      "standard": "STD.SDTMIG",
+      "observationClass": {
+        "name": "FINDINGS"
+      },
+      "items": [
+        {
+          "OID": "IT.LB.STUDYID",
+          "mandatory": true,
+          "name": "STUDYID",
+          "description": "Study Identifier",
+          "role": "Identifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.LB.DOMAIN",
+          "mandatory": true,
+          "name": "DOMAIN",
+          "description": "Domain Abbreviation",
+          "role": "Identifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.LB.USUBJID",
+          "mandatory": true,
+          "name": "USUBJID",
+          "description": "Unique Subject Identifier",
+          "role": "Identifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.LB.LBSEQ",
+          "mandatory": true,
+          "name": "LBSEQ",
+          "description": "Sequence Number",
+          "role": "Identifier",
+          "dataType": "integer",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.LB.LBTESTCD",
+          "mandatory": true,
+          "name": "LBTESTCD",
+          "description": "Lab Test or Examination Short Name",
+          "role": "Topic",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ],
+          "codeList": "CL.LBTESTCD"
+        },
+        {
+          "OID": "IT.LB.LBTEST",
+          "mandatory": true,
+          "name": "LBTEST",
+          "description": "Lab Test or Examination Name",
+          "role": "Synonym Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ],
+          "codeList": "CL.LBTEST"
+        },
+        {
+          "OID": "IT.LB.LBCAT",
+          "mandatory": false,
+          "name": "LBCAT",
+          "description": "Category for Lab Test",
+          "role": "Grouping Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.LB.LBORRES",
+          "mandatory": false,
+          "name": "LBORRES",
+          "description": "Result or Finding in Original Units",
+          "role": "Result Qualifier",
+          "dataType": "float",
+          "length": 12,
+          "displayFormat": "12.4",
+          "significantDigits": 4,
+          "origin": [
+            {
+              "type": "Collected",
+              "source": "Vendor"
+            }
+          ]
+        },
+        {
+          "OID": "IT.LB.LBORRESU",
+          "mandatory": false,
+          "name": "LBORRESU",
+          "description": "Original Units",
+          "role": "Variable Qualifier",
+          "dataType": "text",
+          "length": 20,
+          "origin": [
+            {
+              "type": "Collected",
+              "source": "Vendor"
+            }
+          ],
+          "codeList": "CL.UNIT"
+        },
+        {
+          "OID": "IT.LB.LBORNRLO",
+          "mandatory": false,
+          "name": "LBORNRLO",
+          "description": "Reference Range Lower Limit in Orig Unit",
+          "role": "Variable Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.LB.LBORNRHI",
+          "mandatory": false,
+          "name": "LBORNRHI",
+          "description": "Reference Range Upper Limit in Orig Unit",
+          "role": "Variable Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.LB.LBSTRESC",
+          "mandatory": false,
+          "name": "LBSTRESC",
+          "description": "Character Result/Finding in Std Format",
+          "role": "Result Qualifier",
+          "dataType": "float",
+          "length": 12,
+          "displayFormat": "12.4",
+          "significantDigits": 4,
+          "origin": [
+            {
+              "type": "Derived",
+              "source": "Vendor"
+            }
+          ],
+          "codeList": "CL.LBSTRESC"
+        },
+        {
+          "OID": "IT.LB.LBSTRESN",
+          "mandatory": false,
+          "name": "LBSTRESN",
+          "description": "Numeric Result/Finding in Standard Units",
+          "role": "Result Qualifier",
+          "dataType": "float",
+          "length": 12,
+          "displayFormat": "12.4",
+          "significantDigits": 4,
+          "origin": [
+            {
+              "type": "Derived",
+              "source": "Vendor"
+            }
+          ]
+        },
+        {
+          "OID": "IT.LB.LBSTRESU",
+          "mandatory": false,
+          "name": "LBSTRESU",
+          "description": "Standard Units",
+          "role": "Variable Qualifier",
+          "dataType": "text",
+          "length": 20,
+          "origin": [
+            {
+              "type": "Assigned",
+              "source": "Vendor"
+            }
+          ],
+          "codeList": "CL.UNIT"
+        },
+        {
+          "OID": "IT.LB.LBSTNRLO",
+          "mandatory": false,
+          "name": "LBSTNRLO",
+          "description": "Reference Range Lower Limit-Std Units",
+          "role": "Variable Qualifier",
+          "dataType": "integer",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.LB.LBSTNRHI",
+          "mandatory": false,
+          "name": "LBSTNRHI",
+          "description": "Reference Range Upper Limit-Std Units",
+          "role": "Variable Qualifier",
+          "dataType": "integer",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.LB.LBNRIND",
+          "mandatory": false,
+          "name": "LBNRIND",
+          "description": "Reference Range Indicator",
+          "role": "Variable Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ],
+          "codeList": "CL.NRIND"
+        },
+        {
+          "OID": "IT.LB.LBSPEC",
+          "mandatory": false,
+          "name": "LBSPEC",
+          "description": "Specimen Type",
+          "role": "Record Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ],
+          "codeList": "CL.SPECTYPE"
+        },
+        {
+          "OID": "IT.LB.LBMETHOD",
+          "mandatory": false,
+          "name": "LBMETHOD",
+          "description": "Method of Test or Examination",
+          "role": "Record Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ],
+          "codeList": "CL.METHOD"
+        },
+        {
+          "OID": "IT.LB.LBLOBXFL",
+          "mandatory": false,
+          "name": "LBLOBXFL",
+          "description": "Last Observation Before Exposure Flag",
+          "role": "Record Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ],
+          "codeList": "CL.NY"
+        },
+        {
+          "OID": "IT.LB.LBFAST",
+          "mandatory": false,
+          "name": "LBFAST",
+          "description": "Fasting Status",
+          "role": "Record Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ],
+          "codeList": "CL.NY_NY"
+        },
+        {
+          "OID": "IT.LB.VISITNUM",
+          "mandatory": false,
+          "name": "VISITNUM",
+          "description": "Visit Number",
+          "role": "Timing",
+          "dataType": "integer",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.LB.LBDTC",
+          "mandatory": false,
+          "name": "LBDTC",
+          "description": "Date/Time of Specimen Collection",
+          "role": "Timing",
+          "dataType": "datetime",
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "OID": "IG.UR",
+      "name": "UR",
+      "description": "Urinary System Findings",
+      "domain": "UR",
+      "purpose": "Tabulation",
+      "structure": "One record per finding per location per per visit per subject",
+      "isReferenceData": false,
+      "keySequence": [
+        "__PLACEHOLDER__"
+      ],
+      "standard": "STD.SDTMIG",
+      "observationClass": {
+        "name": "FINDINGS"
+      },
+      "items": [
+        {
+          "OID": "IT.UR.STUDYID",
+          "mandatory": true,
+          "name": "STUDYID",
+          "description": "Study Identifier",
+          "role": "Identifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.UR.DOMAIN",
+          "mandatory": true,
+          "name": "DOMAIN",
+          "description": "Domain Abbreviation",
+          "role": "Identifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.UR.USUBJID",
+          "mandatory": true,
+          "name": "USUBJID",
+          "description": "Unique Subject Identifier",
+          "role": "Identifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.UR.URSEQ",
+          "mandatory": true,
+          "name": "URSEQ",
+          "description": "Sequence Number",
+          "role": "Identifier",
+          "dataType": "integer",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.UR.URTESTCD",
+          "mandatory": true,
+          "name": "URTESTCD",
+          "description": "Short Name of Urinary Test",
+          "role": "Topic",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ],
+          "codeList": "CL.URNSTSCD"
+        },
+        {
+          "OID": "IT.UR.URTEST",
+          "mandatory": true,
+          "name": "URTEST",
+          "description": "Name of Urinary Test",
+          "role": "Synonym Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ],
+          "codeList": "CL.URNSTS"
+        },
+        {
+          "OID": "IT.UR.URORRES",
+          "mandatory": false,
+          "name": "URORRES",
+          "description": "Result or Finding in Original Units",
+          "role": "Result Qualifier",
+          "dataType": "text",
+          "length": 200,
+          "origin": [
+            {
+              "type": "Collected",
+              "source": "Investigator"
+            }
+          ]
+        },
+        {
+          "OID": "IT.UR.URSTRESC",
+          "mandatory": false,
+          "name": "URSTRESC",
+          "description": "Character Result/Finding in Std Format",
+          "role": "Result Qualifier",
+          "dataType": "text",
+          "length": 2,
+          "origin": [
+            {
+              "type": "Derived",
+              "source": "Sponsor"
+            }
+          ]
+        },
+        {
+          "OID": "IT.UR.URMETHOD",
+          "mandatory": false,
+          "name": "URMETHOD",
+          "description": "Method of Test or Examination",
+          "role": "Record Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ],
+          "codeList": "CL.METHOD"
+        },
+        {
+          "OID": "IT.UR.URLOBXFL",
+          "mandatory": false,
+          "name": "URLOBXFL",
+          "description": "Last Observation Before Exposure Flag",
+          "role": "Record Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ],
+          "codeList": "CL.NY"
+        },
+        {
+          "OID": "IT.UR.VISITNUM",
+          "mandatory": false,
+          "name": "VISITNUM",
+          "description": "Visit Number",
+          "role": "Timing",
+          "dataType": "integer",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.UR.URDTC",
+          "mandatory": false,
+          "name": "URDTC",
+          "description": "Date/Time of Collection",
+          "role": "Timing",
+          "dataType": "datetime",
+          "origin": [
+            {
+              "type": "Collected",
+              "source": "Investigator"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "OID": "IG.CM",
+      "name": "CM",
+      "description": "Concomitant/Prior Medications",
+      "domain": "CM",
+      "purpose": "Tabulation",
+      "structure": "One record per recorded intervention occurrence or constant-dosing interval per subject",
+      "isReferenceData": false,
+      "keySequence": [
+        "__PLACEHOLDER__"
+      ],
+      "standard": "STD.SDTMIG",
+      "observationClass": {
+        "name": "INTERVENTIONS"
+      },
+      "items": [
+        {
+          "OID": "IT.CM.STUDYID",
+          "mandatory": true,
+          "name": "STUDYID",
+          "description": "Study Identifier",
+          "role": "Identifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.CM.DOMAIN",
+          "mandatory": true,
+          "name": "DOMAIN",
+          "description": "Domain Abbreviation",
+          "role": "Identifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.CM.USUBJID",
+          "mandatory": true,
+          "name": "USUBJID",
+          "description": "Unique Subject Identifier",
+          "role": "Identifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.CM.CMSEQ",
+          "mandatory": true,
+          "name": "CMSEQ",
+          "description": "Sequence Number",
+          "role": "Identifier",
+          "dataType": "integer",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.CM.CMTRT",
+          "mandatory": true,
+          "name": "CMTRT",
+          "description": "Reported Name of Drug, Med, or Therapy",
+          "role": "Topic",
+          "dataType": "text",
+          "length": 200,
+          "origin": [
+            {
+              "type": "Collected",
+              "source": "Investigator"
+            }
+          ]
+        },
+        {
+          "OID": "IT.CM.CMDECOD",
+          "mandatory": false,
+          "name": "CMDECOD",
+          "description": "Standardized Medication Name",
+          "role": "Synonym Qualifier",
+          "dataType": "text",
+          "length": 200,
+          "origin": [
+            {
+              "type": "Assigned",
+              "source": "Sponsor"
+            }
+          ]
+        },
+        {
+          "OID": "IT.CM.CMCAT",
+          "mandatory": false,
+          "name": "CMCAT",
+          "description": "Category for Medication",
+          "role": "Grouping Qualifier",
+          "dataType": "text",
+          "length": 200,
+          "origin": [
+            {
+              "type": "Assigned",
+              "source": "Sponsor"
+            }
+          ]
+        },
+        {
+          "OID": "IT.CM.CMSCAT",
+          "mandatory": false,
+          "name": "CMSCAT",
+          "description": "Subcategory for Medication",
+          "role": "Grouping Qualifier",
+          "dataType": "text",
+          "length": 200,
+          "origin": [
+            {
+              "type": "Assigned",
+              "source": "Sponsor"
+            }
+          ]
+        },
+        {
+          "OID": "IT.CM.CMPRESP",
+          "mandatory": false,
+          "name": "CMPRESP",
+          "description": "CM Pre-specified",
+          "role": "Variable Qualifier",
+          "dataType": "text",
+          "length": 1,
+          "origin": [
+            {
+              "type": "Assigned",
+              "source": "Sponsor"
+            }
+          ],
+          "codeList": "CL.NY"
+        },
+        {
+          "OID": "IT.CM.CMOCCUR",
+          "mandatory": false,
+          "name": "CMOCCUR",
+          "description": "CM Occurrence",
+          "role": "Record Qualifier",
+          "dataType": "text",
+          "length": 1,
+          "origin": [
+            {
+              "type": "Collected",
+              "source": "Investigator"
+            }
+          ],
+          "codeList": "CL.NY"
+        },
+        {
+          "OID": "IT.CM.CMINDC",
+          "mandatory": false,
+          "name": "CMINDC",
+          "description": "Indication",
+          "role": "Record Qualifier",
+          "dataType": "text",
+          "length": 200,
+          "origin": [
+            {
+              "type": "Collected",
+              "source": "Investigator"
+            }
+          ]
+        },
+        {
+          "OID": "IT.CM.CMCLAS",
+          "mandatory": false,
+          "name": "CMCLAS",
+          "description": "Medication Class",
+          "role": "Variable Qualifier",
+          "dataType": "text",
+          "length": 200,
+          "origin": [
+            {
+              "type": "Assigned",
+              "source": "Sponsor"
+            }
+          ]
+        },
+        {
+          "OID": "IT.CM.CMCLASCD",
+          "mandatory": false,
+          "name": "CMCLASCD",
+          "description": "Medication Class Code",
+          "role": "Variable Qualifier",
+          "dataType": "text",
+          "length": 200,
+          "origin": [
+            {
+              "type": "Assigned",
+              "source": "Sponsor"
+            }
+          ]
+        },
+        {
+          "OID": "IT.CM.CMDOSE",
+          "mandatory": false,
+          "name": "CMDOSE",
+          "description": "Dose per Administration",
+          "role": "Record Qualifier",
+          "dataType": "float",
+          "length": 8,
+          "displayFormat": "8.3",
+          "significantDigits": 3,
+          "origin": [
+            {
+              "type": "Collected",
+              "source": "Investigator"
+            }
+          ]
+        },
+        {
+          "OID": "IT.CM.CMDOSTXT",
+          "mandatory": false,
+          "name": "CMDOSTXT",
+          "description": "Dose Description",
+          "role": "Record Qualifier",
+          "dataType": "text",
+          "length": 40,
+          "origin": [
+            {
+              "type": "Collected",
+              "source": "Investigator"
+            }
+          ]
+        },
+        {
+          "OID": "IT.CM.CMDOSU",
+          "mandatory": false,
+          "name": "CMDOSU",
+          "description": "Dose Units",
+          "role": "Variable Qualifier",
+          "dataType": "text",
+          "length": 40,
+          "origin": [
+            {
+              "type": "Collected",
+              "source": "Investigator"
+            }
+          ],
+          "codeList": "CL.UNIT"
+        },
+        {
+          "OID": "IT.CM.CMDOSFRM",
+          "mandatory": false,
+          "name": "CMDOSFRM",
+          "description": "Dose Form",
+          "role": "Variable Qualifier",
+          "dataType": "text",
+          "length": 40,
+          "origin": [
+            {
+              "type": "Collected",
+              "source": "Investigator"
+            }
+          ],
+          "codeList": "CL.FRM"
+        },
+        {
+          "OID": "IT.CM.CMDOSFRQ",
+          "mandatory": false,
+          "name": "CMDOSFRQ",
+          "description": "Dosing Frequency per Interval",
+          "role": "Record Qualifier",
+          "dataType": "text",
+          "length": 40,
+          "origin": [
+            {
+              "type": "Collected",
+              "source": "Investigator"
+            }
+          ],
+          "codeList": "CL.FREQ"
+        },
+        {
+          "OID": "IT.CM.CMROUTE",
+          "mandatory": false,
+          "name": "CMROUTE",
+          "description": "Route of Administration",
+          "role": "Variable Qualifier",
+          "dataType": "text",
+          "length": 40,
+          "origin": [
+            {
+              "type": "Collected",
+              "source": "Investigator"
+            }
+          ],
+          "codeList": "CL.ROUTE"
+        },
+        {
+          "OID": "IT.CM.CMSTDTC",
+          "mandatory": false,
+          "name": "CMSTDTC",
+          "description": "Start Date/Time of Medication",
+          "role": "Timing",
+          "dataType": "datetime",
+          "origin": [
+            {
+              "type": "Collected",
+              "source": "Investigator"
+            }
+          ]
+        },
+        {
+          "OID": "IT.CM.CMENDTC",
+          "mandatory": false,
+          "name": "CMENDTC",
+          "description": "End Date/Time of Medication",
+          "role": "Timing",
+          "dataType": "datetime",
+          "origin": [
+            {
+              "type": "Collected",
+              "source": "Investigator"
+            }
+          ]
+        },
+        {
+          "OID": "IT.CM.CMSTRF",
+          "mandatory": false,
+          "name": "CMSTRF",
+          "description": "Start Relative to Reference Period",
+          "role": "Timing",
+          "dataType": "text",
+          "length": 20,
+          "origin": [
+            {
+              "type": "Assigned",
+              "source": "Sponsor"
+            }
+          ],
+          "codeList": "CL.STENRF"
+        },
+        {
+          "OID": "IT.CM.CMENRF",
+          "mandatory": false,
+          "name": "CMENRF",
+          "description": "End Relative to Reference Period",
+          "role": "Timing",
+          "dataType": "text",
+          "length": 20,
+          "origin": [
+            {
+              "type": "Assigned",
+              "source": "Sponsor"
+            }
+          ],
+          "codeList": "CL.STENRF"
+        },
+        {
+          "OID": "IT.CM.CMSTRTPT",
+          "mandatory": false,
+          "name": "CMSTRTPT",
+          "description": "Start Relative to Reference Time Point",
+          "role": "Timing",
+          "dataType": "text",
+          "length": 20,
+          "origin": [
+            {
+              "type": "Assigned",
+              "source": "Sponsor"
+            }
+          ],
+          "codeList": "CL.STENRF"
+        },
+        {
+          "OID": "IT.CM.CMSTTPT",
+          "mandatory": false,
+          "name": "CMSTTPT",
+          "description": "Start Reference Time Point",
+          "role": "Timing",
+          "dataType": "text",
+          "length": 20,
+          "origin": [
+            {
+              "type": "Assigned",
+              "source": "Sponsor"
+            }
+          ]
+        },
+        {
+          "OID": "IT.CM.CMENRTPT",
+          "mandatory": false,
+          "name": "CMENRTPT",
+          "description": "End Relative to Reference Time Point",
+          "role": "Timing",
+          "dataType": "text",
+          "length": 20,
+          "origin": [
+            {
+              "type": "Assigned",
+              "source": "Sponsor"
+            }
+          ],
+          "codeList": "CL.STENRF"
+        },
+        {
+          "OID": "IT.CM.CMENTPT",
+          "mandatory": false,
+          "name": "CMENTPT",
+          "description": "End Reference Time Point",
+          "role": "Timing",
+          "dataType": "text",
+          "length": 20,
+          "origin": [
+            {
+              "type": "Assigned",
+              "source": "Sponsor"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "OID": "IG.TS",
+      "name": "TS",
+      "description": "Trial Summary",
+      "domain": "TS",
+      "purpose": "Tabulation",
+      "structure": "One record per trial summary parameter value",
+      "isReferenceData": true,
+      "keySequence": [
+        "__PLACEHOLDER__"
+      ],
+      "standard": "STD.SDTMIG",
+      "observationClass": {
+        "name": "TRIAL DESIGN"
+      },
+      "items": [
+        {
+          "OID": "IT.TS.STUDYID",
+          "mandatory": true,
+          "name": "STUDYID",
+          "description": "Study Identifier",
+          "role": "Identifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.TS.DOMAIN",
+          "mandatory": true,
+          "name": "DOMAIN",
+          "description": "Domain Abbreviation",
+          "role": "Identifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.TS.TSSEQ",
+          "mandatory": true,
+          "name": "TSSEQ",
+          "description": "Sequence Number",
+          "role": "Identifier",
+          "dataType": "integer",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.TS.TSPARMCD",
+          "mandatory": true,
+          "name": "TSPARMCD",
+          "description": "Trial Summary Parameter Short Name",
+          "role": "Topic",
+          "dataType": "text",
+          "length": null,
+          "codeList": "CL.TSPARMCD"
+        },
+        {
+          "OID": "IT.TS.TSPARM",
+          "mandatory": true,
+          "name": "TSPARM",
+          "description": "Trial Summary Parameter",
+          "role": "Synonym Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ],
+          "codeList": "CL.TSPARM"
+        },
+        {
+          "OID": "IT.TS.TSVAL",
+          "mandatory": false,
+          "name": "TSVAL",
+          "description": "Parameter Value",
+          "role": "Result Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.TS.TSVALCD",
+          "mandatory": false,
+          "name": "TSVALCD",
+          "description": "Parameter Value Code",
+          "role": "Result Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.TS.TSVCDREF",
+          "mandatory": false,
+          "name": "TSVCDREF",
+          "description": "Name of the Reference Terminology",
+          "role": "Result Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ],
+          "codeList": "CL.DICTNAM"
+        },
+        {
+          "OID": "IT.TS.TSVCDVER",
+          "mandatory": false,
+          "name": "TSVCDVER",
+          "description": "Version of the Reference Terminology",
+          "role": "Result Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        }
+      ],
+      "slices": [
+        {
+          "OID": "VL.TS.TSPARMCD",
+          "name": "VL_TS_TSPARMCD",
+          "type": "ValueList",
+          "wasDerivedFrom": "IT.TS.TSPARMCD",
+          "items": [
+            {
+              "OID": "IT.TS.TSPARMCD.COMPTRT",
+              "mandatory": false,
+              "name": "TSPARMCD",
+              "dataType": "text",
+              "length": 200,
+              "origin": [
+                {
+                  "type": "Protocol",
+                  "source": "Sponsor"
+                }
+              ],
+              "applicableWhen": [
+                "WC.TS.54cd02f1"
+              ]
+            },
+            {
+              "OID": "IT.TS.TSPARMCD.INDIC",
+              "mandatory": false,
+              "name": "TSPARMCD",
+              "dataType": "text",
+              "length": 200,
+              "origin": [
+                {
+                  "type": "Protocol",
+                  "source": "Sponsor"
+                }
+              ],
+              "applicableWhen": [
+                "WC.TS.9cdae039"
+              ]
+            },
+            {
+              "OID": "IT.TS.TSPARMCD.INTTYPE",
+              "mandatory": false,
+              "name": "TSPARMCD",
+              "dataType": "text",
+              "length": 200,
+              "origin": [
+                {
+                  "type": "Protocol",
+                  "source": "Sponsor"
+                }
+              ],
+              "applicableWhen": [
+                "WC.TS.e3ae16cd"
+              ]
+            },
+            {
+              "OID": "IT.TS.TSPARMCD.NARMS",
+              "mandatory": false,
+              "name": "TSPARMCD",
+              "dataType": "text",
+              "length": 200,
+              "origin": [
+                {
+                  "type": "Protocol",
+                  "source": "Sponsor"
+                }
+              ],
+              "applicableWhen": [
+                "WC.TS.89c0d243"
+              ]
+            },
+            {
+              "OID": "IT.TS.TSPARMCD.OBJPRIM",
+              "mandatory": false,
+              "name": "TSPARMCD",
+              "dataType": "text",
+              "length": 200,
+              "origin": [
+                {
+                  "type": "Protocol",
+                  "source": "Sponsor"
+                }
+              ],
+              "applicableWhen": [
+                "WC.TS.7a056c75"
+              ]
+            },
+            {
+              "OID": "IT.TS.TSPARMCD.OBJSEC",
+              "mandatory": false,
+              "name": "TSPARMCD",
+              "dataType": "text",
+              "length": 200,
+              "origin": [
+                {
+                  "type": "Protocol",
+                  "source": "Sponsor"
+                }
+              ],
+              "applicableWhen": [
+                "WC.TS.36721696"
+              ]
+            },
+            {
+              "OID": "IT.TS.TSPARMCD.OUTMSPRI",
+              "mandatory": false,
+              "name": "TSPARMCD",
+              "dataType": "text",
+              "length": 200,
+              "origin": [
+                {
+                  "type": "Protocol",
+                  "source": "Sponsor"
+                }
+              ],
+              "applicableWhen": [
+                "WC.TS.d8b84608"
+              ]
+            },
+            {
+              "OID": "IT.TS.TSPARMCD.OUTMSSEC",
+              "mandatory": false,
+              "name": "TSPARMCD",
+              "dataType": "text",
+              "length": 200,
+              "origin": [
+                {
+                  "type": "Protocol",
+                  "source": "Sponsor"
+                }
+              ],
+              "applicableWhen": [
+                "WC.TS.1d3cd461"
+              ]
+            },
+            {
+              "OID": "IT.TS.TSPARMCD.SPONSOR",
+              "mandatory": false,
+              "name": "TSPARMCD",
+              "dataType": "text",
+              "length": 200,
+              "origin": [
+                {
+                  "type": "Protocol",
+                  "source": "Sponsor"
+                }
+              ],
+              "applicableWhen": [
+                "WC.TS.51236927"
+              ]
+            },
+            {
+              "OID": "IT.TS.TSPARMCD.TITLE",
+              "mandatory": false,
+              "name": "TSPARMCD",
+              "dataType": "text",
+              "length": 200,
+              "origin": [
+                {
+                  "type": "Protocol",
+                  "source": "Sponsor"
+                }
+              ],
+              "applicableWhen": [
+                "WC.TS.43684533"
+              ]
+            },
+            {
+              "OID": "IT.TS.TSPARMCD.TRT",
+              "mandatory": false,
+              "name": "TSPARMCD",
+              "dataType": "text",
+              "length": 200,
+              "origin": [
+                {
+                  "type": "Protocol",
+                  "source": "Sponsor"
+                }
+              ],
+              "applicableWhen": [
+                "WC.TS.1948fed3"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "OID": "IG.TU",
+      "name": "TU",
+      "description": "Tumor/Lesion Identification",
+      "domain": "TU",
+      "purpose": "Tabulation",
+      "structure": "One record per identified tumor per subject per assessor",
+      "isReferenceData": false,
+      "keySequence": [
+        "__PLACEHOLDER__"
+      ],
+      "standard": "STD.SDTMIG",
+      "observationClass": {
+        "name": "FINDINGS"
+      },
+      "items": [
+        {
+          "OID": "IT.TU.STUDYID",
+          "mandatory": true,
+          "name": "STUDYID",
+          "description": "Study Identifier",
+          "role": "Identifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.TU.DOMAIN",
+          "mandatory": true,
+          "name": "DOMAIN",
+          "description": "Domain Abbreviation",
+          "role": "Identifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.TU.USUBJID",
+          "mandatory": true,
+          "name": "USUBJID",
+          "description": "Unique Subject Identifier",
+          "role": "Identifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.TU.TUSEQ",
+          "mandatory": true,
+          "name": "TUSEQ",
+          "description": "Sequence Number",
+          "role": "Identifier",
+          "dataType": "integer",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.TU.TUREFID",
+          "mandatory": false,
+          "name": "TUREFID",
+          "description": "Reference ID",
+          "role": "Identifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "Assigned",
+              "source": "Sponsor"
+            }
+          ]
+        },
+        {
+          "OID": "IT.TU.TULNKID",
+          "mandatory": false,
+          "name": "TULNKID",
+          "description": "Link ID",
+          "role": "Identifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "Assigned",
+              "source": "Sponsor"
+            }
+          ]
+        },
+        {
+          "OID": "IT.TU.TUTESTCD",
+          "mandatory": true,
+          "name": "TUTESTCD",
+          "description": "Tumor/Lesion ID Short Name",
+          "role": "Topic",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ],
+          "codeList": "CL.TUTESTCD"
+        },
+        {
+          "OID": "IT.TU.TUTEST",
+          "mandatory": true,
+          "name": "TUTEST",
+          "description": "Tumor/Lesion ID Test Name",
+          "role": "Synonym Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ],
+          "codeList": "CL.TUTEST"
+        },
+        {
+          "OID": "IT.TU.TUORRES",
+          "mandatory": false,
+          "name": "TUORRES",
+          "description": "Tumor/Lesion ID Result",
+          "role": "Result Qualifier",
+          "dataType": "text",
+          "length": 24,
+          "origin": [
+            {
+              "type": "Collected",
+              "source": "Investigator"
+            }
+          ]
+        },
+        {
+          "OID": "IT.TU.TUSTRESC",
+          "mandatory": false,
+          "name": "TUSTRESC",
+          "description": "Tumor/Lesion ID Result Std. Format",
+          "role": "Result Qualifier",
+          "dataType": "text",
+          "length": 24,
+          "origin": [
+            {
+              "type": "Derived",
+              "source": "Sponsor"
+            }
+          ],
+          "codeList": "CL.TUIDRS"
+        },
+        {
+          "OID": "IT.TU.TULOC",
+          "mandatory": false,
+          "name": "TULOC",
+          "description": "Location of the Tumor/Lesion",
+          "role": "Record Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "Collected",
+              "source": "Investigator"
+            }
+          ],
+          "codeList": "CL.LOC"
+        },
+        {
+          "OID": "IT.TU.TULAT",
+          "mandatory": false,
+          "name": "TULAT",
+          "description": "Laterality",
+          "role": "Variable Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "Collected",
+              "source": "Investigator"
+            }
+          ],
+          "codeList": "CL.LAT"
+        },
+        {
+          "OID": "IT.TU.TUDIR",
+          "mandatory": false,
+          "name": "TUDIR",
+          "description": "Directionality",
+          "role": "Variable Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "Collected",
+              "source": "Investigator"
+            }
+          ],
+          "codeList": "CL.DIR"
+        },
+        {
+          "OID": "IT.TU.TUMETHOD",
+          "mandatory": false,
+          "name": "TUMETHOD",
+          "description": "Method of Identification",
+          "role": "Record Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "Collected",
+              "source": "Investigator"
+            }
+          ],
+          "codeList": "CL.METHOD"
+        },
+        {
+          "OID": "IT.TU.TULOBXFL",
+          "mandatory": false,
+          "name": "TULOBXFL",
+          "description": "Last Observation Before Exposure Flag",
+          "role": "Record Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ],
+          "codeList": "CL.NY"
+        },
+        {
+          "OID": "IT.TU.TUEVAL",
+          "mandatory": false,
+          "name": "TUEVAL",
+          "description": "Evaluator",
+          "role": "Record Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "Assigned",
+              "source": "Sponsor"
+            }
+          ],
+          "codeList": "CL.EVAL"
+        },
+        {
+          "OID": "IT.TU.TUEVALID",
+          "mandatory": false,
+          "name": "TUEVALID",
+          "description": "Evaluator Identifier",
+          "role": "Variable Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "Collected",
+              "source": "Vendor"
+            }
+          ],
+          "codeList": "CL.MEDEVAL"
+        },
+        {
+          "OID": "IT.TU.VISITNUM",
+          "mandatory": false,
+          "name": "VISITNUM",
+          "description": "Visit Number",
+          "role": "Timing",
+          "dataType": "integer",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.TU.TUDTC",
+          "mandatory": false,
+          "name": "TUDTC",
+          "description": "Date/Time of Tumor/Lesion Identification",
+          "role": "Timing",
+          "dataType": "datetime",
+          "origin": [
+            {
+              "type": "Collected",
+              "source": "Sponsor"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "OID": "IG.TA",
+      "name": "TA",
+      "description": "Trial Arms",
+      "domain": "TA",
+      "purpose": "Tabulation",
+      "structure": "One record per planned Element per Arm",
+      "isReferenceData": true,
+      "keySequence": [
+        "__PLACEHOLDER__"
+      ],
+      "standard": "STD.SDTMIG",
+      "observationClass": {
+        "name": "TRIAL DESIGN"
+      },
+      "items": [
+        {
+          "OID": "IT.TA.STUDYID",
+          "mandatory": true,
+          "name": "STUDYID",
+          "description": "Study Identifier",
+          "role": "Identifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.TA.DOMAIN",
+          "mandatory": true,
+          "name": "DOMAIN",
+          "description": "Domain Abbreviation",
+          "role": "Identifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.TA.ARMCD",
+          "mandatory": true,
+          "name": "ARMCD",
+          "description": "Planned Arm Code",
+          "role": "Topic",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ],
+          "codeList": "CL.ARMCD"
+        },
+        {
+          "OID": "IT.TA.ARM",
+          "mandatory": true,
+          "name": "ARM",
+          "description": "Description of Planned Arm",
+          "role": "Synonym Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ],
+          "codeList": "CL.ARM"
+        },
+        {
+          "OID": "IT.TA.TAETORD",
+          "mandatory": true,
+          "name": "TAETORD",
+          "description": "Planned Order of Element within Arm",
+          "role": "Timing",
+          "dataType": "integer",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.TA.ETCD",
+          "mandatory": true,
+          "name": "ETCD",
+          "description": "Element Code",
+          "role": "Record Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ],
+          "codeList": "CL.ETCD"
+        },
+        {
+          "OID": "IT.TA.ELEMENT",
+          "mandatory": false,
+          "name": "ELEMENT",
+          "description": "Description of Element",
+          "role": "Synonym Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ],
+          "codeList": "CL.ELEMENT"
+        },
+        {
+          "OID": "IT.TA.TABRANCH",
+          "mandatory": false,
+          "name": "TABRANCH",
+          "description": "Branch",
+          "role": "Rule",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.TA.TATRANS",
+          "mandatory": false,
+          "name": "TATRANS",
+          "description": "Transition Rule",
+          "role": "Rule",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.TA.EPOCH",
+          "mandatory": true,
+          "name": "EPOCH",
+          "description": "Epoch",
+          "role": "Timing",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ],
+          "codeList": "CL.EPOCH"
+        }
+      ]
+    },
+    {
+      "OID": "IG.TE",
+      "name": "TE",
+      "description": "Trial Elements",
+      "domain": "TE",
+      "purpose": "Tabulation",
+      "structure": "One record per planned Element",
+      "isReferenceData": true,
+      "keySequence": [
+        "__PLACEHOLDER__"
+      ],
+      "standard": "STD.SDTMIG",
+      "observationClass": {
+        "name": "TRIAL DESIGN"
+      },
+      "items": [
+        {
+          "OID": "IT.TE.STUDYID",
+          "mandatory": true,
+          "name": "STUDYID",
+          "description": "Study Identifier",
+          "role": "Identifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.TE.DOMAIN",
+          "mandatory": true,
+          "name": "DOMAIN",
+          "description": "Domain Abbreviation",
+          "role": "Identifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.TE.ETCD",
+          "mandatory": true,
+          "name": "ETCD",
+          "description": "Element Code",
+          "role": "Topic",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ],
+          "codeList": "CL.ETCD"
+        },
+        {
+          "OID": "IT.TE.ELEMENT",
+          "mandatory": true,
+          "name": "ELEMENT",
+          "description": "Description of Element",
+          "role": "Synonym Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ],
+          "codeList": "CL.ELEMENT"
+        },
+        {
+          "OID": "IT.TE.TESTRL",
+          "mandatory": true,
+          "name": "TESTRL",
+          "description": "Rule for Start of Element",
+          "role": "Rule",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "OID": "IG.SV",
+      "name": "SV",
+      "description": "Subject Visits",
+      "domain": "SV",
+      "purpose": "Tabulation",
+      "structure": "One record per actual or planned visit per subject",
+      "isReferenceData": false,
+      "keySequence": [
+        "__PLACEHOLDER__"
+      ],
+      "standard": "STD.SDTMIG",
+      "observationClass": {
+        "name": "SPECIAL-PURPOSE"
+      },
+      "items": [
+        {
+          "OID": "IT.SV.STUDYID",
+          "mandatory": true,
+          "name": "STUDYID",
+          "description": "Study Identifier",
+          "role": "Identifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.SV.DOMAIN",
+          "mandatory": true,
+          "name": "DOMAIN",
+          "description": "Domain Abbreviation",
+          "role": "Identifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.SV.USUBJID",
+          "mandatory": true,
+          "name": "USUBJID",
+          "description": "Unique Subject Identifier",
+          "role": "Identifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.SV.VISITNUM",
+          "mandatory": true,
+          "name": "VISITNUM",
+          "description": "Visit Number",
+          "role": "Topic",
+          "dataType": "integer",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.SV.VISIT",
+          "mandatory": false,
+          "name": "VISIT",
+          "description": "Visit Name",
+          "role": "Synonym Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.SV.SVPRESP",
+          "mandatory": false,
+          "name": "SVPRESP",
+          "description": "Pre-specified",
+          "role": "Variable Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ],
+          "codeList": "CL.NY"
+        },
+        {
+          "OID": "IT.SV.SVOCCUR",
+          "mandatory": false,
+          "name": "SVOCCUR",
+          "description": "Occurrence",
+          "role": "Record Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ],
+          "codeList": "CL.NY"
+        },
+        {
+          "OID": "IT.SV.SVCNTMOD",
+          "mandatory": false,
+          "name": "SVCNTMOD",
+          "description": "Contact Mode",
+          "role": "Record Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ],
+          "codeList": "CL.CNTMODE"
+        },
+        {
+          "OID": "IT.SV.SVSTDTC",
+          "mandatory": false,
+          "name": "SVSTDTC",
+          "description": "Start Date/Time of Observation",
+          "role": "Timing",
+          "dataType": "datetime",
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.SV.SVENDTC",
+          "mandatory": false,
+          "name": "SVENDTC",
+          "description": "End Date/Time of Observation",
+          "role": "Timing",
+          "dataType": "datetime",
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "OID": "IG.SE",
+      "name": "SE",
+      "description": "Subject Elements",
+      "domain": "SE",
+      "purpose": "Tabulation",
+      "structure": "One record per actual Element per subject",
+      "isReferenceData": false,
+      "keySequence": [
+        "__PLACEHOLDER__"
+      ],
+      "standard": "STD.SDTMIG",
+      "observationClass": {
+        "name": "SPECIAL-PURPOSE"
+      },
+      "items": [
+        {
+          "OID": "IT.SE.STUDYID",
+          "mandatory": true,
+          "name": "STUDYID",
+          "description": "Study Identifier",
+          "role": "Identifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.SE.DOMAIN",
+          "mandatory": true,
+          "name": "DOMAIN",
+          "description": "Domain Abbreviation",
+          "role": "Identifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.SE.USUBJID",
+          "mandatory": true,
+          "name": "USUBJID",
+          "description": "Unique Subject Identifier",
+          "role": "Identifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.SE.SESEQ",
+          "mandatory": true,
+          "name": "SESEQ",
+          "description": "Sequence Number",
+          "role": "Identifier",
+          "dataType": "integer",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.SE.ETCD",
+          "mandatory": true,
+          "name": "ETCD",
+          "description": "Element Code",
+          "role": "Topic",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ],
+          "codeList": "CL.ETCD"
+        },
+        {
+          "OID": "IT.SE.ELEMENT",
+          "mandatory": false,
+          "name": "ELEMENT",
+          "description": "Description of Element",
+          "role": "Synonym Qualifier",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ],
+          "codeList": "CL.ELEMENT"
+        },
+        {
+          "OID": "IT.SE.EPOCH",
+          "mandatory": false,
+          "name": "EPOCH",
+          "description": "Epoch",
+          "role": "Timing",
+          "dataType": "text",
+          "length": null,
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ],
+          "codeList": "CL.EPOCH"
+        },
+        {
+          "OID": "IT.SE.SESTDTC",
+          "mandatory": true,
+          "name": "SESTDTC",
+          "description": "Start Date/Time of Element",
+          "role": "Timing",
+          "dataType": "datetime",
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        },
+        {
+          "OID": "IT.SE.SEENDTC",
+          "mandatory": false,
+          "name": "SEENDTC",
+          "description": "End Date/Time of Element",
+          "role": "Timing",
+          "dataType": "datetime",
+          "origin": [
+            {
+              "type": "__PLACEHOLDER__",
+              "source": "__PLACEHOLDER__"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "conditions": [
+    {
+      "OID": "COND.TS.TSPARMCD.cd7838e7",
+      "rangeChecks": [
+        {
+          "comparator": "EQ",
+          "checkValues": [
+            "COMPTRT"
+          ],
+          "item": "IT.TS.TSPARMCD",
+          "softHard": "Soft"
+        }
+      ]
+    },
+    {
+      "OID": "COND.TS.TSPARMCD.204aa07d",
+      "rangeChecks": [
+        {
+          "comparator": "EQ",
+          "checkValues": [
+            "INDIC"
+          ],
+          "item": "IT.TS.TSPARMCD",
+          "softHard": "Soft"
+        }
+      ]
+    },
+    {
+      "OID": "COND.TS.TSPARMCD.fd076a8d",
+      "rangeChecks": [
+        {
+          "comparator": "EQ",
+          "checkValues": [
+            "INTTYPE"
+          ],
+          "item": "IT.TS.TSPARMCD",
+          "softHard": "Soft"
+        }
+      ]
+    },
+    {
+      "OID": "COND.TS.TSPARMCD.770c1610",
+      "rangeChecks": [
+        {
+          "comparator": "EQ",
+          "checkValues": [
+            "NARMS"
+          ],
+          "item": "IT.TS.TSPARMCD",
+          "softHard": "Soft"
+        }
+      ]
+    },
+    {
+      "OID": "COND.TS.TSPARMCD.eb0c9bb2",
+      "rangeChecks": [
+        {
+          "comparator": "EQ",
+          "checkValues": [
+            "OBJPRIM"
+          ],
+          "item": "IT.TS.TSPARMCD",
+          "softHard": "Soft"
+        }
+      ]
+    },
+    {
+      "OID": "COND.TS.TSPARMCD.5ca3cd0c",
+      "rangeChecks": [
+        {
+          "comparator": "EQ",
+          "checkValues": [
+            "OBJSEC"
+          ],
+          "item": "IT.TS.TSPARMCD",
+          "softHard": "Soft"
+        }
+      ]
+    },
+    {
+      "OID": "COND.TS.TSPARMCD.a724d633",
+      "rangeChecks": [
+        {
+          "comparator": "EQ",
+          "checkValues": [
+            "OUTMSPRI"
+          ],
+          "item": "IT.TS.TSPARMCD",
+          "softHard": "Soft"
+        }
+      ]
+    },
+    {
+      "OID": "COND.TS.TSPARMCD.b313e712",
+      "rangeChecks": [
+        {
+          "comparator": "EQ",
+          "checkValues": [
+            "OUTMSSEC"
+          ],
+          "item": "IT.TS.TSPARMCD",
+          "softHard": "Soft"
+        }
+      ]
+    },
+    {
+      "OID": "COND.TS.TSPARMCD.2e2517d1",
+      "rangeChecks": [
+        {
+          "comparator": "EQ",
+          "checkValues": [
+            "SPONSOR"
+          ],
+          "item": "IT.TS.TSPARMCD",
+          "softHard": "Soft"
+        }
+      ]
+    },
+    {
+      "OID": "COND.TS.TSPARMCD.52dad99f",
+      "rangeChecks": [
+        {
+          "comparator": "EQ",
+          "checkValues": [
+            "TITLE"
+          ],
+          "item": "IT.TS.TSPARMCD",
+          "softHard": "Soft"
+        }
+      ]
+    },
+    {
+      "OID": "COND.TS.TSPARMCD.185bd9b1",
+      "rangeChecks": [
+        {
+          "comparator": "EQ",
+          "checkValues": [
+            "TRT"
+          ],
+          "item": "IT.TS.TSPARMCD",
+          "softHard": "Soft"
+        }
+      ]
+    }
+  ],
+  "whereClauses": [
+    {
+      "OID": "WC.TS.54cd02f1",
+      "conditions": [
+        "COND.TS.TSPARMCD.cd7838e7"
+      ]
+    },
+    {
+      "OID": "WC.TS.9cdae039",
+      "conditions": [
+        "COND.TS.TSPARMCD.204aa07d"
+      ]
+    },
+    {
+      "OID": "WC.TS.e3ae16cd",
+      "conditions": [
+        "COND.TS.TSPARMCD.fd076a8d"
+      ]
+    },
+    {
+      "OID": "WC.TS.89c0d243",
+      "conditions": [
+        "COND.TS.TSPARMCD.770c1610"
+      ]
+    },
+    {
+      "OID": "WC.TS.7a056c75",
+      "conditions": [
+        "COND.TS.TSPARMCD.eb0c9bb2"
+      ]
+    },
+    {
+      "OID": "WC.TS.36721696",
+      "conditions": [
+        "COND.TS.TSPARMCD.5ca3cd0c"
+      ]
+    },
+    {
+      "OID": "WC.TS.d8b84608",
+      "conditions": [
+        "COND.TS.TSPARMCD.a724d633"
+      ]
+    },
+    {
+      "OID": "WC.TS.1d3cd461",
+      "conditions": [
+        "COND.TS.TSPARMCD.b313e712"
+      ]
+    },
+    {
+      "OID": "WC.TS.51236927",
+      "conditions": [
+        "COND.TS.TSPARMCD.2e2517d1"
+      ]
+    },
+    {
+      "OID": "WC.TS.43684533",
+      "conditions": [
+        "COND.TS.TSPARMCD.52dad99f"
+      ]
+    },
+    {
+      "OID": "WC.TS.1948fed3",
+      "conditions": [
+        "COND.TS.TSPARMCD.185bd9b1"
+      ]
+    }
+  ],
+  "codeLists": [
+    {
+      "OID": "CL.ARMCD",
+      "name": "ARM Code",
+      "dataType": "text",
+      "isNonStandard": true,
+      "codeListItems": [
+        {
+          "codedValue": "ARM A"
+        },
+        {
+          "codedValue": "ARM B"
+        }
+      ]
+    },
+    {
+      "OID": "CL.ARM",
+      "name": "ARM",
+      "dataType": "text",
+      "isNonStandard": true,
+      "codeListItems": [
+        {
+          "codedValue": "ARM A"
+        },
+        {
+          "codedValue": "ARM B"
+        }
+      ]
+    },
+    {
+      "OID": "CL.ELEMENT",
+      "name": "Description of Element",
+      "dataType": "text",
+      "isNonStandard": true,
+      "codeListItems": [
+        {
+          "codedValue": "Screening"
+        },
+        {
+          "codedValue": "Induction: Fulvestrant + Everolimus"
+        },
+        {
+          "codedValue": "Induction: Fulvestrant + Placebo"
+        },
+        {
+          "codedValue": "Continuation: Fulvestrant + Everolimus"
+        },
+        {
+          "codedValue": "Continuation: Fulvestrant alone"
+        },
+        {
+          "codedValue": "Follow-Up Off-Therapy"
+        }
+      ]
+    },
+    {
+      "OID": "CL.ETCD",
+      "name": "Element Code",
+      "dataType": "text",
+      "isNonStandard": true,
+      "codeListItems": [
+        {
+          "codedValue": "SCREENING_ELEMENT",
+          "decode": "Screening"
+        },
+        {
+          "codedValue": "INDUCTION_EVE_FUL",
+          "decode": "Induction: Fulvestrant + Everolimus"
+        },
+        {
+          "codedValue": "INDUCTION_PBO_FUL",
+          "decode": "Induction: Fulvestrant + Placebo"
+        },
+        {
+          "codedValue": "CONTINUATION_EVE_FUL",
+          "decode": "Continuation: Fulvestrant + Everolimus"
+        },
+        {
+          "codedValue": "CONTINUATION_FUL",
+          "decode": "Continuation: Fulvestrant alone"
+        },
+        {
+          "codedValue": "FOLLOW_UP_ELEMENT",
+          "decode": "Follow-Up Off-Therapy"
+        }
+      ]
+    },
+    {
+      "OID": "CL.EPOCH",
+      "name": "Epoch",
+      "dataType": "text",
+      "standard": "STD.SDTMCT",
+      "coding": [
+        {
+          "code": "C99079",
+          "codeSystem": "nci:ExtCodeID"
+        }
+      ],
+      "codeListItems": [
+        {
+          "codedValue": "Pre-Study Phase",
+          "coding": {
+            "code": "C202487",
+            "codeSystem": "nci:ExtCodeID"
+          }
+        },
+        {
+          "codedValue": "Induction Phase",
+          "coding": {
+            "code": "C101526",
+            "codeSystem": "nci:ExtCodeID"
+          }
+        },
+        {
+          "codedValue": "Continuation Phase",
+          "coding": {
+            "code": "C123452",
+            "codeSystem": "nci:ExtCodeID"
+          }
+        },
+        {
+          "codedValue": "Follow-up Off Therapy",
+          "coding": {
+            "code": "C202578",
+            "codeSystem": "nci:ExtCodeID"
+          }
+        }
+      ]
+    },
+    {
+      "OID": "CL.NCOMPLT",
+      "name": "Completion/Reason for Non-Completion",
+      "dataType": "text",
+      "standard": "STD.SDTMCT",
+      "coding": [
+        {
+          "code": "C66727",
+          "codeSystem": "nci:ExtCodeID"
+        }
+      ],
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
+    },
+    {
+      "OID": "CL.DSCAT",
+      "name": "Category of Disposition Event",
+      "dataType": "text",
+      "standard": "STD.SDTMCT",
+      "coding": [
+        {
+          "code": "C74558",
+          "codeSystem": "nci:ExtCodeID"
+        }
+      ],
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
+    },
+    {
+      "OID": "CL.DSSCAT",
+      "name": "Subcategory for Disposition Event",
+      "dataType": "text",
+      "standard": "STD.SDTMCT",
+      "coding": [
+        {
+          "code": "C170443",
+          "codeSystem": "nci:ExtCodeID"
+        }
+      ],
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
+    },
+    {
+      "OID": "CL.ONCRTSCD",
+      "name": "Oncology Response Assessment Test Code",
+      "dataType": "text",
+      "standard": "STD.SDTMCT",
+      "coding": [
+        {
+          "code": "C96782",
+          "codeSystem": "nci:ExtCodeID"
+        }
+      ],
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
+    },
+    {
+      "OID": "CL.ONCRTS",
+      "name": "Oncology Response Assessment Test Name",
+      "dataType": "text",
+      "standard": "STD.SDTMCT",
+      "coding": [
+        {
+          "code": "C96781",
+          "codeSystem": "nci:ExtCodeID"
+        }
+      ],
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
+    },
+    {
+      "OID": "CL.ONCRSCAT",
+      "name": "Category of Oncology Response Assessment",
+      "dataType": "text",
+      "standard": "STD.SDTMCT",
+      "coding": [
+        {
+          "code": "C124298",
+          "codeSystem": "nci:ExtCodeID"
+        }
+      ],
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
+    },
+    {
+      "OID": "CL.ONCRSR",
+      "name": "Oncology Response Assessment Result",
+      "dataType": "text",
+      "standard": "STD.SDTMCT",
+      "coding": [
+        {
+          "code": "C96785",
+          "codeSystem": "nci:ExtCodeID"
+        }
+      ],
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
+    },
+    {
+      "OID": "CL.EVAL",
+      "name": "Evaluator",
+      "dataType": "text",
+      "standard": "STD.SDTMCT",
+      "coding": [
+        {
+          "code": "C78735",
+          "codeSystem": "nci:ExtCodeID"
+        }
+      ],
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
+    },
+    {
+      "OID": "CL.MEDEVAL",
+      "name": "Medical Evaluator Identifier",
+      "dataType": "text",
+      "standard": "STD.SDTMCT",
+      "coding": [
+        {
+          "code": "C96777",
+          "codeSystem": "nci:ExtCodeID"
+        }
+      ],
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
+    },
+    {
+      "OID": "CL.VSTESTCD",
+      "name": "Vital Signs Test Code",
+      "dataType": "text",
+      "standard": "STD.SDTMCT",
+      "coding": [
+        {
+          "code": "C66741",
+          "codeSystem": "nci:ExtCodeID"
+        }
+      ],
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
+    },
+    {
+      "OID": "CL.VSTEST",
+      "name": "Vital Signs Test Name",
+      "dataType": "text",
+      "standard": "STD.SDTMCT",
+      "coding": [
+        {
+          "code": "C67153",
+          "codeSystem": "nci:ExtCodeID"
+        }
+      ],
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
+    },
+    {
+      "OID": "CL.POSITION",
+      "name": "Position",
+      "dataType": "text",
+      "standard": "STD.SDTMCT",
+      "coding": [
+        {
+          "code": "C71148",
+          "codeSystem": "nci:ExtCodeID"
+        }
+      ],
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
+    },
+    {
+      "OID": "CL.VSRESU",
+      "name": "Units for Vital Signs Results",
+      "dataType": "text",
+      "standard": "STD.SDTMCT",
+      "coding": [
+        {
+          "code": "C66770",
+          "codeSystem": "nci:ExtCodeID"
+        }
+      ],
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
+    },
+    {
+      "OID": "CL.LOC",
+      "name": "Anatomical Location",
+      "dataType": "text",
+      "standard": "STD.SDTMCT",
+      "coding": [
+        {
+          "code": "C74456",
+          "codeSystem": "nci:ExtCodeID"
+        }
+      ],
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
+    },
+    {
+      "OID": "CL.LAT",
+      "name": "Laterality",
+      "dataType": "text",
+      "standard": "STD.SDTMCT",
+      "coding": [
+        {
+          "code": "C99073",
+          "codeSystem": "nci:ExtCodeID"
+        }
+      ],
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
+    },
+    {
+      "OID": "CL.NY",
+      "name": "No Yes Response",
+      "dataType": "text",
+      "standard": "STD.SDTMCT",
+      "coding": [
+        {
+          "code": "C66742",
+          "codeSystem": "nci:ExtCodeID"
+        }
+      ],
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
+    },
+    {
+      "OID": "CL.LBTESTCD",
+      "name": "Laboratory Test Code",
+      "dataType": "text",
+      "standard": "STD.SDTMCT",
+      "coding": [
+        {
+          "code": "C65047",
+          "codeSystem": "nci:ExtCodeID"
+        }
+      ],
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
+    },
+    {
+      "OID": "CL.LBTEST",
+      "name": "Laboratory Test Name",
+      "dataType": "text",
+      "standard": "STD.SDTMCT",
+      "coding": [
+        {
+          "code": "C67154",
+          "codeSystem": "nci:ExtCodeID"
+        }
+      ],
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
+    },
+    {
+      "OID": "CL.UNIT",
+      "name": "Unit",
+      "dataType": "text",
+      "standard": "STD.SDTMCT",
+      "coding": [
+        {
+          "code": "C71620",
+          "codeSystem": "nci:ExtCodeID"
+        }
+      ],
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
+    },
+    {
+      "OID": "CL.LBSTRESC",
+      "name": "Laboratory Test Standard Character Result",
+      "dataType": "text",
+      "standard": "STD.SDTMCT",
+      "coding": [
+        {
+          "code": "C102580",
+          "codeSystem": "nci:ExtCodeID"
+        }
+      ],
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
+    },
+    {
+      "OID": "CL.NRIND",
+      "name": "Reference Range Indicator",
+      "dataType": "text",
+      "standard": "STD.SDTMCT",
+      "coding": [
+        {
+          "code": "C78736",
+          "codeSystem": "nci:ExtCodeID"
+        }
+      ],
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
+    },
+    {
+      "OID": "CL.SPECTYPE",
+      "name": "Specimen Type",
+      "dataType": "text",
+      "standard": "STD.SDTMCT",
+      "coding": [
+        {
+          "code": "C78734",
+          "codeSystem": "nci:ExtCodeID"
+        }
+      ],
+      "codeListItems": [
+        {
+          "codedValue": "BLOOD",
+          "decode": "Peripheral Blood",
+          "coding": {
+            "code": "C12434",
+            "codeSystem": "nci:ExtCodeID"
+          }
+        },
+        {
+          "codedValue": "SERUM OR PLASMA",
+          "decode": "Ser/Plas",
+          "coding": {
+            "code": "C105706",
+            "codeSystem": "nci:ExtCodeID"
+          }
+        },
+        {
+          "codedValue": "URINE",
+          "decode": "",
+          "coding": {
+            "code": "C13283",
+            "codeSystem": "nci:ExtCodeID"
+          }
+        }
+      ]
+    },
+    {
+      "OID": "CL.METHOD",
+      "name": "Method",
+      "dataType": "text",
+      "standard": "STD.SDTMCT",
+      "coding": [
+        {
+          "code": "C85492",
+          "codeSystem": "nci:ExtCodeID"
+        }
+      ],
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
+    },
+    {
+      "OID": "CL.NY_NY",
+      "name": "No Yes Response (Subset NY)",
+      "dataType": "text",
+      "standard": "STD.SDTMCT",
+      "coding": [
+        {
+          "code": "C66742",
+          "codeSystem": "nci:ExtCodeID"
+        }
+      ],
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
+    },
+    {
+      "OID": "CL.URNSTSCD",
+      "name": "Urinary System Test Code",
+      "dataType": "text",
+      "standard": "STD.SDTMCT",
+      "coding": [
+        {
+          "code": "C129942",
+          "codeSystem": "nci:ExtCodeID"
+        }
+      ],
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
+    },
+    {
+      "OID": "CL.URNSTS",
+      "name": "Urinary System Test Name",
+      "dataType": "text",
+      "standard": "STD.SDTMCT",
+      "coding": [
+        {
+          "code": "C129941",
+          "codeSystem": "nci:ExtCodeID"
+        }
+      ],
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
+    },
+    {
+      "OID": "CL.FRM",
+      "name": "Dosage Form",
+      "dataType": "text",
+      "standard": "STD.SDTMCT",
+      "coding": [
+        {
+          "code": "C66726",
+          "codeSystem": "nci:ExtCodeID"
+        }
+      ],
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
+    },
+    {
+      "OID": "CL.FREQ",
+      "name": "Frequency",
+      "dataType": "text",
+      "standard": "STD.SDTMCT",
+      "coding": [
+        {
+          "code": "C71113",
+          "codeSystem": "nci:ExtCodeID"
+        }
+      ],
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
+    },
+    {
+      "OID": "CL.ROUTE",
+      "name": "Route of Administration Response",
+      "dataType": "text",
+      "standard": "STD.SDTMCT",
+      "coding": [
+        {
+          "code": "C66729",
+          "codeSystem": "nci:ExtCodeID"
+        }
+      ],
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
+    },
+    {
+      "OID": "CL.STENRF",
+      "name": "Relation to Reference Period",
+      "dataType": "text",
+      "standard": "STD.SDTMCT",
+      "coding": [
+        {
+          "code": "C66728",
+          "codeSystem": "nci:ExtCodeID"
+        }
+      ],
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
+    },
+    {
+      "OID": "CL.TSPARMCD",
+      "name": "Trial Summary Parameter Test Code",
+      "dataType": "text",
+      "standard": "STD.SDTMCT",
+      "coding": [
+        {
+          "code": "C66738",
+          "codeSystem": "nci:ExtCodeID"
+        }
+      ],
+      "codeListItems": [
+        {
+          "codedValue": "RANDOM",
+          "decode": "Trial is Randomized",
+          "coding": {
+            "code": "C25196",
+            "codeSystem": "nci:ExtCodeID"
+          }
+        }
+      ]
+    },
+    {
+      "OID": "CL.TSPARM",
+      "name": "Trial Summary Parameter Test Name",
+      "dataType": "text",
+      "standard": "STD.SDTMCT",
+      "coding": [
+        {
+          "code": "C67152",
+          "codeSystem": "nci:ExtCodeID"
+        }
+      ],
+      "codeListItems": [
+        {
+          "codedValue": "Trial is Randomized",
+          "decode": "Trial is Randomized",
+          "coding": {
+            "code": "C25196",
+            "codeSystem": "nci:ExtCodeID"
+          }
+        }
+      ]
+    },
+    {
+      "OID": "CL.DICTNAM",
+      "name": "Dictionary Name",
+      "dataType": "text",
+      "standard": "STD.SDTMCT",
+      "coding": [
+        {
+          "code": "C66788",
+          "codeSystem": "nci:ExtCodeID"
+        }
+      ],
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
+    },
+    {
+      "OID": "CL.TUTESTCD",
+      "name": "Tumor or Lesion Identification Test Code",
+      "dataType": "text",
+      "standard": "STD.SDTMCT",
+      "coding": [
+        {
+          "code": "C96784",
+          "codeSystem": "nci:ExtCodeID"
+        }
+      ],
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
+    },
+    {
+      "OID": "CL.TUTEST",
+      "name": "Tumor or Lesion Identification Test Name",
+      "dataType": "text",
+      "standard": "STD.SDTMCT",
+      "coding": [
+        {
+          "code": "C96783",
+          "codeSystem": "nci:ExtCodeID"
+        }
+      ],
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
+    },
+    {
+      "OID": "CL.TUIDRS",
+      "name": "Tumor or Lesion Identification Test Results",
+      "dataType": "text",
+      "standard": "STD.SDTMCT",
+      "coding": [
+        {
+          "code": "C123650",
+          "codeSystem": "nci:ExtCodeID"
+        }
+      ],
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
+    },
+    {
+      "OID": "CL.DIR",
+      "name": "Directionality",
+      "dataType": "text",
+      "standard": "STD.SDTMCT",
+      "coding": [
+        {
+          "code": "C99074",
+          "codeSystem": "nci:ExtCodeID"
+        }
+      ],
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
+    },
+    {
+      "OID": "CL.CNTMODE",
+      "name": "Mode of Subject Contact",
+      "dataType": "text",
+      "standard": "STD.SDTMCT",
+      "coding": [
+        {
+          "code": "C171445",
+          "codeSystem": "nci:ExtCodeID"
+        }
+      ],
+      "codeListItems": [
+        {
+          "codedValue": "IN PERSON",
+          "decode": "In-Person",
+          "coding": {
+            "code": "C175574",
+            "codeSystem": "nci:ExtCodeID"
+          }
+        }
+      ]
+    }
+  ],
+  "methods": [],
+  "comments": [],
+  "standards": [
+    {
+      "OID": "STD.SDTMIG",
+      "name": "SDTMIG",
+      "type": "IG",
+      "version": "3.4",
+      "status": "FINAL"
+    },
+    {
+      "OID": "STD.SDTMCT",
+      "name": "CDISC/NCI",
+      "type": "CT",
+      "version": "2025-03-28",
+      "status": "FINAL",
+      "publishingSet": "SDTM"
+    }
+  ],
+  "annotatedCRF": [],
+  "concepts": [],
+  "conceptProperties": []
+}

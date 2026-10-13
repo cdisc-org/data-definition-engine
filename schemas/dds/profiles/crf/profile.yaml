@@ -1,0 +1,249 @@
+id: https://cdisc.org/dds/profiles/crf
+name: dds-profile-crf
+title: DDS CRF Profile
+description: >-
+  Differential profile of the Data Definition Specification for generating ODM v1.3.2 and
+  ODM v2.0 case report forms (blank and SDTM-annotated) from a DDS instance.
+license: MIT
+version: 0.1.0
+
+prefixes:
+  dds: https://cdisc.org/dds/
+  ddsp: https://cdisc.org/dds/profiles/crf/
+  linkml: https://w3id.org/linkml/
+  odm: http://www.cdisc.org/ns/odm/v2.0/
+  NCIT: http://purl.obolibrary.org/obo/NCIT_
+default_prefix: ddsp
+
+imports:
+  - linkml:types
+  - dds
+
+annotations:
+  dds.profile.baseModel: https://cdisc.org/dds
+  dds.profile.baseVersion: "unversioned"
+  dds.profile.status: draft
+  dds.profile.useCase: >-
+    Generation of ODM v1.3.2 and ODM v2.0 case report forms (blank and SDTM-annotated)
+    from a DDS instance.
+
+# ---------------------------------------------------------------------------------
+# STATUS - READ THIS BEFORE RUNNING dds_profile_snapshot.py
+# ---------------------------------------------------------------------------------
+# This differential is authored against dds.yaml PLUS the base-model additions listed as
+# PR-DDS-1 in CRF_GEN_PLAN.md section 3.1, which have NOT landed upstream yet. The
+# following slots and enum values it relies on do not exist in the current
+# DataExchange-DDS model/dds.yaml:
+#
+#   IsODMItem.question, .prompt, .definition, .mappingInstructions, .unitsItem
+#   ItemGroup.repeating
+#   Alias class, Labelled.aliases widening
+#   ItemGroupType permissible value  Concept
+#   StandardName permissible value   CDASHIG
+#   StudyEvent class + MetaDataVersion.studyEvents, StudyEventType enum
+#
+# A profile may only TIGHTEN a base model, never add to it, so this file cannot be
+# snapshotted or used to generate a JSON Schema until PR-DDS-1 merges. It is committed
+# here as the authoring record and the thing to open upstream as a PR.
+#
+# What crf_loader.py --validate actually uses today is the hand-written, self-contained
+# crf.schema.json beside this file. See README.md.
+# ---------------------------------------------------------------------------------
+
+classes:
+
+  MetaDataVersion:
+    slot_usage:
+      OID:            {required: true}
+      name:           {required: true}
+      studyOID:       {required: true}
+      studyName:      {required: true}
+      protocolName:   {required: true}    # ODM 2.0 Study/@ProtocolName is required
+      itemGroups:     {required: true, minimum_cardinality: 1}
+      standards:      {required: true, minimum_cardinality: 1}
+      # The SDMX-derived analysis subtree is out of scope for a CRF.
+      analyses:       {maximum_cardinality: 0}
+      dataProducts:   {maximum_cardinality: 0}
+      displays:       {maximum_cardinality: 0}
+      dictionaries:   {maximum_cardinality: 0}
+
+  ItemGroup:
+    slot_usage:
+      OID:        {required: true, pattern: '^IG\.(FORM|SEC|CON)\..+'}
+      name:       {required: true}
+      type:       {required: true, range: CrfItemGroupType}
+      repeating:  {required: true}
+      mandatory:  {required: true}
+    rules:
+      - preconditions: {slot_conditions: {type: {equals_string: Form}}}
+        postconditions: {slot_conditions: {slices: {minimum_cardinality: 1}}}
+        description: A Form must contain at least one Section.
+      - preconditions: {slot_conditions: {type: {equals_string: Concept}}}
+        postconditions:
+          slot_conditions:
+            items: {minimum_cardinality: 1}
+            implementsConcept: {required: true}
+        description: A Concept group must carry items and name the concept it collects.
+    attributes:
+      crfSpecializationRef:
+        description: Href of the CRF Specialization this Concept group implements.
+        range: string
+        slot_uri: ddsp:crfSpecializationRef
+        annotations: {dds.profile.extension: true}
+      crfImplementationOption:
+        description: Whether the specialization is the Normalized or Denormalized variant.
+        range: CrfImplementationOption
+        slot_uri: ddsp:crfImplementationOption
+        annotations: {dds.profile.extension: true}
+      crfScenario:
+        description: CDASHIG scenario the group implements, when it names one.
+        range: string
+        slot_uri: ddsp:crfScenario
+        annotations: {dds.profile.extension: true}
+      crfSectionInstructions:
+        description: >-
+          Completion instructions for a Section or Form. ODM has no ItemGroupDef-level
+          element for this, so both generators emit it as Alias Context=completionInstructions.
+        range: string
+        slot_uri: ddsp:crfSectionInstructions
+        annotations: {dds.profile.extension: true}
+      crfActivityRef:
+        description: USDM Activity id this Form was derived from.
+        range: string
+        slot_uri: ddsp:crfActivityRef
+        annotations: {dds.profile.extension: true}
+      crfRenderingHint:
+        description: Layout hint for the stylesheets; set only by the refinement file.
+        range: CrfRenderingHint
+        slot_uri: ddsp:crfRenderingHint
+        annotations: {dds.profile.extension: true}
+
+  Item:
+    slot_usage:
+      OID:        {required: true, pattern: '^IT\.CRF\..+'}
+      name:       {required: true}
+      mandatory:  {required: true}
+      dataType:   {required: true, range: CrfDataType}
+    rules:
+      - postconditions:
+          any_of:
+            - slot_conditions: {question: {required: true}}
+            - slot_conditions: {prompt: {required: true}}
+        description: Every collected item must show the subject a question or a prompt.
+    attributes:
+      crfSelectionType:
+        description: Single (radio) or Multiple (checkbox) selection.
+        range: CrfSelectionType
+        slot_uri: ddsp:crfSelectionType
+        annotations: {dds.profile.extension: true}
+      crfDisplayHidden:
+        description: >-
+          Item is retained for traceability but not rendered; the generator omits it
+          unless --include-hidden is given.
+        range: boolean
+        slot_uri: ddsp:crfDisplayHidden
+        annotations: {dds.profile.extension: true}
+      crfDerived:
+        description: Item is derived rather than collected; derivation text goes to cdiscNotes.
+        range: boolean
+        slot_uri: ddsp:crfDerived
+        annotations: {dds.profile.extension: true}
+      crfPrepopulatedCoding:
+        description: Coding of the pre-populated value behind preSpecifiedValue.
+        range: Coding
+        slot_uri: ddsp:crfPrepopulatedCoding
+        annotations: {dds.profile.extension: true}
+      crfSdtmTarget:
+        description: The SDTM annotation and target variables for the aCRF.
+        range: CrfSdtmTarget
+        slot_uri: ddsp:crfSdtmTarget
+        annotations: {dds.profile.extension: true}
+
+  Origin:
+    slot_usage:
+      type:   {required: true, range: CrfOriginType}
+      source: {required: true}
+
+  CodeList:
+    slot_usage:
+      OID:           {required: true, pattern: '^CL\..+'}
+      codeListItems: {minimum_cardinality: 1}
+
+  StudyEvent:
+    slot_usage:
+      OID:  {required: true, pattern: '^SE\..+'}
+      name: {required: true}
+      type: {required: true}
+    attributes:
+      crfEncounterRef:
+        description: USDM Encounter id this StudyEvent was derived from.
+        range: string
+        slot_uri: ddsp:crfEncounterRef
+        annotations: {dds.profile.extension: true}
+
+  Standard:
+    slot_usage:
+      name:    {required: true}
+      version: {required: true}
+
+  CrfSdtmTarget:
+    description: Where a collected item lands in SDTM.
+    annotations: {dds.profile.extension: true}
+    attributes:
+      annotation:
+        description: MSG-style annotation text, e.g. "VSORRES when VSTESTCD = SYSBP".
+        range: string
+      variables:
+        description: SDTM variable names the item maps to.
+        range: string
+        multivalued: true
+      items:
+        description: OIDs of the SDTM Items in this same DDS, when they exist.
+        range: string
+        multivalued: true
+
+  CrfRenderingHint:
+    description: Presentation hints consumed by the CRF stylesheets.
+    annotations: {dds.profile.extension: true}
+    attributes:
+      placement:        {range: string}
+      widget:           {range: string}
+      columns:          {range: integer}
+      abbreviatedLabel: {range: string}
+
+enums:
+
+  CrfItemGroupType:
+    description: The ItemGroup types a CRF uses.
+    permissible_values:
+      Form:
+      Section:
+      Concept:
+
+  CrfDataType:
+    description: The data types a collected field may take.
+    permissible_values:
+      text:
+      integer:
+      float:
+      date:
+      time:
+      datetime:
+      boolean:
+
+  CrfOriginType:
+    description: How a CRF item's value comes to be.
+    permissible_values:
+      Collected:
+      Assigned:
+      Protocol:
+
+  CrfImplementationOption:
+    permissible_values:
+      Normalized:
+      Denormalized:
+
+  CrfSelectionType:
+    permissible_values:
+      Single:
+      Multiple:

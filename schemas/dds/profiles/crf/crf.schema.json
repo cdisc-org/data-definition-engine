@@ -1,0 +1,223 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cdisc.org/dds/profiles/crf/crf.schema.json",
+  "title": "DDS CRF Profile",
+  "description": "Validation schema for a DDS instance carrying CRF metadata. Hand-written and self-contained: it constrains only the CRF-owned content and tolerates the Define-XML content that shares the instance, so a combined DDS validates without stripping. See README.md.",
+  "type": "object",
+  "required": ["OID", "name", "studyOID", "studyName", "protocolName", "itemGroups", "standards"],
+  "properties": {
+    "OID": {"type": "string", "minLength": 1},
+    "name": {"type": "string", "minLength": 1},
+    "studyOID": {"type": "string", "minLength": 1},
+    "studyName": {"type": "string", "minLength": 1, "not": {"const": "None"}},
+    "studyDescription": {"type": ["string", "null"]},
+    "protocolName": {"type": "string", "minLength": 1},
+    "standards": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/standard"},
+      "contains": {"properties": {"OID": {"const": "STD.CDASHIG"}}, "required": ["OID"]}
+    },
+    "itemGroups": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/itemGroup"}},
+    "codeLists": {"type": "array", "items": {"$ref": "#/$defs/codeList"}},
+    "studyEvents": {"type": "array", "items": {"$ref": "#/$defs/studyEvent"}},
+    "annotatedCRFs": {"type": "array", "items": {"$ref": "#/$defs/documentReference"}},
+    "profile": {"type": "array", "items": {"type": "string"}},
+    "analyses": {"type": "array", "maxItems": 0},
+    "dataProducts": {"type": "array", "maxItems": 0},
+    "displays": {"type": "array", "maxItems": 0}
+  },
+  "$defs": {
+    "standard": {
+      "type": "object",
+      "required": ["OID", "name", "version"],
+      "properties": {
+        "OID": {"type": "string"},
+        "name": {"type": "string", "minLength": 1},
+        "type": {"type": "string", "enum": ["IG", "CT"]},
+        "version": {"type": "string", "minLength": 1},
+        "status": {"type": "string"},
+        "publishingSet": {"type": "string"}
+      }
+    },
+    "itemGroup": {
+      "type": "object",
+      "required": ["OID"],
+      "properties": {
+        "OID": {"type": "string", "minLength": 1},
+        "name": {"type": "string"},
+        "type": {"type": "string"},
+        "items": {"type": "array"},
+        "slices": {"type": "array", "items": {"$ref": "#/$defs/itemGroup"}}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"type": {"const": "Form"}}, "required": ["type"]},
+          "then": {
+            "required": ["OID", "name", "type", "repeating", "mandatory", "slices"],
+            "properties": {
+              "OID": {"pattern": "^IG\\.FORM\\..+"},
+              "repeating": {"$ref": "#/$defs/repeating"},
+              "mandatory": {"type": "boolean"},
+              "slices": {"type": "array", "minItems": 1}
+            }
+          }
+        },
+        {
+          "if": {"properties": {"type": {"const": "Section"}}, "required": ["type"]},
+          "then": {
+            "required": ["OID", "name", "type", "repeating", "mandatory"],
+            "properties": {
+              "OID": {"pattern": "^IG\\.SEC\\..+"},
+              "repeating": {"$ref": "#/$defs/repeating"},
+              "mandatory": {"type": "boolean"},
+              "crfSectionInstructions": {"type": ["string", "null"]}
+            }
+          }
+        },
+        {
+          "if": {"properties": {"type": {"const": "Concept"}}, "required": ["type"]},
+          "then": {
+            "required": ["OID", "name", "type", "repeating", "mandatory", "items"],
+            "properties": {
+              "OID": {"pattern": "^IG\\.CON\\..+"},
+              "repeating": {"$ref": "#/$defs/repeating"},
+              "mandatory": {"type": "boolean"},
+              "items": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/crfItem"}},
+              "crfImplementationOption": {"enum": ["Normalized", "Denormalized"]},
+              "crfSpecializationRef": {"type": "string"},
+              "crfScenario": {"type": "string"},
+              "coding": {"type": "array", "items": {"$ref": "#/$defs/coding"}}
+            }
+          }
+        }
+      ]
+    },
+    "repeating": {"type": "string", "enum": ["No", "Simple", "Static", "Dynamic"]},
+    "crfItem": {
+      "type": "object",
+      "required": ["OID", "name", "mandatory", "dataType"],
+      "properties": {
+        "OID": {"type": "string", "pattern": "^IT\\.CRF\\..+"},
+        "name": {"type": "string", "minLength": 1},
+        "mandatory": {"type": "boolean"},
+        "dataType": {"type": "string", "enum": ["text", "integer", "float", "date", "time", "datetime", "boolean"]},
+        "length": {"type": "integer"},
+        "significantDigits": {"type": "integer"},
+        "question": {"type": "string"},
+        "prompt": {"type": "string"},
+        "description": {"type": "string"},
+        "definition": {"type": "string"},
+        "crfCompletionInstructions": {"type": "string"},
+        "implementationNotes": {"type": "string"},
+        "mappingInstructions": {"type": "string"},
+        "cdiscNotes": {"type": "string"},
+        "codeList": {"type": "string"},
+        "unitsItem": {"type": "string"},
+        "preSpecifiedValue": {"type": "string"},
+        "conceptProperty": {"type": "string"},
+        "crfSelectionType": {"enum": ["Single", "Multiple"]},
+        "crfDisplayHidden": {"type": "boolean"},
+        "crfDerived": {"type": "boolean"},
+        "crfPrepopulatedCoding": {"$ref": "#/$defs/coding"},
+        "crfSdtmTarget": {
+          "type": "object",
+          "properties": {
+            "annotation": {"type": "string"},
+            "variables": {"type": "array", "items": {"type": "string"}},
+            "items": {"type": "array", "items": {"type": "string"}}
+          }
+        },
+        "coding": {"type": "array", "items": {"$ref": "#/$defs/coding"}},
+        "aliases": {"type": "array", "items": {"$ref": "#/$defs/alias"}},
+        "origin": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["type", "source"],
+            "properties": {
+              "type": {"enum": ["Collected", "Assigned", "Protocol"]},
+              "source": {"type": "string", "minLength": 1}
+            }
+          }
+        }
+      },
+      "anyOf": [
+        {"required": ["question"]},
+        {"required": ["prompt"]}
+      ]
+    },
+    "codeList": {
+      "type": "object",
+      "required": ["OID"],
+      "properties": {
+        "OID": {"type": "string", "pattern": "^CL\\..+"},
+        "name": {"type": "string"},
+        "dataType": {"type": "string"},
+        "wasDerivedFrom": {"type": "string"},
+        "codeListItems": {"type": "array"},
+        "coding": {"type": "array", "items": {"$ref": "#/$defs/coding"}}
+      }
+    },
+    "studyEvent": {
+      "type": "object",
+      "required": ["OID", "name", "type"],
+      "properties": {
+        "OID": {"type": "string", "pattern": "^SE\\..+"},
+        "name": {"type": "string", "minLength": 1},
+        "label": {"type": "string"},
+        "description": {"type": "string"},
+        "type": {"enum": ["Scheduled", "Unscheduled", "Common"]},
+        "repeating": {"type": "boolean"},
+        "category": {"type": "string"},
+        "itemGroups": {"type": "array", "items": {"type": "string", "pattern": "^IG\\.FORM\\..+"}},
+        "crfEncounterRef": {"type": "string"},
+        "coding": {"type": "array", "items": {"$ref": "#/$defs/coding"}},
+        "occurrence": {
+          "type": "object",
+          "properties": {
+            "timing": {
+              "type": "object",
+              "properties": {
+                "type": {"type": "string"},
+                "value": {"type": "string"},
+                "isNominal": {"type": "boolean"},
+                "label": {"type": "string"},
+                "relativeTo": {"type": "string"}
+              }
+            },
+            "event": {"type": "string"}
+          }
+        }
+      }
+    },
+    "coding": {
+      "type": "object",
+      "required": ["code"],
+      "properties": {
+        "code": {"type": "string"},
+        "codeSystem": {"type": "string"},
+        "codeSystemVersion": {"type": "string"},
+        "decode": {"type": ["string", "null"]}
+      }
+    },
+    "alias": {
+      "type": "object",
+      "required": ["context", "name"],
+      "properties": {
+        "context": {"type": "string"},
+        "name": {"type": "string"}
+      }
+    },
+    "documentReference": {
+      "type": "object",
+      "required": ["leafID"],
+      "properties": {
+        "leafID": {"type": "string"},
+        "title": {"type": "string"},
+        "href": {"type": "string"}
+      }
+    }
+  }
+}

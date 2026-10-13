@@ -1,0 +1,50 @@
+{
+  "name": "VS",
+  "label": "Vital Signs",
+  "fields": [
+    {
+      "name": "VSDAT",
+      "label": "Date of Measurement",
+      "ordinal": "5",
+      "questionText": "What was the date of the vital signs measurement?",
+      "prompt": "(Date)",
+      "definition": "Date of the vital signs measurement.",
+      "completionInstructions": "Record the date the measurement was taken.",
+      "implementationNotes": "Use ISO 8601.",
+      "mappingInstructions": "Maps to VSDTC.",
+      "simpleDatatype": "Char",
+      "core": "HR"
+    },
+    {
+      "name": "VSORRES",
+      "label": "VS Result or Finding in Original Units",
+      "ordinal": "16",
+      "questionText": "What was the result of the measurement?",
+      "prompt": "(Result)",
+      "definition": "Result of the vital signs measurement.",
+      "completionInstructions": "Record the vital sign result.",
+      "mappingInstructions": "Maps directly to the SDTMIG variable.",
+      "simpleDatatype": "Char",
+      "core": "HR"
+    },
+    {
+      "name": "--ORRESU",
+      "label": "Original Units",
+      "ordinal": "17",
+      "questionText": "What was the unit of the measurement?",
+      "prompt": "(Unit)",
+      "definition": "Unit of the original result.",
+      "simpleDatatype": "Char",
+      "core": "HR"
+    }
+  ],
+  "_links": {
+    "scenarios": [
+      {
+        "href": "/mdr/cdashig/2-3/scenarios/VS.HorizontalGeneric",
+        "title": "Horizontal Generic",
+        "type": "CDASH Scenario"
+      }
+    ]
+  }
+}

@@ -36,6 +36,9 @@ ELEMENTS = ["ValueListDef", "WhereClauseDef", "ItemGroupDef", "ItemDef", "CodeLi
 # and post-processing depends on ItemDef being fully materialized.
 SECTION_ORDER = [
     "standards",
+    # The DDS schema names this slot annotatedCRFs; the singular is the legacy key that
+    # create_define_json.py wrote before the rename. Both dispatch to the same loader.
+    "annotatedCRFs",
     "annotatedCRF",
     "codeLists",
     "concepts",
@@ -56,6 +59,7 @@ LOADERS = {
     "codeLists": codeLists.CodeLists,
     "methods": methods.Methods,
     "standards": standards.Standards,
+    "annotatedCRFs": annotatedCRF.AnnotatedCRF,
     "annotatedCRF": annotatedCRF.AnnotatedCRF,
     "concepts": concepts.Concepts,
     "conceptProperties": conceptProperties.ConceptProperties,
@@ -115,26 +119,34 @@ class DefineGenerator:
         self._init_define_objects()
         self._load_study(template_objects)
         # explicit dispatch order — no dependency on JSON key order.
+        loaded: set[type] = set()
         for section in SECTION_ORDER:
             if section not in template_objects:
                 continue
             value = template_objects[section]
             if not isinstance(value, list):
                 continue
+            # annotatedCRFs and annotatedCRF are the same slot under two spellings; a
+            # file carrying both must not run the loader twice.
+            loader_class = LOADERS.get(section)
+            if loader_class in loaded:
+                logging.info(f"skipping {section} - already loaded under another key")
+                continue
+            loaded.add(loader_class)
             logging.info(f"processing {section}")
             self._load(section, value)
 
-        self._post_process_elements()
+        self._post_process_elements(template_objects)
         odm = self._build_doc()
         self._write_define(odm)
 
 
-    def _post_process_elements(self) -> None:
+    def _post_process_elements(self, template_objects) -> None:
         """
         Post-processing adds content determined after all elements are created.
         :return: None
         """
-        pp = PP.PostProcessing(self.define_objects, self.is_xpt, self.lang)
+        pp = PP.PostProcessing(self.define_objects, template_objects, self.is_xpt, self.lang)
         pp.process_define_objects()
 
     def _init_define_objects(self) -> None:
@@ -218,6 +230,7 @@ class DefineGenerator:
 
         :param odm: the instantiated odmlib Define-XML ODM object
         """
+        Path(self.define_file).parent.mkdir(parents=True, exist_ok=True)
         odm.write_xml(self.define_file)
 
     def _check_file_existence(self) -> None:

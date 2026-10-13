@@ -1,5 +1,6 @@
 from typing import Any
 from odmlib.define_2_1 import model as DEFINE
+from odmlib import permissive
 import define_object
 
 
@@ -48,11 +49,9 @@ class Items(define_object.DefineObject):
         data_type = self.require_key(obj, "dataType", f"ItemDef {oid}")
         attr = {"OID": oid, "Name": name, "DataType": data_type, "SASFieldName": name}
         self._add_optional_itemdef_attributes(attr, obj)
-        # TODO hack — bypasses odmlib descriptor validation so "__PLACEHOLDER__" values
-        # can be stashed on an ItemDef until odmlib v0.2.0 ships. We must manually
-        # materialize the list-typed children that downstream code later appends to
-        # because skipping __init__ skips their initialization.
-        item = self._new_itemdef(attr)
+        # permissive mode needed to bypass odmlib descriptor validation to allow __PLACEHOLDER__ values
+        with permissive():
+            item = DEFINE.ItemDef(**attr)
 
         if obj.get("description"):
             tt = DEFINE.TranslatedText(_content=obj["description"], lang=self.lang)
@@ -64,14 +63,6 @@ class Items(define_object.DefineObject):
         for list_attr in ("Origin",):
             if list_attr not in item.__dict__:
                 item.__dict__[list_attr] = []
-        return item
-
-    @staticmethod
-    def _new_itemdef(attr: dict[str, Any]) -> Any:
-        """Instantiate an ItemDef without triggering descriptor validation."""
-        item = object.__new__(DEFINE.ItemDef)
-        for key, value in attr.items():
-            item.__dict__[key] = value
         return item
 
     def _add_optional_itemdef_elements(self, item, obj, it_oid, slice):
@@ -88,7 +79,23 @@ class Items(define_object.DefineObject):
             self._add_origin(item, obj)
 
     def _add_origin(self, item, obj):
-        origin_in = obj["origin"]
+        origins_in = obj["origin"]
+        if isinstance(origins_in, dict):
+            # Today's DDS shape: a single origin dict with item-level predecessor/pages siblings.
+            # Future shape: a list of origin dicts, each carrying its own predecessor/pages.
+            # Normalize today's shape by folding the item-level fields into the wrapped dict so
+            # the per-origin builder only ever reads from the origin dict.
+            wrapped = dict(origins_in)
+            if obj.get("predecessor") and "predecessor" not in wrapped:
+                wrapped["predecessor"] = obj["predecessor"]
+            if obj.get("pages") and "pages" not in wrapped:
+                wrapped["pages"] = obj["pages"]
+            origins_in = [wrapped]
+
+        for origin_in in origins_in:
+            item.Origin.append(self._build_origin(origin_in))
+
+    def _build_origin(self, origin_in):
         origin_type = origin_in.get("type")
         origin_source = origin_in.get("source")
         attr: dict[str, Any] = {}
@@ -96,29 +103,25 @@ class Items(define_object.DefineObject):
             attr["Type"] = origin_type
         if origin_source:
             attr["Source"] = origin_source
-        # Bypass odmlib descriptor validation to allow __PLACEHOLDER__ values later.
-        # TODO remove this hack when odmlib v0.2.0 is released.
-        origin = object.__new__(DEFINE.Origin)
-        for key, value in attr.items():
-            origin.__dict__[key] = value
-        origin.__dict__.setdefault("DocumentRef", [])
+        # permissive mode needed to bypass odmlib descriptor validation to allow __PLACEHOLDER__ values
+        with permissive():
+            origin = DEFINE.Origin(**attr)
 
         if origin_type == "Collected" and origin_source == "Investigator":
             dr = DEFINE.DocumentRef(leafID=self.acrf)
             dr.PDFPageRef.append(DEFINE.PDFPageRef(PageRefs="__PLACEHOLDER__", Type="PhysicalRef"))
             origin.DocumentRef.append(dr)
 
-        if obj.get("predecessor"):
+        if origin_in.get("predecessor"):
             origin.Description = DEFINE.Description()
             origin.Description.TranslatedText.append(
-                DEFINE.TranslatedText(_content=obj["predecessor"], lang=self.lang)
+                DEFINE.TranslatedText(_content=origin_in["predecessor"], lang=self.lang)
             )
-        if obj.get("pages"):
+        if origin_in.get("pages"):
             dr = DEFINE.DocumentRef(leafID=self.acrf)
-            dr.PDFPageRef.append(DEFINE.PDFPageRef(PageRefs=obj["pages"], Type="PhysicalRef"))
+            dr.PDFPageRef.append(DEFINE.PDFPageRef(PageRefs=origin_in["pages"], Type="PhysicalRef"))
             origin.DocumentRef.append(dr)
-
-        item.Origin.append(origin)
+        return origin
 
     @staticmethod
     def _add_optional_itemdef_attributes(attr, obj):
@@ -131,6 +134,13 @@ class Items(define_object.DefineObject):
             attr["Length"] = "__PLACEHOLDER__"
         if obj.get("significantDigits"):
             attr["SignificantDigits"] = obj["significantDigits"]
+        elif obj.get("displayFormat") and obj.get("dataType") == "float":
+            # ASSUMPTION: workaround for cases where SignificantDigits is missing
+            length_str, sep, sig_str = str(obj["displayFormat"]).partition(".")
+            if sep and sig_str.isdigit():
+                attr["SignificantDigits"] = int(sig_str)
+            if length_str.isdigit() and attr.get("Length") == "__PLACEHOLDER__":
+                attr["Length"] = int(length_str)
         if obj.get("displayFormat"):
             attr["DisplayFormat"] = obj["displayFormat"]
         if obj.get("comment"):

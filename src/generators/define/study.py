@@ -12,8 +12,10 @@ class Study(define_object.DefineObject):
         self.acrf = acrf
         if "language" in template:
             self.lang = template["language"]
-        if "annotatedCRF" in template and len(template["annotatedCRF"]) > 0:
-            self.acrf = template["annotatedCRF"][0].get("leafID", None)
+        # The DDS schema names this slot annotatedCRFs; older files wrote the singular.
+        acrf_list = template.get("annotatedCRFs") or template.get("annotatedCRF") or []
+        if acrf_list:
+            self.acrf = acrf_list[0].get("leafID", None)
         define_objects["Study"] = self._create_study_object(template)
         define_objects["MetaDataVersion"] = self._create_metadataversion_object(template)
 
@@ -27,7 +29,7 @@ class Study(define_object.DefineObject):
         study_oid = study_dict["studyOID"]
         study = DEFINE.Study(OID=study_oid)
         gv = DEFINE.GlobalVariables()
-        gv.StudyName = DEFINE.StudyName(_content=study_dict["studyName"])
+        gv.StudyName = DEFINE.StudyName(_content=study_dict.get("studyName", "NA"))
         gv.StudyDescription = DEFINE.StudyDescription(_content=study_dict.get("studyDescription", "NA"))
         gv.ProtocolName = DEFINE.ProtocolName(_content=study_dict.get("protocolName", "NA"))
         study.GlobalVariables = gv

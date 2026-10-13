@@ -1,4 +1,5 @@
 from odmlib.define_2_1 import model as DEFINE
+from odmlib import permissive
 import define_object
 
 
@@ -29,12 +30,9 @@ class ItemRefs(define_object.DefineObject):
                 mandatory = "No"
         attr = {"ItemOID": it_oid, "Mandatory": mandatory}
         self._add_optional_itemref_attributes(attr, obj, order)
-        # Bypass odmlib descriptor validation to allow __PLACEHOLDER__ values
-        # item = DEFINE.ItemRef(**attr)
-        # TODO a hack to allow the KeySequence to be set to __PLACEHOLDER__ that will be replaced with odmlib v0.2.0
-        item = object.__new__(DEFINE.ItemRef)
-        for key, value in attr.items():
-            item.__dict__[key] = value
+        # permissive mode needed to bypass odmlib descriptor validation to allow __PLACEHOLDER__ values
+        with permissive():
+            item = DEFINE.ItemRef(**attr)
 
         igd.ItemRef.append(item)
 
