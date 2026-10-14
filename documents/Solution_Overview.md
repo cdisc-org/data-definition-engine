@@ -16,27 +16,25 @@ and from the DDS through generators to produce study artifacts. Each component i
 implemented or prototyped, or planned.
 
 ```mermaid
----
-title: Data Definition Engine (DDE) Architecture
----
+%%{init: {'theme': 'base', 'htmlLabels': false, 'flowchart': {'htmlLabels': false, 'nodeSpacing': 20, 'rankSpacing': 25, 'padding': 16, 'subGraphTitleMargin': {'top': 6, 'bottom': 6}}, 'themeVariables': {'fontSize': '18px', 'fontFamily': 'Segoe UI, Helvetica, Arial, Liberation Sans, DejaVu Sans, sans-serif', 'primaryTextColor': '#111111', 'textColor': '#111111', 'titleColor': '#111111', 'lineColor': '#5f6b7a', 'clusterBkg': '#f6f8fa', 'clusterBorder': '#8c959f', 'edgeLabelBackground': '#ffffff'}}}%%
 graph LR
     subgraph Sources["Metadata Sources"]
-        USDM["USDM Study Design<br/>(E2J / SoA Workbench)"]
-        BC["Biomedical Concepts"]
-        DSS["Dataset Specializations"]
-        CRFS["CRF Specializations"]
-        CLIB["CDISC Library"]
-        GAP["Gap / Replacement<br/>Metadata (patch YAML)"]
-        XLS["Metadata Spreadsheets"]
-        DEF_IN["Define-XML Files"]
+        USDM["USDM Study<br/>Design (E2J /<br/>SoA Workbench)"]
+        BC["Biomedical<br/>Concepts"]
+        DSS["Dataset<br/>Specializations"]
+        CRFS["CRF<br/>Specializations"]
+        CLIB["CDISC Library<br/>(all loaders)"]
+        GAP["Gap / Replacement<br/>Metadata<br/>(patch YAML)"]
+        XLS["Metadata<br/>Spreadsheets"]
+        DEF_IN["Define-XML<br/>Files"]
         CRF_IN["Template CRFs"]
         AC["AC for ADaM"]
         DTA["Lab DTAs"]
     end
 
     subgraph Loaders["Loaders"]
-        L1["Define Loader<br/>(USDM + BC + DSS)"]
-        L7["CRF Loader<br/>(USDM + BC + CRF Spec.)"]
+        L1["Define Loader<br/>(USDM + BC<br/>+ DSS)"]
+        L7["CRF Loader<br/>(USDM + BC<br/>+ CRF Spec.)"]
         L6["Enrichment<br/>(patch files)"]
         L2["Spreadsheet<br/>Loader"]
         L3["Define-XML<br/>Loader"]
@@ -52,11 +50,11 @@ graph LR
     end
 
     subgraph Generators["Generators"]
-        G1["SDTM Define-XML<br/>Generator"]
+        G1["SDTM<br/>Define-XML<br/>Generator"]
         G3["ODM CRF<br/>Generator"]
-        G5["Dataset-JSON<br/>Shell Generator"]
-        G2["ADaM Define-XML<br/>Generator"]
-        G4["Trial Design<br/>Dataset Generator"]
+        G5["Dataset-JSON<br/>Shell<br/>Generator"]
+        G2["ADaM<br/>Define-XML<br/>Generator"]
+        G4["Trial Design<br/>Dataset<br/>Generator"]
         G6["SDTM Dataset<br/>Generator"]
         GP["Custom Plugins"]
     end
@@ -89,12 +87,12 @@ graph LR
     CRF_IN --> L4
     AC --> L5
     DTA --> L8
-    CLIB -.->|"Referenced by<br/>multiple loaders"| Loaders
+    CLIB -.-> Loaders
 
     %% Loaders to DDS (the CRF loader enriches the Define loader's DDS)
     L1 --> DDS
-    L1 -->|"Define DDS"| L7
-    L7 -->|"combined DDS"| DDS
+    L1 --> L7
+    L7 --> DDS
     L6 --> DDS
     L2 --> DDS
     L3 --> DDS
@@ -123,19 +121,22 @@ graph LR
     G4 --> A4
     G6 --> A6
 
-    %% Styling: implemented components use their category colour; partial and planned are dashed
-    classDef source fill:#4a90d9,stroke:#2c5f8a,color:#fff
-    classDef loader fill:#7b68ee,stroke:#5a4cb5,color:#fff
-    classDef core fill:#e8a838,stroke:#b8832c,color:#fff
-    classDef generator fill:#50b86c,stroke:#3a8a50,color:#fff
-    classDef artifact fill:#e06060,stroke:#b04545,color:#fff
-    classDef loaderPartial fill:#fff,stroke:#7b68ee,color:#5a4cb5,stroke-width:2px,stroke-dasharray: 5 5
-    classDef corePartial fill:#fff,stroke:#e8a838,color:#8a6220,stroke-width:2px,stroke-dasharray: 5 5
-    classDef generatorPartial fill:#fff,stroke:#50b86c,color:#2f6e40,stroke-width:2px,stroke-dasharray: 5 5
-    classDef artifactPartial fill:#fff,stroke:#e06060,color:#b04545,stroke-width:2px,stroke-dasharray: 5 5
-    classDef planned fill:#f2f2f2,stroke:#888,color:#222,stroke-dasharray: 3 3
-    classDef legendDone fill:#666,stroke:#444,color:#fff
-    classDef legendPartial fill:#fff,stroke:#666,color:#333,stroke-width:2px,stroke-dasharray: 5 5
+    %% Styling: implemented = category fill; partial = white, dashed; planned = grey, dotted.
+    %% The theme is fixed and all text is near-black, so the diagram reads the same in light and dark viewers.
+    %% Labels are SVG text (htmlLabels: false): HTML labels are recoloured by Markdown preview CSS such as PyCharm's.
+    classDef source fill:#93c5fd,stroke:#1d4ed8,stroke-width:2px,color:#111
+    classDef loader fill:#c4b5fd,stroke:#6d28d9,stroke-width:2px,color:#111
+    classDef core fill:#fcd34d,stroke:#b45309,stroke-width:2px,color:#111
+    classDef generator fill:#86efac,stroke:#15803d,stroke-width:2px,color:#111
+    classDef artifact fill:#fca5a5,stroke:#b91c1c,stroke-width:2px,color:#111
+    classDef loaderPartial fill:#fff,stroke:#6d28d9,stroke-width:2.5px,stroke-dasharray: 6 4,color:#111
+    classDef corePartial fill:#fff,stroke:#b45309,stroke-width:2.5px,stroke-dasharray: 6 4,color:#111
+    classDef generatorPartial fill:#fff,stroke:#15803d,stroke-width:2.5px,stroke-dasharray: 6 4,color:#111
+    classDef artifactPartial fill:#fff,stroke:#b91c1c,stroke-width:2.5px,stroke-dasharray: 6 4,color:#111
+    classDef planned fill:#e5e7eb,stroke:#6b7280,stroke-width:1.5px,stroke-dasharray: 2 3,color:#111
+    classDef legendDone fill:#d1d5db,stroke:#374151,stroke-width:2px,color:#111
+    classDef legendPartial fill:#fff,stroke:#374151,stroke-width:2.5px,stroke-dasharray: 6 4,color:#111
+    linkStyle default stroke:#5f6b7a,stroke-width:1.5px
 
     class USDM,BC,DSS,CRFS,CLIB,GAP source
     class L1,L7 loader
