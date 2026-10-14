@@ -8,30 +8,31 @@ This script transforms a [USDM](https://www.cdisc.org/standards/foundational/usd
 
 ### Python version
 
-Python 3.9 or later is recommended.
+Python 3.11 or later is required, because `requirements.txt` pins pandas 3.x. pandas is used only to write the Excel validation report (`--validation_report`).
 
 ### Required packages
 
 Install dependencies with:
 
 ```bash
-pip install jsonata cdisc-library-client python-dotenv pyyaml openpyxl
+pip install -r requirements.txt
 ```
 
 | Package | Purpose |
 |---|---|
-| `jsonata` | JSONata expression evaluation for USDM navigation |
+| `jmespath` | JMESPath queries for USDM navigation |
 | `cdisc-library-client` | CDISC Library REST API client |
 | `python-dotenv` | Load API key from a `.env` file |
-| `pyyaml` | Parse the Define-JSON YAML schema for validation |
-| `openpyxl` | Write the Excel validation report |
+| `pyyaml` | Read and write YAML patch files and the schema |
+| `linkml`, `linkml-runtime`, `jsonschema` | Validate the output against the LinkML schema (`--validate`) |
+| `pandas`, `openpyxl` | Write the Excel validation report |
 
 ### CDISC Library API key
 
-The script requires a valid CDISC Library API key. Provide it in one of two ways:
+The script requires a valid CDISC Library API key. Provide it in one of three ways:
 
 1. **Environment variable** – set `CDISC_API_KEY` in your shell or system environment.
-2. **`.env` file** – create a `.env` file in the working directory containing:
+2. **`.env` file** – create a `.env` file containing the line below, either in this directory or in any directory above it, such as the repository root (the search starts at the script's directory and walks upward):
    ```
    CDISC_API_KEY=your_api_key_here
    ```
@@ -67,6 +68,8 @@ python create_define_json.py --usdm_file <path> --output_template <path> --sdtmc
 | `--cosmosversion` | No | `v2` | CDISC Cosmos API version |
 | `--validate [schema]` | No | `define.yaml` | Validate output against a YAML schema file. If omitted the default `define.yaml` is used. Requires `--validation_report` when specified. |
 | `--validation_report` | Conditional | — | Path to the Excel validation report (required when `--validate` is used) |
+| `--patch_file` | Conditional | — | Path to a YAML patch file. On every run it is (re)written with every value still `__PLACEHOLDER__` or null, for you to fill in. Required when `--apply_patch` is used. |
+| `--apply_patch` | No | — | Path to a completed patch file. Its values are merged into the freshly generated output; OIDs that no longer exist are ignored. Requires `--patch_file`, so the patch file is refreshed after applying. |
 | `--debug` | No | `false` | Save intermediate dictionaries as JSON debug files |
 
 ---
@@ -77,30 +80,51 @@ python create_define_json.py --usdm_file <path> --output_template <path> --sdtmc
 
 ```bash
 python create_define_json.py \
-  --usdm_file ..\..\data\protocol\LZZT\usdm\pilot_LLZT_protocol.json \
+  --usdm_file ../../data/protocols/NCT01797120/NCT01797120-latest.json \
   --output_template define.json \
-  --sdtmct 2025-03-28
+  --sdtmct 2026-03-27
 ```
 
 ### With schema validation and debug output
 
 ```bash
 python create_define_json.py \
-  --usdm_file ..\..\data\protocol\LZZT\usdm\pilot_LLZT_protocol.json \
+  --usdm_file ../../data/protocols/NCT01797120/NCT01797120-latest.json \
   --output_template define.json \
-  --sdtmct 2025-03-28 \
+  --sdtmct 2026-03-27 \
   --validate \
   --validation_report validation_report.xlsx \
   --debug
+```
+
+### Filling in placeholders with a patch file
+
+Values the script cannot derive from the USDM (for example variable `Length` and `Origin`) are written as `__PLACEHOLDER__`. Write them to a patch file, fill it in, then re-run with the completed file:
+
+```bash
+# 1. Generate, and write the remaining placeholders to patch.yaml
+python create_define_json.py \
+  --usdm_file ../../data/protocols/NCT01797120/NCT01797120-latest.json \
+  --output_template define.json \
+  --sdtmct 2026-03-27 \
+  --patch_file patch.yaml
+
+# 2. Edit patch.yaml, then apply it (patch.yaml is refreshed with whatever is still missing)
+python create_define_json.py \
+  --usdm_file ../../data/protocols/NCT01797120/NCT01797120-latest.json \
+  --output_template define.json \
+  --sdtmct 2026-03-27 \
+  --apply_patch patch.yaml \
+  --patch_file patch.yaml
 ```
 
 ### Specifying a custom SDTMIG version and API key
 
 ```bash
 python create_define_json.py \
-  --usdm_file ..\..\data\protocol\LZZT\usdm\pilot_LLZT_protocol.json \
+  --usdm_file ../../data/protocols/NCT01797120/NCT01797120-latest.json \
   --output_template define.json \
-  --sdtmct 2025-03-28 \
+  --sdtmct 2026-03-27 \
   --sdtmig 3.3 \
   --cdisc_api_key <your_api_key> \
   --validate \

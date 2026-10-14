@@ -84,7 +84,7 @@ normalized/*.json
 .cache/
 
 # VSCode Python settings
-.python-versioncpshadle@gmail.com
+.python-version
 
 # App specific
 normalized/
