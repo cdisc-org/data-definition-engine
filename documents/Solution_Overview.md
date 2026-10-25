@@ -166,7 +166,9 @@ between the two halves of the system: each generator reads the whole file and ig
 - **Define loader** (`src/define-xml/create_define_json.py`). Reads the USDM study design, resolves each Biomedical Concept in the schedule of activities to its SDTM Dataset Specialization, and builds the datasets, variables, value-level metadata, codelists, and study-level metadata. The specialization is taken from the USDM when the producing tool records it, and looked up in the CDISC Library otherwise. The two USDM producers seen so far both declare USDM 4.0, so the loader tells them apart by the shape of the data rather than by version.
 - **CRF loader** (`src/loaders/crf/crf_loader.py`). An enrichment loader: it reads the Define DDS and the USDM, and writes a combined DDS that adds CRF content without changing the Define content. For each Biomedical Concept it selects one CRF Specialization by priority (an explicit USDM `crf` extension, then the SDTM Dataset Specialization, then the concept's code) and completes it from CDASHIG, with codelists from CDASH Controlled Terminology. USDM activities become forms and encounters become study events. CRF Specializations are read from a draft file, because the CDISC Library does not publish them yet.
 - **Define generator** (`src/generators/define/define_generator.py`). Generates Define-XML v2.1 using odmlib.
-- **CRF generator** (`src/generators/crf/crf_generator.py`). Generates ODM v1.3.2 or v2.0 from the same DDS. Every difference between the two ODM versions sits behind a single target abstraction, so the rest of the generator is written once. SDTM annotations are always embedded, so one ODM file is both the blank CRF and the annotated CRF (aCRF); which one you see is a rendering choice.
+- **CRF generator** (`src/generators/crf/crf_generator.py`). Generates ODM v1.3.2 or v2.0 from the same DDS. Every difference between the two ODM versions sits behind a single target abstraction, so the rest of the generator is written once. SDTM annotations are always embedded, so one ODM file is both the blank CRF and the annotated CRF (aCRF); which one you see is a rendering choice. Each CRF item also states the Define-XML ItemDefs it populates (`SDTMItemOIDs`) and how it maps (`SDTMMappingType`), and each concept its fixed values.
+- **Pagerefs loader** (`src/loaders/pagerefs/`). A third enrichment loader: crfutils `crfpdf` renders the aCRF PDF and writes the page each annotation lands on, and this loader writes each Define item's Origin with those pages. It runs after the CRF generator because Origin pages only exist once the PDF does.
+- **Pipeline** (`src/pipeline/`). Runs the Define loader, CRF loader, CRF generator, crfpdf, pagerefs loader and Define generator in order for one study, from a per-study YAML, and reports the open review items.
 
 ### Enrichment
 No single source supplies every value a study artifact needs. Each loader marks the values it cannot derive as 
@@ -178,8 +180,9 @@ Specialization covers. This enrichment stage takes a study from an initial speci
 specification, to a submission-ready artifact. A browser-based editor for patch files is being prototyped on the 
 `patchUI` branch.
 
-The CRF content in a combined DDS is itself a potential source for enriching the Define content. None of the 
-following is implemented yet:
+The CRF content in a combined DDS is itself a potential source for enriching the Define content. The first item below 
+is implemented for Origin (the pagerefs loader writes CRF-evidenced origins with their aCRF pages, and lists every 
+origin it replaced in `origin-review.yaml` for a person to confirm or pin); the others are not yet:
 - **Gap and replacement metadata.** Some values the Define loader cannot derive are known from the CRF. For example, a variable collected on a CRF has a Collected origin.
 - **Variables.** Each CRF item records the SDTM variables it maps to, and is linked only to those that exist in the datasets. A target variable with no link is collected on the CRF but missing from the dataset, and may be evaluated for inclusion.
 - **Codelist subsets.** CRF codelists are often a different subset of the same NCI codelist that a dataset variable uses. A term collected on the CRF but missing from the dataset's subset may likewise be evaluated for inclusion.
@@ -312,9 +315,11 @@ output adds the forms a second time.
 
 ### Orchestration
 Incremental loading will almost certainly require an orchestrator of some kind, to make the initial and enrichment 
-loaders work together to build the full DDS. Today the person running the pipeline is the orchestrator: they run the 
-Define loader, pass its DDS to the CRF loader, and give each loader its own patch file. That works for two loaders, 
-but the coordination grows with every loader added:
+loaders work together to build the full DDS. **Status: a first driver exists** (`src/pipeline`): a per-study YAML 
+names the inputs, standards versions, output folder and the three review files; the driver runs each stage in order, 
+applies each review file that exists, stops on a failing stage, re-runs part of the chain with `--from`/`--to`, records 
+every step with input and output hashes, and fails with `--strict` while review items are open. The coordination it 
+has to handle grows with every loader added:
 - **Order.** An enrichment loader depends on content that earlier loaders wrote. The CRF loader needs the Define DDS to link CRF items to SDTM variables, patch values apply only to OIDs that already exist, and enriching the Define content from the CRFs (see [Enrichment](#enrichment)) would add a step after both loaders.
 - **Re-runs.** The CRF loader cannot yet be re-run on its own output, so when a source changes, the chain is re-run from the initial loader, applying each patch file at its step.
 - **Ownership and conflicts.** Each loader owns some sections of the DDS and reads others as context. When two sources supply the same value, the orchestrator needs a rule for which wins, informed by the provenance described below.

@@ -25,7 +25,10 @@ For each run, `define_generator.py` assembles an `ODM → Study → MetaDataVers
 following Define-XML element types under `MetaDataVersion`:
 
 - `ItemGroupDef` — dataset-level metadata (one per dataset), including `leaf` file references
-- `ItemDef` / `ItemRef` — variable-level metadata, origins, and key sequences
+- `ItemDef` / `ItemRef` — variable-level metadata, origins, and key sequences. An origin's aCRF pages come from
+  `origin[].documents[].pages` (written by the pagerefs loader, `src/loaders/pagerefs/`): a contiguous run becomes
+  `FirstPage`/`LastPage`, otherwise `PageRefs`; a `__PLACEHOLDER__` page reference is written only for a
+  Collected/Investigator origin with no pages, and every `def:DocumentRef` uses the DDS `annotatedCRFs[0].leafID`
 - `ValueListDef` / `WhereClauseDef` — value-level metadata derived from itemGroup `slices`
 - `CodeList` — enumerated and external codelists
 - `MethodDef` — derivation methods (auto-created for `Derived` origins during post-processing)

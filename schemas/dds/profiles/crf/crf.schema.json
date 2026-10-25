@@ -125,7 +125,20 @@
           "properties": {
             "annotation": {"type": "string"},
             "variables": {"type": "array", "items": {"type": "string"}},
-            "items": {"type": "array", "items": {"type": "string"}}
+            "items": {"type": "array", "items": {"type": "string"}},
+            "links": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["dataset", "variable", "item"],
+                "properties": {
+                  "dataset": {"type": "string"},
+                  "variable": {"type": "string"},
+                  "item": {"type": ["string", "null"]}
+                }
+              }
+            },
+            "mapping": {"enum": ["direct", "concatenated", "relative_timing", "split", "not_submitted"]}
           }
         },
         "coding": {"type": "array", "items": {"$ref": "#/$defs/coding"}},

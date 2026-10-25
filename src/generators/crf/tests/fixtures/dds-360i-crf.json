@@ -407,7 +407,15 @@
                     ],
                     "items": [
                       "IT.VS.VSDTC"
-                    ]
+                    ],
+                    "links": [
+                      {
+                        "dataset": "VS",
+                        "variable": "VSDTC",
+                        "item": "IT.VS.VSDTC"
+                      }
+                    ],
+                    "mapping": "concatenated"
                   }
                 },
                 {
@@ -541,7 +549,15 @@
                       "IT.VS.VSORRES",
                       "IT.VS.VSTESTCD",
                       "IT.VS.VSTEST"
-                    ]
+                    ],
+                    "links": [
+                      {
+                        "dataset": "VS",
+                        "variable": "VSORRES",
+                        "item": "IT.VS.VSORRES.SYSBP"
+                      }
+                    ],
+                    "mapping": "direct"
                   }
                 },
                 {
@@ -594,7 +610,15 @@
                       "IT.VS.VSORRESU",
                       "IT.VS.VSTESTCD",
                       "IT.VS.VSTEST"
-                    ]
+                    ],
+                    "links": [
+                      {
+                        "dataset": "VS",
+                        "variable": "VSORRESU",
+                        "item": null
+                      }
+                    ],
+                    "mapping": "direct"
                   }
                 }
               ],
@@ -617,7 +641,17 @@
               "crfSpecializationRef": "/mdr/specializations/crf/specializations/SYSBP_DENORMALIZED",
               "domain": "VS",
               "crfImplementationOption": "Denormalized",
-              "implementsConcept": "CONC.BiomedicalConcept_7"
+              "implementsConcept": "CONC.BiomedicalConcept_7",
+              "aliases": [
+                {
+                  "context": "SDTM",
+                  "name": "VSTESTCD = SYSBP; VSTEST = Systolic Blood Pressure"
+                },
+                {
+                  "context": "SDTMItemOIDs",
+                  "name": "VS.VSTESTCD=IT.VS.VSTESTCD VS.VSTEST=IT.VS.VSTEST"
+                }
+              ]
             },
             {
               "OID": "IG.CON.DIABP_DENORMALIZED",
@@ -667,7 +701,15 @@
                     ],
                     "items": [
                       "IT.VS.VSDTC"
-                    ]
+                    ],
+                    "links": [
+                      {
+                        "dataset": "VS",
+                        "variable": "VSDTC",
+                        "item": "IT.VS.VSDTC"
+                      }
+                    ],
+                    "mapping": "concatenated"
                   }
                 },
                 {
@@ -927,7 +969,15 @@
                     ],
                     "items": [
                       "IT.VS.VSDTC"
-                    ]
+                    ],
+                    "links": [
+                      {
+                        "dataset": "VS",
+                        "variable": "VSDTC",
+                        "item": "IT.VS.VSDTC"
+                      }
+                    ],
+                    "mapping": "concatenated"
                   }
                 },
                 {
@@ -1231,7 +1281,15 @@
                     ],
                     "items": [
                       "IT.VS.VSDTC"
-                    ]
+                    ],
+                    "links": [
+                      {
+                        "dataset": "VS",
+                        "variable": "VSDTC",
+                        "item": "IT.VS.VSDTC"
+                      }
+                    ],
+                    "mapping": "concatenated"
                   }
                 },
                 {
@@ -1442,7 +1500,15 @@
                     ],
                     "items": [
                       "IT.VS.VSDTC"
-                    ]
+                    ],
+                    "links": [
+                      {
+                        "dataset": "VS",
+                        "variable": "VSDTC",
+                        "item": "IT.VS.VSDTC"
+                      }
+                    ],
+                    "mapping": "concatenated"
                   }
                 },
                 {
@@ -1609,7 +1675,15 @@
                     ],
                     "items": [
                       "IT.VS.VSDTC"
-                    ]
+                    ],
+                    "links": [
+                      {
+                        "dataset": "VS",
+                        "variable": "VSDTC",
+                        "item": "IT.VS.VSDTC"
+                      }
+                    ],
+                    "mapping": "concatenated"
                   }
                 },
                 {

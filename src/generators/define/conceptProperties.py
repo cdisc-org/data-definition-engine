@@ -2,7 +2,14 @@ import define_object
 
 
 class ConceptProperties(define_object.DefineObject):
-    """Create Define-XML v2.1 CodeList elements for concept properties."""
+    """
+    Read the DDS ``conceptProperties`` section.
+
+    The loaders write Biomedical Concept properties here (ConceptProperty in the DDS
+    schema), which have no Define-XML 2.1 element and are skipped. An entry in the legacy
+    dictionary shape (``shortName``, ``dictionary``, ``version``) still becomes an external
+    CodeList.
+    """
     def __init__(self):
         super().__init__()
 
@@ -14,6 +21,8 @@ class ConceptProperties(define_object.DefineObject):
         for concept in template:
             short_name = concept.get("shortName") or concept.get("Short Name")
             if not short_name:
+                if concept.get("dictionary") is None:
+                    continue  # a ConceptProperty: nothing to emit in Define-XML
                 raise ValueError("Required field 'shortName' missing in ConceptProperties")
             cl_oid = self.generate_oid(["CL", short_name])
             if self.find_object(objects["CodeList"], cl_oid) is not None:

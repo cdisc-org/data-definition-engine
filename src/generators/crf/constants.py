@@ -12,7 +12,7 @@ DEFAULT_ORIGINATOR = "CDISC 360i DDE"
 DEFAULT_SOURCE_SYSTEM = "odmlib"
 
 ACRF_LEAF_ID = "LF.acrf"
-ACRF_HREF = "acrf.html"
+ACRF_HREF = "acrf.pdf"
 
 ODM_VERSIONS = ("1.3.2", "2.0")
 
@@ -44,6 +44,11 @@ CTX_CRF_SPEC = "CRFSpecialization"
 CTX_USDM = "USDM"
 CTX_NCI = "nci:ExtCodeID"
 CTX_STANDARD = "Standard"
+#: The Define-XML ItemDefs an item (or a Concept's fixed values) populates, as
+#: space-separated ``DATASET.VARIABLE=OID`` pairs; crfpdf joins page references on them.
+CTX_SDTM_ITEM_OIDS = "SDTMItemOIDs"
+#: How an item maps to SDTM: direct | concatenated | relative_timing | split | not_submitted.
+CTX_SDTM_MAPPING_TYPE = "SDTMMappingType"
 
 # --- Value maps -------------------------------------------------------------------
 #: ODM 1.3.2 ItemGroupDef/@Repeating and FormDef/@Repeating are Yes/No only.
@@ -55,6 +60,14 @@ DATATYPE_TO_ODM = {
     "date": "date", "time": "time", "datetime": "datetime", "boolean": "boolean",
     "string": "string",
 }
+
+#: CodeList/@DataType is a closed set in each version (ODM 2.0 CLDataType: integer, decimal, text,
+#: string; 1.3.2: integer, float, text, string). The Define loader writes Define-XML's ``float``
+#: on codelists of float variables, and every DDS codelist is built before pruning, so map it.
+CODELIST_DATATYPE_20 = {"integer": "integer", "float": "decimal", "decimal": "decimal",
+                        "text": "text", "string": "string"}
+CODELIST_DATATYPE_132 = {"integer": "integer", "float": "float", "decimal": "float",
+                         "text": "text", "string": "string"}
 
 #: ODM 2.0 ODM/@Context is a closed set that has no "Other" - the DDS default.
 ODM20_CONTEXT = {"Other": "Exchange", "Submission": "Submission",

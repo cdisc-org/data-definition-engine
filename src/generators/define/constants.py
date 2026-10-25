@@ -11,6 +11,13 @@ TRIAL_DESIGN_DOMAINS: frozenset[str] = frozenset(["TA", "TD", "TE", "TI", "TM", 
 # Non-repeating domains - datasets with Repeating = "No" (subject-level fixtures)
 NON_REPEATING_DOMAINS: frozenset[str] = frozenset(["DM", "APDM", "ADSL", "DI", "OI"])
 
+# def:Standard/@Name values the Define-XML 2.1 schema allows (define-enumerations.xsd StandardName).
+# A combined DDS also carries the CRF's CDASHIG standard, which has no Define-XML 2.1 name.
+DEFINE_STANDARD_NAMES: frozenset[str] = frozenset([
+    "ADaM-OCCDSIG", "ADaMIG", "ADaMIG-MD", "ADaMIG-NCA", "ADaMIG-popPK", "BIMO", "CDISC/NCI", "SDTMIG",
+    "SDTMIG-AP", "SDTMIG-MD", "SENDIG", "SENDIG-AR", "SENDIG-DART", "SENDIG-GENETOX",
+])
+
 # Default values
 DEFAULT_PURPOSE: str = "Tabulation"
 DEFAULT_LANGUAGE: str = "en"

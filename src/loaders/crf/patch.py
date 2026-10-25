@@ -9,6 +9,8 @@ carries four kinds of content:
 * **gaps** — concepts with no CRF specialization at all, and visits with no forms bound
 * **structure** — which Concepts sit in which Section, which Sections in which Form, and
   which Forms are collected at which visit
+* **mapping review** — SDTM targets the loader could not link to exactly one Define item;
+  an item's ``crfSdtmTarget`` (annotation, mapping, links) is answered under ``items``
 
 Applying a patch is deliberately conservative: a value still set to ``__PLACEHOLDER__``
 means the human has not answered, so it is never written back over the loader's output.
@@ -20,6 +22,8 @@ from typing import Any
 
 from ..common.patch import (PLACEHOLDER, apply_field_patches, is_placeholder, load_patch,
                             write_patch_file, yaml_list, yaml_scalar)
+from .builders import sdtm_links
+from .constants import SDTM_DSS_SYSTEM
 
 logger = logging.getLogger(__name__)
 
@@ -50,8 +54,12 @@ def generate_patch_file(path: str, dds: dict[str, Any], extras: dict[str, Any]) 
     :param path: output path
     :param dds: the combined DDS
     :param extras: loader findings — ``crfGroupChoices``, ``uncoveredConcepts``,
-        ``formCandidates``
+        ``formCandidates``, ``mappingReview``
     """
+    review_by_item: dict[str, list[dict[str, str]]] = {}
+    for entry in extras.get("mappingReview") or []:
+        review_by_item.setdefault(entry["item"], []).append(entry)
+
     forms, sections, items = [], [], []
     for form in _crf_forms(dds):
         forms.extend(_form_lines(form))
@@ -59,9 +67,19 @@ def generate_patch_file(path: str, dds: dict[str, Any], extras: dict[str, Any]) 
             sections.extend(_section_lines(section))
 
     for oid, occurrences in _crf_items_by_oid(dds).items():
-        lines = _item_lines(occurrences[0])
+        lines = _item_lines(occurrences[0], oid in review_by_item)
         if lines:
             items.extend(lines)
+
+    review = []
+    for oid, entries in review_by_item.items():
+        review.append(f"  {oid}:")
+        review.append(f"    annotation: {yaml_scalar(entries[0].get('annotation'))}")
+        review.append("    reasons:")
+        for entry in entries:
+            reason = f"{entry['target']}: {entry['reason']}" if entry.get("target") \
+                else entry["reason"]
+            review.append(f"      - {yaml_scalar(reason)}")
 
     study_events = []
     candidates = extras.get("formCandidates") or []
@@ -98,6 +116,7 @@ def generate_patch_file(path: str, dds: dict[str, Any], extras: dict[str, Any]) 
         ("crfGroupChoices", choices),
         ("uncoveredConcepts", uncovered),
         ("codeLists", code_lists),
+        ("mappingReview", review),
     ])
 
 
@@ -121,16 +140,25 @@ def _section_lines(section: dict[str, Any]) -> list[str]:
     ]
 
 
-def _item_lines(item: dict[str, Any]) -> list[str]:
-    """Only items with an unfilled question need an entry."""
-    if item.get("question") != PLACEHOLDER:
-        return []
-    return [
-        f"  {item['OID']}:",
-        f"    question: {yaml_scalar(item.get('question'))}",
-        f"    prompt: {yaml_scalar(item.get('prompt'))}",
-        f"    crfCompletionInstructions: {yaml_scalar(item.get('crfCompletionInstructions'))}",
-    ]
+def _item_lines(item: dict[str, Any], in_review: bool = False) -> list[str]:
+    """Items with an unfilled question, or with an SDTM target in ``mappingReview``."""
+    lines = []
+    if item.get("question") == PLACEHOLDER:
+        lines += [
+            f"    question: {yaml_scalar(item.get('question'))}",
+            f"    prompt: {yaml_scalar(item.get('prompt'))}",
+            f"    crfCompletionInstructions: {yaml_scalar(item.get('crfCompletionInstructions'))}",
+        ]
+    if in_review:
+        target = item.get("crfSdtmTarget") or {}
+        lines += [
+            "    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation",
+            f"      annotation: {yaml_scalar(PLACEHOLDER)}",
+            f"      mapping: {yaml_scalar(target.get('mapping') or PLACEHOLDER)}"
+            f"   # {' | '.join(sdtm_links.MAPPING_CODES)}",
+            f"      links: {yaml_scalar(PLACEHOLDER)}   # optional DATASET.VARIABLE=OID pairs",
+        ]
+    return [f"  {item['OID']}:"] + lines if lines else []
 
 
 def _study_event_lines(event: dict[str, Any], candidates: list[str]) -> list[str]:
@@ -227,8 +255,69 @@ def _apply_items(patches: dict[str, Any], dds: dict[str, Any]) -> list[str]:
         fields: set[str] = set()
         for item in occurrences:
             fields.update(apply_field_patches(item, patch, ITEM_FIELDS))
+        if isinstance(patch.get("crfSdtmTarget"), dict):
+            fields.update(_apply_sdtm_target(oid, patch["crfSdtmTarget"], dds))
         changes.extend(f"item {oid}.{field}" for field in sorted(fields))
     return changes
+
+
+def _apply_sdtm_target(oid: str, answer: dict[str, Any], dds: dict[str, Any]) -> list[str]:
+    """Apply an answered ``crfSdtmTarget``.
+
+    A new annotation recomputes the links against the Define items (with the concept's
+    prefilled values and specialization id) unless the answer gives ``links`` as
+    ``DATASET.VARIABLE=OID`` pairs; a mapping must be one of the mapping codes.
+    """
+    changed: list[str] = []
+    occurrences = [(c, i) for c, i in _crf_item_occurrences(dds) if i.get("OID") == oid]
+    if not occurrences:
+        return changed
+    concept, item = occurrences[0]     # occurrences of one OID share the same dict
+    target = item.setdefault("crfSdtmTarget", {})
+
+    annotation = answer.get("annotation")
+    if not is_placeholder(annotation) and annotation != target.get("annotation"):
+        target["annotation"] = annotation
+        parsed = sdtm_links.parse_annotation(annotation)
+        target["variables"] = [t.variable for t in parsed.targets]
+        changed.append("crfSdtmTarget.annotation")
+        if is_placeholder(answer.get("links")):
+            define = sdtm_links.DefineIndex(dds)
+            context = {}
+            for sibling in concept.get("items") or []:
+                value = sibling.get("preSpecifiedValue")
+                for t in sdtm_links.parse_annotation(
+                        (sibling.get("crfSdtmTarget") or {}).get("annotation")).targets:
+                    if value and not t.conditions and t.qnam is None:
+                        context.setdefault(t.variable, t.value or value)
+            dss = next((c.get("code") for c in concept.get("coding") or []
+                        if c.get("codeSystem") == SDTM_DSS_SYSTEM), None)
+            target["links"] = []
+            for t in parsed.targets:
+                dataset = sdtm_links.target_dataset(t, concept.get("domain"), define) or ""
+                own = {k: v for k, v in context.items() if k != t.variable}
+                target["links"].append(
+                    define.link(dataset, t.variable, t.conditions, own, dss).as_dict())
+            changed.append("crfSdtmTarget.links")
+
+    links = answer.get("links")
+    if isinstance(links, str) and not is_placeholder(links):
+        target["links"] = [
+            {"dataset": pair.split("=", 1)[0].split(".", 1)[0],
+             "variable": pair.split("=", 1)[0].split(".", 1)[-1],
+             "item": pair.split("=", 1)[1]}
+            for pair in links.split() if "=" in pair and "." in pair.split("=", 1)[0]]
+        changed.append("crfSdtmTarget.links")
+
+    mapping = answer.get("mapping")
+    if mapping in sdtm_links.MAPPING_CODES and mapping != target.get("mapping"):
+        target["mapping"] = mapping
+        changed.append("crfSdtmTarget.mapping")
+    elif not is_placeholder(mapping) and mapping not in sdtm_links.MAPPING_CODES:
+        logger.warning("item %s: mapping %r is not one of %s - ignored", oid, mapping,
+                       ", ".join(sdtm_links.MAPPING_CODES))
+    return changed
+
 
 
 def _apply_study_events(patches: dict[str, Any], dds: dict[str, Any]) -> list[str]:
@@ -294,6 +383,12 @@ def _crf_items(dds: dict[str, Any]) -> list[dict[str, Any]]:
     be applied to all of them.
     """
     return [item for concept in _crf_concepts(dds)
+            for item in concept.get("items") or []]
+
+
+def _crf_item_occurrences(dds: dict[str, Any]) -> list[tuple[dict[str, Any], dict[str, Any]]]:
+    """Every CRF item occurrence with the Concept group it sits in."""
+    return [(concept, item) for concept in _crf_concepts(dds)
             for item in concept.get("items") or []]
 
 

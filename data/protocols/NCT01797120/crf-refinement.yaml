@@ -1,0 +1,1544 @@
+# CRF refinement file - written by crf_loader.py
+#
+# Fill in every __PLACEHOLDER__ and re-run crf_loader.py with --apply_patch to fold
+# the answers into the DDS. Values left as __PLACEHOLDER__ are ignored, so a partly
+# completed file is safe to apply.
+#
+# This file is regenerated on every run. Your answers survive because applying them
+# first removes the placeholder they replaced.
+
+forms:
+  IG.FORM.ELIGIBILITY-ASSESSMENT:
+    label: Eligibility Assessment
+    repeating: "No"
+    sections: [IG.SEC.ELIGIBILITY-ASSESSMENT.1]
+  IG.FORM.INFORMED-CONSENT:
+    label: Informed Consent
+    repeating: "No"
+    sections: [IG.SEC.INFORMED-CONSENT.1]
+  IG.FORM.RANDOMIZATION:
+    label: Randomization
+    repeating: "No"
+    sections: [IG.SEC.RANDOMIZATION.1]
+  IG.FORM.MEDICAL-HISTORY:
+    label: Medical History
+    repeating: "No"
+    sections: [IG.SEC.MEDICAL-HISTORY.1]
+  IG.FORM.PHYSICAL-EXAM:
+    label: Physical Examination
+    repeating: "No"
+    sections: [IG.SEC.PHYSICAL-EXAM.1]
+  IG.FORM.CONCOMITANT-MEDS:
+    label: Concomitant Medications
+    repeating: "No"
+    sections: [IG.SEC.CONCOMITANT-MEDS.1]
+  IG.FORM.VITAL-SIGNS:
+    label: Vital Signs
+    repeating: "No"
+    sections: [IG.SEC.VITAL-SIGNS.1]
+  IG.FORM.ADVERSE-EVENTS-ASSESSMENTS:
+    label: Adverse Event Assessment
+    repeating: "No"
+    sections: [IG.SEC.ADVERSE-EVENTS-ASSESSMENTS.1]
+  IG.FORM.PT/INR:
+    label: PT with INR
+    repeating: "No"
+    sections: [IG.SEC.PT/INR.1]
+  IG.FORM.URINALYSIS:
+    label: Urinalysis Labs
+    repeating: "No"
+    sections: [IG.SEC.URINALYSIS.1]
+  IG.FORM.CBC:
+    label: "CBC with differentials, Platelets"
+    repeating: "No"
+    sections: [IG.SEC.CBC.1]
+  IG.FORM.CHEMISTRY-LABS:
+    label: "Serum Creatinine, Electrolytes (K, Na, Cl, CO2), Ca, BUN, Albumin, Total Protein, Phosphorus, AST (SGOT), ALT (SGPT), Alkaline Phosphatase, Total Bilirubin, Magnesium, Uric Acid."
+    repeating: "No"
+    sections: [IG.SEC.CHEMISTRY-LABS.1]
+  IG.FORM.GLUCOSE:
+    label: Fasting Glucose
+    repeating: "No"
+    sections: [IG.SEC.GLUCOSE.1]
+  IG.FORM.LIPID-PROFILE:
+    label: "Fasting serum Lipid Profile (triglycerides, total cholesterol, HDL and LDL)"
+    repeating: "No"
+    sections: [IG.SEC.LIPID-PROFILE.1]
+  IG.FORM.COMPLIANCE:
+    label: Study Drug Compliance (Pill Diary)
+    repeating: "No"
+    sections: [IG.SEC.COMPLIANCE.1]
+
+sections:
+  IG.SEC.ELIGIBILITY-ASSESSMENT.1:
+    label: Eligibility Assessment
+    crfSectionInstructions: __PLACEHOLDER__
+    concepts: [IG.CON.ELIGMET]
+  IG.SEC.INFORMED-CONSENT.1:
+    label: Informed Consent
+    crfSectionInstructions: __PLACEHOLDER__
+    concepts: [IG.CON.CONSENT]
+  IG.SEC.RANDOMIZATION.1:
+    label: Randomization
+    crfSectionInstructions: __PLACEHOLDER__
+    concepts: [IG.CON.RAND]
+  IG.SEC.MEDICAL-HISTORY.1:
+    label: Medical History
+    crfSectionInstructions: __PLACEHOLDER__
+    concepts: [IG.CON.MEDHISTFREE_NORMALIZED]
+  IG.SEC.PHYSICAL-EXAM.1:
+    label: Physical Examination
+    crfSectionInstructions: __PLACEHOLDER__
+    concepts: [IG.CON.MHALZHEIMERS_DENORMALIZED]
+  IG.SEC.CONCOMITANT-MEDS.1:
+    label: Concomitant Medications
+    crfSectionInstructions: __PLACEHOLDER__
+    concepts: [IG.CON.CMFREE_NORMALIZED]
+  IG.SEC.VITAL-SIGNS.1:
+    label: Vital Signs
+    crfSectionInstructions: __PLACEHOLDER__
+    concepts: [IG.CON.DIABP_DENORMALIZED, IG.CON.HR_DENORMALIZED, IG.CON.TEMP_DENORMALIZED, IG.CON.WEIGHT_DENORMALIZED, IG.CON.SYSBP_DENORMALIZED]
+  IG.SEC.ADVERSE-EVENTS-ASSESSMENTS.1:
+    label: Adverse Event Assessment
+    crfSectionInstructions: __PLACEHOLDER__
+    concepts: [IG.CON.AE_DENORMALIZED]
+  IG.SEC.PT/INR.1:
+    label: PT with INR
+    crfSectionInstructions: __PLACEHOLDER__
+    concepts: [IG.CON.PTBLD_DENORMALIZED]
+  IG.SEC.URINALYSIS.1:
+    label: Urinalysis Labs
+    crfSectionInstructions: __PLACEHOLDER__
+    concepts: [IG.CON.PHURIN_DENORMALIZED, IG.CON.COLORURIN_DENORMALIZED, IG.CON.SPGRAVURIN_DENORMALIZED]
+  IG.SEC.CBC.1:
+    label: "CBC with differentials, Platelets"
+    crfSectionInstructions: __PLACEHOLDER__
+    concepts: [IG.CON.WBCBLD_DENORMALIZED, IG.CON.RBCBLD_DENORMALIZED, IG.CON.PLATBLD_DENORMALIZED, IG.CON.HCTBLD_DENORMALIZED, IG.CON.HGBBLD_DENORMALIZED, IG.CON.MCH_DENORMALIZED, IG.CON.MONOBLD_DENORMALIZED, IG.CON.NEUTBLD_DENORMALIZED, IG.CON.BASOBLD_DENORMALIZED, IG.CON.EOSBLD_DENORMALIZED, IG.CON.NEUTBBLD_DENORMALIZED, IG.CON.MCV_DENORMALIZED]
+  IG.SEC.CHEMISTRY-LABS.1:
+    label: "Serum Creatinine, Electrolytes (K, Na, Cl, CO2), Ca, BUN, Albumin, Total Protein, Phosphorus, AST (SGOT), ALT (SGPT), Alkaline Phosphatase, Total Bilirubin, Magnesium, Uric Acid."
+    crfSectionInstructions: __PLACEHOLDER__
+    concepts: [IG.CON.ALTSERPL_DENORMALIZED, IG.CON.ASTSERPL_DENORMALIZED, IG.CON.BILISERPL_DENORMALIZED, IG.CON.CREATSERPL_DENORMALIZED, IG.CON.ALBSERPL_DENORMALIZED, IG.CON.KBLD_DENORMALIZED, IG.CON.SODIUMBLD_DENORMALIZED, IG.CON.CLBLD_DENORMALIZED, IG.CON.CO2BLD_DENORMALIZED, IG.CON.CABLD_DENORMALIZED, IG.CON.UREANSERPL_DENORMALIZED, IG.CON.PROTSERPL_DENORMALIZED, IG.CON.ALPSERPL_DENORMALIZED, IG.CON.URATESERPL_DENORMALIZED, IG.CON.PHOSSERPL_DENORMALIZED]
+  IG.SEC.GLUCOSE.1:
+    label: Fasting Glucose
+    crfSectionInstructions: __PLACEHOLDER__
+    concepts: [IG.CON.GLUCBLD_DENORMALIZED]
+  IG.SEC.LIPID-PROFILE.1:
+    label: "Fasting serum Lipid Profile (triglycerides, total cholesterol, HDL and LDL)"
+    crfSectionInstructions: __PLACEHOLDER__
+    concepts: [IG.CON.TRIGSERPL_DENORMALIZED, IG.CON.CHOLSERPL_DENORMALIZED, IG.CON.HDLSERPL_DENORMALIZED, IG.CON.LDLSERPL_DENORMALIZED]
+  IG.SEC.COMPLIANCE.1:
+    label: Study Drug Compliance (Pill Diary)
+    crfSectionInstructions: __PLACEHOLDER__
+    concepts: [IG.CON.EXPOSCOLL_DENORMALIZED]
+
+items:
+  IT.CRF.DSSCAT:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.MHSPID:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.MHPRIOR:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: relative_timing   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.MHEVDTYP:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.SYSBP_VSORRES:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.SYSBP_VSORRESU:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.PT_LBSCAT:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.PT_LBNAM:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.PT_LBCLSIG:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.PH_LBSCAT:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.PH_LBNAM:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.PH_LBCLSIG:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.COLOR_LBSCAT:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.COLOR_LBNAM:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.COLOR_LBCLSIG:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.SPGRAV_LBSCAT:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.SPGRAV_LBNAM:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.SPGRAV_LBCLSIG:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.WBC_LBSCAT:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.WBC_LBNAM:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.WBC_LBCLSIG:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.RBC_LBSCAT:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.RBC_LBNAM:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.RBC_LBCLSIG:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.PLAT_LBSCAT:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.PLAT_LBNAM:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.PLAT_LBCLSIG:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.HCT_LBSCAT:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.HCT_LBNAM:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.HCT_LBCLSIG:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.HGB_LBSCAT:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.HGB_LBNAM:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.HGB_LBCLSIG:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.MCH_LBSCAT:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.MCH_LBNAM:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.MCH_LBCLSIG:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.MONO_LBSCAT:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.MONO_LBNAM:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.MONO_LBCLSIG:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.NEUT_LBSCAT:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.NEUT_LBNAM:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.NEUT_LBCLSIG:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.BASO_LBSCAT:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.BASO_LBNAM:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.BASO_LBCLSIG:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.EOS_LBSCAT:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.EOS_LBNAM:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.EOS_LBCLSIG:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.NEUTB_LBSCAT:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.NEUTB_LBNAM:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.NEUTB_LBCLSIG:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.MCV_LBSCAT:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.MCV_LBNAM:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.MCV_LBCLSIG:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.ALT_LBSCAT:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.ALT_LBNAM:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.ALT_LBCLSIG:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.AST_LBSCAT:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.AST_LBNAM:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.AST_LBCLSIG:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.BILI_LBSCAT:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.BILI_LBNAM:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.BILI_LBCLSIG:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.CREAT_LBSCAT:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.CREAT_LBNAM:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.CREAT_LBCLSIG:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.ALB_LBSCAT:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.ALB_LBNAM:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.ALB_LBCLSIG:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.K_LBSCAT:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.K_LBNAM:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.K_LBCLSIG:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.SODIUM_LBSCAT:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.SODIUM_LBNAM:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.SODIUM_LBCLSIG:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.CL_LBSCAT:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.CL_LBNAM:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.CL_LBCLSIG:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.CO2_LBSCAT:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.CO2_LBNAM:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.CO2_LBCLSIG:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.CA_LBSCAT:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.CA_LBNAM:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.CA_LBCLSIG:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.UREAN_LBSCAT:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.UREAN_LBNAM:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.UREAN_LBCLSIG:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.PROT_LBSCAT:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.PROT_LBNAM:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.PROT_LBCLSIG:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.ALP_LBSCAT:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.ALP_LBNAM:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.ALP_LBCLSIG:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.URATE_LBSCAT:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.URATE_LBNAM:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.URATE_LBCLSIG:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.PHOS_LBSCAT:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.PHOS_LBNAM:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.PHOS_LBCLSIG:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.GLUC_LBSCAT:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.GLUC_LBNAM:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.GLUC_LBCLSIG:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.TRIG_LBSCAT:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.TRIG_LBNAM:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.TRIG_LBCLSIG:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.CHOL_LBSCAT:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.CHOL_LBNAM:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.CHOL_LBCLSIG:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.HDL_LBSCAT:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.HDL_LBNAM:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.HDL_LBCLSIG:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.LDL_LBSCAT:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.LDL_LBNAM:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.LDL_LBCLSIG:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.ECLOT:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.ECFAST:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.ECDOSADJ:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+  IT.CRF.ECADJ:
+    crfSdtmTarget:   # answer the mappingReview entry; links recompute from the annotation
+      annotation: __PLACEHOLDER__
+      mapping: direct   # direct | concatenated | relative_timing | split | not_submitted
+      links: __PLACEHOLDER__   # optional DATASET.VARIABLE=OID pairs
+
+studyEvents:
+  SE.PRE-STUDY:
+    itemGroups: []
+    candidates: [IG.FORM.ADVERSE-EVENTS-ASSESSMENTS, IG.FORM.CBC, IG.FORM.CHEMISTRY-LABS, IG.FORM.COMPLIANCE, IG.FORM.CONCOMITANT-MEDS, IG.FORM.ELIGIBILITY-ASSESSMENT, IG.FORM.GLUCOSE, IG.FORM.INFORMED-CONSENT, IG.FORM.LIPID-PROFILE, IG.FORM.MEDICAL-HISTORY, IG.FORM.PHYSICAL-EXAM, IG.FORM.PT/INR, IG.FORM.RANDOMIZATION, IG.FORM.URINALYSIS, IG.FORM.VITAL-SIGNS]
+  SE.C1D1:
+    itemGroups: []
+    candidates: [IG.FORM.ADVERSE-EVENTS-ASSESSMENTS, IG.FORM.CBC, IG.FORM.CHEMISTRY-LABS, IG.FORM.COMPLIANCE, IG.FORM.CONCOMITANT-MEDS, IG.FORM.ELIGIBILITY-ASSESSMENT, IG.FORM.GLUCOSE, IG.FORM.INFORMED-CONSENT, IG.FORM.LIPID-PROFILE, IG.FORM.MEDICAL-HISTORY, IG.FORM.PHYSICAL-EXAM, IG.FORM.PT/INR, IG.FORM.RANDOMIZATION, IG.FORM.URINALYSIS, IG.FORM.VITAL-SIGNS]
+  SE.C1D15:
+    itemGroups: []
+    candidates: [IG.FORM.ADVERSE-EVENTS-ASSESSMENTS, IG.FORM.CBC, IG.FORM.CHEMISTRY-LABS, IG.FORM.COMPLIANCE, IG.FORM.CONCOMITANT-MEDS, IG.FORM.ELIGIBILITY-ASSESSMENT, IG.FORM.GLUCOSE, IG.FORM.INFORMED-CONSENT, IG.FORM.LIPID-PROFILE, IG.FORM.MEDICAL-HISTORY, IG.FORM.PHYSICAL-EXAM, IG.FORM.PT/INR, IG.FORM.RANDOMIZATION, IG.FORM.URINALYSIS, IG.FORM.VITAL-SIGNS]
+  SE.C2D1:
+    itemGroups: []
+    candidates: [IG.FORM.ADVERSE-EVENTS-ASSESSMENTS, IG.FORM.CBC, IG.FORM.CHEMISTRY-LABS, IG.FORM.COMPLIANCE, IG.FORM.CONCOMITANT-MEDS, IG.FORM.ELIGIBILITY-ASSESSMENT, IG.FORM.GLUCOSE, IG.FORM.INFORMED-CONSENT, IG.FORM.LIPID-PROFILE, IG.FORM.MEDICAL-HISTORY, IG.FORM.PHYSICAL-EXAM, IG.FORM.PT/INR, IG.FORM.RANDOMIZATION, IG.FORM.URINALYSIS, IG.FORM.VITAL-SIGNS]
+  SE.C3D1:
+    itemGroups: []
+    candidates: [IG.FORM.ADVERSE-EVENTS-ASSESSMENTS, IG.FORM.CBC, IG.FORM.CHEMISTRY-LABS, IG.FORM.COMPLIANCE, IG.FORM.CONCOMITANT-MEDS, IG.FORM.ELIGIBILITY-ASSESSMENT, IG.FORM.GLUCOSE, IG.FORM.INFORMED-CONSENT, IG.FORM.LIPID-PROFILE, IG.FORM.MEDICAL-HISTORY, IG.FORM.PHYSICAL-EXAM, IG.FORM.PT/INR, IG.FORM.RANDOMIZATION, IG.FORM.URINALYSIS, IG.FORM.VITAL-SIGNS]
+  SE.C4D1:
+    itemGroups: []
+    candidates: [IG.FORM.ADVERSE-EVENTS-ASSESSMENTS, IG.FORM.CBC, IG.FORM.CHEMISTRY-LABS, IG.FORM.COMPLIANCE, IG.FORM.CONCOMITANT-MEDS, IG.FORM.ELIGIBILITY-ASSESSMENT, IG.FORM.GLUCOSE, IG.FORM.INFORMED-CONSENT, IG.FORM.LIPID-PROFILE, IG.FORM.MEDICAL-HISTORY, IG.FORM.PHYSICAL-EXAM, IG.FORM.PT/INR, IG.FORM.RANDOMIZATION, IG.FORM.URINALYSIS, IG.FORM.VITAL-SIGNS]
+  SE.C5D1:
+    itemGroups: []
+    candidates: [IG.FORM.ADVERSE-EVENTS-ASSESSMENTS, IG.FORM.CBC, IG.FORM.CHEMISTRY-LABS, IG.FORM.COMPLIANCE, IG.FORM.CONCOMITANT-MEDS, IG.FORM.ELIGIBILITY-ASSESSMENT, IG.FORM.GLUCOSE, IG.FORM.INFORMED-CONSENT, IG.FORM.LIPID-PROFILE, IG.FORM.MEDICAL-HISTORY, IG.FORM.PHYSICAL-EXAM, IG.FORM.PT/INR, IG.FORM.RANDOMIZATION, IG.FORM.URINALYSIS, IG.FORM.VITAL-SIGNS]
+  SE.C6D1:
+    itemGroups: []
+    candidates: [IG.FORM.ADVERSE-EVENTS-ASSESSMENTS, IG.FORM.CBC, IG.FORM.CHEMISTRY-LABS, IG.FORM.COMPLIANCE, IG.FORM.CONCOMITANT-MEDS, IG.FORM.ELIGIBILITY-ASSESSMENT, IG.FORM.GLUCOSE, IG.FORM.INFORMED-CONSENT, IG.FORM.LIPID-PROFILE, IG.FORM.MEDICAL-HISTORY, IG.FORM.PHYSICAL-EXAM, IG.FORM.PT/INR, IG.FORM.RANDOMIZATION, IG.FORM.URINALYSIS, IG.FORM.VITAL-SIGNS]
+  SE.C7D1:
+    itemGroups: []
+    candidates: [IG.FORM.ADVERSE-EVENTS-ASSESSMENTS, IG.FORM.CBC, IG.FORM.CHEMISTRY-LABS, IG.FORM.COMPLIANCE, IG.FORM.CONCOMITANT-MEDS, IG.FORM.ELIGIBILITY-ASSESSMENT, IG.FORM.GLUCOSE, IG.FORM.INFORMED-CONSENT, IG.FORM.LIPID-PROFILE, IG.FORM.MEDICAL-HISTORY, IG.FORM.PHYSICAL-EXAM, IG.FORM.PT/INR, IG.FORM.RANDOMIZATION, IG.FORM.URINALYSIS, IG.FORM.VITAL-SIGNS]
+  SE.C8D1:
+    itemGroups: []
+    candidates: [IG.FORM.ADVERSE-EVENTS-ASSESSMENTS, IG.FORM.CBC, IG.FORM.CHEMISTRY-LABS, IG.FORM.COMPLIANCE, IG.FORM.CONCOMITANT-MEDS, IG.FORM.ELIGIBILITY-ASSESSMENT, IG.FORM.GLUCOSE, IG.FORM.INFORMED-CONSENT, IG.FORM.LIPID-PROFILE, IG.FORM.MEDICAL-HISTORY, IG.FORM.PHYSICAL-EXAM, IG.FORM.PT/INR, IG.FORM.RANDOMIZATION, IG.FORM.URINALYSIS, IG.FORM.VITAL-SIGNS]
+  SE.C9D1:
+    itemGroups: []
+    candidates: [IG.FORM.ADVERSE-EVENTS-ASSESSMENTS, IG.FORM.CBC, IG.FORM.CHEMISTRY-LABS, IG.FORM.COMPLIANCE, IG.FORM.CONCOMITANT-MEDS, IG.FORM.ELIGIBILITY-ASSESSMENT, IG.FORM.GLUCOSE, IG.FORM.INFORMED-CONSENT, IG.FORM.LIPID-PROFILE, IG.FORM.MEDICAL-HISTORY, IG.FORM.PHYSICAL-EXAM, IG.FORM.PT/INR, IG.FORM.RANDOMIZATION, IG.FORM.URINALYSIS, IG.FORM.VITAL-SIGNS]
+  SE.C10D1:
+    itemGroups: []
+    candidates: [IG.FORM.ADVERSE-EVENTS-ASSESSMENTS, IG.FORM.CBC, IG.FORM.CHEMISTRY-LABS, IG.FORM.COMPLIANCE, IG.FORM.CONCOMITANT-MEDS, IG.FORM.ELIGIBILITY-ASSESSMENT, IG.FORM.GLUCOSE, IG.FORM.INFORMED-CONSENT, IG.FORM.LIPID-PROFILE, IG.FORM.MEDICAL-HISTORY, IG.FORM.PHYSICAL-EXAM, IG.FORM.PT/INR, IG.FORM.RANDOMIZATION, IG.FORM.URINALYSIS, IG.FORM.VITAL-SIGNS]
+  SE.C11D1:
+    itemGroups: []
+    candidates: [IG.FORM.ADVERSE-EVENTS-ASSESSMENTS, IG.FORM.CBC, IG.FORM.CHEMISTRY-LABS, IG.FORM.COMPLIANCE, IG.FORM.CONCOMITANT-MEDS, IG.FORM.ELIGIBILITY-ASSESSMENT, IG.FORM.GLUCOSE, IG.FORM.INFORMED-CONSENT, IG.FORM.LIPID-PROFILE, IG.FORM.MEDICAL-HISTORY, IG.FORM.PHYSICAL-EXAM, IG.FORM.PT/INR, IG.FORM.RANDOMIZATION, IG.FORM.URINALYSIS, IG.FORM.VITAL-SIGNS]
+  SE.C12D1:
+    itemGroups: []
+    candidates: [IG.FORM.ADVERSE-EVENTS-ASSESSMENTS, IG.FORM.CBC, IG.FORM.CHEMISTRY-LABS, IG.FORM.COMPLIANCE, IG.FORM.CONCOMITANT-MEDS, IG.FORM.ELIGIBILITY-ASSESSMENT, IG.FORM.GLUCOSE, IG.FORM.INFORMED-CONSENT, IG.FORM.LIPID-PROFILE, IG.FORM.MEDICAL-HISTORY, IG.FORM.PHYSICAL-EXAM, IG.FORM.PT/INR, IG.FORM.RANDOMIZATION, IG.FORM.URINALYSIS, IG.FORM.VITAL-SIGNS]
+  SE.EOI_EOT:
+    itemGroups: []
+    candidates: [IG.FORM.ADVERSE-EVENTS-ASSESSMENTS, IG.FORM.CBC, IG.FORM.CHEMISTRY-LABS, IG.FORM.COMPLIANCE, IG.FORM.CONCOMITANT-MEDS, IG.FORM.ELIGIBILITY-ASSESSMENT, IG.FORM.GLUCOSE, IG.FORM.INFORMED-CONSENT, IG.FORM.LIPID-PROFILE, IG.FORM.MEDICAL-HISTORY, IG.FORM.PHYSICAL-EXAM, IG.FORM.PT/INR, IG.FORM.RANDOMIZATION, IG.FORM.URINALYSIS, IG.FORM.VITAL-SIGNS]
+  SE.CONT_CXD1:
+    itemGroups: []
+    candidates: [IG.FORM.ADVERSE-EVENTS-ASSESSMENTS, IG.FORM.CBC, IG.FORM.CHEMISTRY-LABS, IG.FORM.COMPLIANCE, IG.FORM.CONCOMITANT-MEDS, IG.FORM.ELIGIBILITY-ASSESSMENT, IG.FORM.GLUCOSE, IG.FORM.INFORMED-CONSENT, IG.FORM.LIPID-PROFILE, IG.FORM.MEDICAL-HISTORY, IG.FORM.PHYSICAL-EXAM, IG.FORM.PT/INR, IG.FORM.RANDOMIZATION, IG.FORM.URINALYSIS, IG.FORM.VITAL-SIGNS]
+  SE.FU_OFF_THERAPY:
+    itemGroups: []
+    candidates: [IG.FORM.ADVERSE-EVENTS-ASSESSMENTS, IG.FORM.CBC, IG.FORM.CHEMISTRY-LABS, IG.FORM.COMPLIANCE, IG.FORM.CONCOMITANT-MEDS, IG.FORM.ELIGIBILITY-ASSESSMENT, IG.FORM.GLUCOSE, IG.FORM.INFORMED-CONSENT, IG.FORM.LIPID-PROFILE, IG.FORM.MEDICAL-HISTORY, IG.FORM.PHYSICAL-EXAM, IG.FORM.PT/INR, IG.FORM.RANDOMIZATION, IG.FORM.URINALYSIS, IG.FORM.VITAL-SIGNS]
+
+crfGroupChoices:
+  C16735:
+    selected: CONSENT
+    candidates: [CONSENT, CONSENT_360]
+  C53630:
+    selected: CMFREE_NORMALIZED
+    candidates: [CMFREE_NORMALIZED, CMPRESP_NORMALIZED, CMPRIORBREASTCANCER_NORMALIZED]
+  C200145:
+    selected: MHALZHEIMERS_DENORMALIZED
+    candidates: [MEDHISTFREE_NORMALIZED, MEDHISTPRESP_NORMALIZED, MHALZHEIMERS_DENORMALIZED]
+  C179175:
+    selected: AE_DENORMALIZED
+    candidates: [AE_DENORMALIZED, AE_NORMALIZED]
+
+uncoveredConcepts:
+  - code: C102408
+    name: ECOG - Performance Status
+    activity: ECOG PERFORMANCE STATUS
+  - code: C64805
+    name: International Normalized Ratio of Prothrombin Time
+    activity: PT/INR
+  - code: C38462
+    name: Activated Partial Thromboplastin Time
+    activity: PT/INR
+  - code: C83119
+    name: Physical Examination Finding
+    activity: MEDICAL HISTORY
+  - code: C83119
+    name: Physical Examination Finding
+    activity: MEDICAL HISTORY
+  - code: C51949
+    name: Lymphocyte Count
+    activity: CBC
+  - code: C111361
+    name: Forced Vital Capacity
+    activity: PFTS
+  - code: C38084
+    name: Forced Expiratory Volume in 1 Second
+    activity: PFTS
+  - code: C47843
+    name: Forced Expiratory Volume in 6 Seconds
+    activity: PFTS
+  - code: C41372
+    name: Peak Expiratory Flow
+    activity: PFTS
+  - code: C111324
+    name: Tidal Volume
+    activity: PFTS
+  - code: C111362
+    name: Inspiratory Capacity
+    activity: PFTS
+  - code: C111200
+    name: Expiratory Reserve Volume
+    activity: PFTS
+  - code: C111237
+    name: Inspiratory Reserve Volume
+    activity: PFTS
+  - code: C111315
+    name: Slow Vital Capacity
+    activity: PFTS
+  - code: C74711
+    name: Hepatitis B Surface Antibody Measurement
+    activity: HBV-DNA-1
+  - code: C142330
+    name: Hepatitis C Virus RNA Measurement
+    activity: HCV
+  - code: C103404
+    name: Hepatitis B DNA Measurement
+    activity: HBV-DNA-2
+  - code: C64840
+    name: Magnesium Measurement
+    activity: CHEMISTRY LABS
+  - code: C38083
+    name: Carbon Monoxide Diffusing Capability Test
+    activity: PFTS
+  - code: C103420
+    name: New Lesion Progression
+    activity: IMAGING SCANS
+  - code: C124448
+    name: Lymph Node State
+    activity: IMAGING SCANS
+  - code: C161483
+    name: Non-Target Indicator
+    activity: IMAGING SCANS
+  - code: C178053
+    name: Target Indicator
+    activity: IMAGING SCANS
+  - code: C225437
+    name: Confluent Tumor Masses Assessment
+    activity: IMAGING SCANS
+  - code: C225438
+    name: Tumor Fragmentation Assessment
+    activity: IMAGING SCANS
+  - code: C94523
+    name: Tumor Identification
+    activity: IMAGING SCANS
+  - code: C94534
+    name: Response in Target Lesion
+    activity: IMAGING SCANS
+  - code: C94535
+    name: Response in Non-Target Lesion
+    activity: IMAGING SCANS
+  - code: C94536
+    name: Best Overall Response
+    activity: IMAGING SCANS
+  - code: C96613
+    name: Overall Response
+    activity: IMAGING SCANS
+  - code: C96643
+    name: Tumor Status
+    activity: IMAGING SCANS
+  - code: C96684
+    name: Longest Diameter
+    activity: IMAGING SCANS
+  - code: C96685
+    name: Longest Perpendicular
+    activity: IMAGING SCANS
+
+codeLists: {}
+
+mappingReview:
+  IT.CRF.DSSCAT:
+    annotation: DSSCAT
+    reasons:
+      - "DS.DSSCAT: the Define has no DS.DSSCAT"
+  IG.CON.ELIGMET:
+    annotation: DSSCAT
+    reasons:
+      - "hidden item IT.CRF.DSSCAT is not prefilled (origin Collected), so the CRF states no value for it"
+  IG.CON.CONSENT:
+    annotation: DSSCAT
+    reasons:
+      - "hidden item IT.CRF.DSSCAT is not prefilled (origin Collected), so the CRF states no value for it"
+  IG.CON.RAND:
+    annotation: DSSCAT
+    reasons:
+      - "hidden item IT.CRF.DSSCAT is not prefilled (origin Collected), so the CRF states no value for it"
+  IT.CRF.MHSPID:
+    annotation: MHSPID
+    reasons:
+      - "MH.MHSPID: the Define has no MH.MHSPID"
+  IT.CRF.MHPRIOR:
+    annotation: "[NOT SUBMITTED];MHSTRF;MHSTRTPT;MHSTTPT"
+    reasons:
+      - "MH.MHSTRF: the Define has no MH.MHSTRF"
+      - "MH.MHSTRTPT: the Define has no MH.MHSTRTPT"
+      - "MH.MHSTTPT: the Define has no MH.MHSTTPT"
+  IG.CON.MEDHISTFREE_NORMALIZED:
+    annotation: MHSCAT
+    reasons:
+      - "hidden item IT.CRF.MHSCAT is not prefilled (origin Collected), so the CRF states no value for it"
+  IT.CRF.MHEVDTYP:
+    annotation: "MHEVDTYP = SYMPTOM ONSET"
+    reasons:
+      - "MH.MHEVDTYP: the Define has no MH.MHEVDTYP"
+  IG.CON.MHALZHEIMERS_DENORMALIZED:
+    annotation: "MHEVDTYP = SYMPTOM ONSET"
+    reasons:
+      - "MH.MHEVDTYP: the Define has no MH.MHEVDTYP"
+      - "hidden item IT.CRF.MHALZHEIMERS_DENORMALIZED.MHONGO is prefilled 'Y' but does not map directly to one SDTM variable, so its SDTM value is not stated"
+  IG.CON.CMFREE_NORMALIZED:
+    annotation: CMCAT
+    reasons:
+      - "hidden item IT.CRF.CMCAT is not prefilled (origin Collected), so the CRF states no value for it"
+      - "hidden item IT.CRF.CMSCAT is not prefilled (origin Collected), so the CRF states no value for it"
+  IT.CRF.SYSBP_VSORRES:
+    annotation: "VSORRES when VSTESTCD = SYSBP"
+    reasons:
+      - "VS.VSORRES: no value-level item matches"
+  IT.CRF.SYSBP_VSORRESU:
+    annotation: "VSORRESU = mmHg when VSTESTCD = SYSBP"
+    reasons:
+      - "VS.VSORRESU: no value-level item matches"
+  IT.CRF.PT_LBSCAT:
+    annotation: LBSCAT
+    reasons:
+      - "LB.LBSCAT: the Define has no LB.LBSCAT"
+  IT.CRF.PT_LBNAM:
+    annotation: LBNAM
+    reasons:
+      - "LB.LBNAM: the Define has no LB.LBNAM"
+  IT.CRF.PT_LBCLSIG:
+    annotation: LBCLSIG
+    reasons:
+      - "LB.LBCLSIG: the Define has no LB.LBCLSIG"
+  IG.CON.PTBLD_DENORMALIZED:
+    annotation: LBSCAT
+    reasons:
+      - "hidden item IT.CRF.PT_LBSCAT is not prefilled (origin Collected), so the CRF states no value for it"
+  IT.CRF.PH_LBSCAT:
+    annotation: LBSCAT
+    reasons:
+      - "LB.LBSCAT: the Define has no LB.LBSCAT"
+  IT.CRF.PH_LBNAM:
+    annotation: LBNAM
+    reasons:
+      - "LB.LBNAM: the Define has no LB.LBNAM"
+  IT.CRF.PH_LBCLSIG:
+    annotation: LBCLSIG
+    reasons:
+      - "LB.LBCLSIG: the Define has no LB.LBCLSIG"
+  IG.CON.PHURIN_DENORMALIZED:
+    annotation: LBSCAT
+    reasons:
+      - "hidden item IT.CRF.PH_LBSCAT is not prefilled (origin Collected), so the CRF states no value for it"
+  IT.CRF.COLOR_LBSCAT:
+    annotation: LBSCAT
+    reasons:
+      - "LB.LBSCAT: the Define has no LB.LBSCAT"
+  IT.CRF.COLOR_LBNAM:
+    annotation: LBNAM
+    reasons:
+      - "LB.LBNAM: the Define has no LB.LBNAM"
+  IT.CRF.COLOR_LBCLSIG:
+    annotation: LBCLSIG
+    reasons:
+      - "LB.LBCLSIG: the Define has no LB.LBCLSIG"
+  IG.CON.COLORURIN_DENORMALIZED:
+    annotation: LBSCAT
+    reasons:
+      - "hidden item IT.CRF.COLOR_LBSCAT is not prefilled (origin Collected), so the CRF states no value for it"
+  IT.CRF.SPGRAV_LBSCAT:
+    annotation: LBSCAT
+    reasons:
+      - "LB.LBSCAT: the Define has no LB.LBSCAT"
+  IT.CRF.SPGRAV_LBNAM:
+    annotation: LBNAM
+    reasons:
+      - "LB.LBNAM: the Define has no LB.LBNAM"
+  IT.CRF.SPGRAV_LBCLSIG:
+    annotation: LBCLSIG
+    reasons:
+      - "LB.LBCLSIG: the Define has no LB.LBCLSIG"
+  IG.CON.SPGRAVURIN_DENORMALIZED:
+    annotation: LBSCAT
+    reasons:
+      - "hidden item IT.CRF.SPGRAV_LBSCAT is not prefilled (origin Collected), so the CRF states no value for it"
+  IT.CRF.WBC_LBSCAT:
+    annotation: LBSCAT
+    reasons:
+      - "LB.LBSCAT: the Define has no LB.LBSCAT"
+  IT.CRF.WBC_LBNAM:
+    annotation: LBNAM
+    reasons:
+      - "LB.LBNAM: the Define has no LB.LBNAM"
+  IT.CRF.WBC_LBCLSIG:
+    annotation: LBCLSIG
+    reasons:
+      - "LB.LBCLSIG: the Define has no LB.LBCLSIG"
+  IG.CON.WBCBLD_DENORMALIZED:
+    annotation: LBSCAT
+    reasons:
+      - "hidden item IT.CRF.WBC_LBSCAT is not prefilled (origin Collected), so the CRF states no value for it"
+  IT.CRF.RBC_LBSCAT:
+    annotation: LBSCAT
+    reasons:
+      - "LB.LBSCAT: the Define has no LB.LBSCAT"
+  IT.CRF.RBC_LBNAM:
+    annotation: LBNAM
+    reasons:
+      - "LB.LBNAM: the Define has no LB.LBNAM"
+  IT.CRF.RBC_LBCLSIG:
+    annotation: LBCLSIG
+    reasons:
+      - "LB.LBCLSIG: the Define has no LB.LBCLSIG"
+  IG.CON.RBCBLD_DENORMALIZED:
+    annotation: LBSCAT
+    reasons:
+      - "hidden item IT.CRF.RBC_LBSCAT is not prefilled (origin Collected), so the CRF states no value for it"
+  IT.CRF.PLAT_LBSCAT:
+    annotation: LBSCAT
+    reasons:
+      - "LB.LBSCAT: the Define has no LB.LBSCAT"
+  IT.CRF.PLAT_LBNAM:
+    annotation: LBNAM
+    reasons:
+      - "LB.LBNAM: the Define has no LB.LBNAM"
+  IT.CRF.PLAT_LBCLSIG:
+    annotation: LBCLSIG
+    reasons:
+      - "LB.LBCLSIG: the Define has no LB.LBCLSIG"
+  IG.CON.PLATBLD_DENORMALIZED:
+    annotation: LBSCAT
+    reasons:
+      - "hidden item IT.CRF.PLAT_LBSCAT is not prefilled (origin Collected), so the CRF states no value for it"
+  IT.CRF.HCT_LBSCAT:
+    annotation: LBSCAT
+    reasons:
+      - "LB.LBSCAT: the Define has no LB.LBSCAT"
+  IT.CRF.HCT_LBNAM:
+    annotation: LBNAM
+    reasons:
+      - "LB.LBNAM: the Define has no LB.LBNAM"
+  IT.CRF.HCT_LBCLSIG:
+    annotation: LBCLSIG
+    reasons:
+      - "LB.LBCLSIG: the Define has no LB.LBCLSIG"
+  IG.CON.HCTBLD_DENORMALIZED:
+    annotation: LBSCAT
+    reasons:
+      - "hidden item IT.CRF.HCT_LBSCAT is not prefilled (origin Collected), so the CRF states no value for it"
+  IT.CRF.HGB_LBSCAT:
+    annotation: LBSCAT
+    reasons:
+      - "LB.LBSCAT: the Define has no LB.LBSCAT"
+  IT.CRF.HGB_LBNAM:
+    annotation: LBNAM
+    reasons:
+      - "LB.LBNAM: the Define has no LB.LBNAM"
+  IT.CRF.HGB_LBCLSIG:
+    annotation: LBCLSIG
+    reasons:
+      - "LB.LBCLSIG: the Define has no LB.LBCLSIG"
+  IG.CON.HGBBLD_DENORMALIZED:
+    annotation: LBSCAT
+    reasons:
+      - "hidden item IT.CRF.HGB_LBSCAT is not prefilled (origin Collected), so the CRF states no value for it"
+  IT.CRF.MCH_LBSCAT:
+    annotation: LBSCAT
+    reasons:
+      - "LB.LBSCAT: the Define has no LB.LBSCAT"
+  IT.CRF.MCH_LBNAM:
+    annotation: LBNAM
+    reasons:
+      - "LB.LBNAM: the Define has no LB.LBNAM"
+  IT.CRF.MCH_LBCLSIG:
+    annotation: LBCLSIG
+    reasons:
+      - "LB.LBCLSIG: the Define has no LB.LBCLSIG"
+  IG.CON.MCH_DENORMALIZED:
+    annotation: LBSCAT
+    reasons:
+      - "hidden item IT.CRF.MCH_LBSCAT is not prefilled (origin Collected), so the CRF states no value for it"
+  IT.CRF.MONO_LBSCAT:
+    annotation: LBSCAT
+    reasons:
+      - "LB.LBSCAT: the Define has no LB.LBSCAT"
+  IT.CRF.MONO_LBNAM:
+    annotation: LBNAM
+    reasons:
+      - "LB.LBNAM: the Define has no LB.LBNAM"
+  IT.CRF.MONO_LBCLSIG:
+    annotation: LBCLSIG
+    reasons:
+      - "LB.LBCLSIG: the Define has no LB.LBCLSIG"
+  IG.CON.MONOBLD_DENORMALIZED:
+    annotation: LBSCAT
+    reasons:
+      - "hidden item IT.CRF.MONO_LBSCAT is not prefilled (origin Collected), so the CRF states no value for it"
+  IT.CRF.NEUT_LBSCAT:
+    annotation: LBSCAT
+    reasons:
+      - "LB.LBSCAT: the Define has no LB.LBSCAT"
+  IT.CRF.NEUT_LBNAM:
+    annotation: LBNAM
+    reasons:
+      - "LB.LBNAM: the Define has no LB.LBNAM"
+  IT.CRF.NEUT_LBCLSIG:
+    annotation: LBCLSIG
+    reasons:
+      - "LB.LBCLSIG: the Define has no LB.LBCLSIG"
+  IG.CON.NEUTBLD_DENORMALIZED:
+    annotation: LBSCAT
+    reasons:
+      - "hidden item IT.CRF.NEUT_LBSCAT is not prefilled (origin Collected), so the CRF states no value for it"
+  IT.CRF.BASO_LBSCAT:
+    annotation: LBSCAT
+    reasons:
+      - "LB.LBSCAT: the Define has no LB.LBSCAT"
+  IT.CRF.BASO_LBNAM:
+    annotation: LBNAM
+    reasons:
+      - "LB.LBNAM: the Define has no LB.LBNAM"
+  IT.CRF.BASO_LBCLSIG:
+    annotation: LBCLSIG
+    reasons:
+      - "LB.LBCLSIG: the Define has no LB.LBCLSIG"
+  IG.CON.BASOBLD_DENORMALIZED:
+    annotation: LBSCAT
+    reasons:
+      - "hidden item IT.CRF.BASO_LBSCAT is not prefilled (origin Collected), so the CRF states no value for it"
+  IT.CRF.EOS_LBSCAT:
+    annotation: LBSCAT
+    reasons:
+      - "LB.LBSCAT: the Define has no LB.LBSCAT"
+  IT.CRF.EOS_LBNAM:
+    annotation: LBNAM
+    reasons:
+      - "LB.LBNAM: the Define has no LB.LBNAM"
+  IT.CRF.EOS_LBCLSIG:
+    annotation: LBCLSIG
+    reasons:
+      - "LB.LBCLSIG: the Define has no LB.LBCLSIG"
+  IG.CON.EOSBLD_DENORMALIZED:
+    annotation: LBSCAT
+    reasons:
+      - "hidden item IT.CRF.EOS_LBSCAT is not prefilled (origin Collected), so the CRF states no value for it"
+  IT.CRF.NEUTB_LBSCAT:
+    annotation: LBSCAT
+    reasons:
+      - "LB.LBSCAT: the Define has no LB.LBSCAT"
+  IT.CRF.NEUTB_LBNAM:
+    annotation: LBNAM
+    reasons:
+      - "LB.LBNAM: the Define has no LB.LBNAM"
+  IT.CRF.NEUTB_LBCLSIG:
+    annotation: LBCLSIG
+    reasons:
+      - "LB.LBCLSIG: the Define has no LB.LBCLSIG"
+  IG.CON.NEUTBBLD_DENORMALIZED:
+    annotation: LBSCAT
+    reasons:
+      - "hidden item IT.CRF.NEUTB_LBSCAT is not prefilled (origin Collected), so the CRF states no value for it"
+  IT.CRF.MCV_LBSCAT:
+    annotation: LBSCAT
+    reasons:
+      - "LB.LBSCAT: the Define has no LB.LBSCAT"
+  IT.CRF.MCV_LBNAM:
+    annotation: LBNAM
+    reasons:
+      - "LB.LBNAM: the Define has no LB.LBNAM"
+  IT.CRF.MCV_LBCLSIG:
+    annotation: LBCLSIG
+    reasons:
+      - "LB.LBCLSIG: the Define has no LB.LBCLSIG"
+  IG.CON.MCV_DENORMALIZED:
+    annotation: LBSCAT
+    reasons:
+      - "hidden item IT.CRF.MCV_LBSCAT is not prefilled (origin Collected), so the CRF states no value for it"
+  IT.CRF.ALT_LBSCAT:
+    annotation: LBSCAT
+    reasons:
+      - "LB.LBSCAT: the Define has no LB.LBSCAT"
+  IT.CRF.ALT_LBNAM:
+    annotation: LBNAM
+    reasons:
+      - "LB.LBNAM: the Define has no LB.LBNAM"
+  IT.CRF.ALT_LBCLSIG:
+    annotation: LBCLSIG
+    reasons:
+      - "LB.LBCLSIG: the Define has no LB.LBCLSIG"
+  IG.CON.ALTSERPL_DENORMALIZED:
+    annotation: LBSCAT
+    reasons:
+      - "hidden item IT.CRF.ALT_LBSCAT is not prefilled (origin Collected), so the CRF states no value for it"
+  IT.CRF.AST_LBSCAT:
+    annotation: LBSCAT
+    reasons:
+      - "LB.LBSCAT: the Define has no LB.LBSCAT"
+  IT.CRF.AST_LBNAM:
+    annotation: LBNAM
+    reasons:
+      - "LB.LBNAM: the Define has no LB.LBNAM"
+  IT.CRF.AST_LBCLSIG:
+    annotation: LBCLSIG
+    reasons:
+      - "LB.LBCLSIG: the Define has no LB.LBCLSIG"
+  IG.CON.ASTSERPL_DENORMALIZED:
+    annotation: LBSCAT
+    reasons:
+      - "hidden item IT.CRF.AST_LBSCAT is not prefilled (origin Collected), so the CRF states no value for it"
+  IT.CRF.BILI_LBSCAT:
+    annotation: LBSCAT
+    reasons:
+      - "LB.LBSCAT: the Define has no LB.LBSCAT"
+  IT.CRF.BILI_LBNAM:
+    annotation: LBNAM
+    reasons:
+      - "LB.LBNAM: the Define has no LB.LBNAM"
+  IT.CRF.BILI_LBCLSIG:
+    annotation: LBCLSIG
+    reasons:
+      - "LB.LBCLSIG: the Define has no LB.LBCLSIG"
+  IG.CON.BILISERPL_DENORMALIZED:
+    annotation: LBSCAT
+    reasons:
+      - "hidden item IT.CRF.BILI_LBSCAT is not prefilled (origin Collected), so the CRF states no value for it"
+  IT.CRF.CREAT_LBSCAT:
+    annotation: LBSCAT
+    reasons:
+      - "LB.LBSCAT: the Define has no LB.LBSCAT"
+  IT.CRF.CREAT_LBNAM:
+    annotation: LBNAM
+    reasons:
+      - "LB.LBNAM: the Define has no LB.LBNAM"
+  IT.CRF.CREAT_LBCLSIG:
+    annotation: LBCLSIG
+    reasons:
+      - "LB.LBCLSIG: the Define has no LB.LBCLSIG"
+  IG.CON.CREATSERPL_DENORMALIZED:
+    annotation: LBSCAT
+    reasons:
+      - "hidden item IT.CRF.CREAT_LBSCAT is not prefilled (origin Collected), so the CRF states no value for it"
+  IT.CRF.ALB_LBSCAT:
+    annotation: LBSCAT
+    reasons:
+      - "LB.LBSCAT: the Define has no LB.LBSCAT"
+  IT.CRF.ALB_LBNAM:
+    annotation: LBNAM
+    reasons:
+      - "LB.LBNAM: the Define has no LB.LBNAM"
+  IT.CRF.ALB_LBCLSIG:
+    annotation: LBCLSIG
+    reasons:
+      - "LB.LBCLSIG: the Define has no LB.LBCLSIG"
+  IG.CON.ALBSERPL_DENORMALIZED:
+    annotation: LBSCAT
+    reasons:
+      - "hidden item IT.CRF.ALB_LBSCAT is not prefilled (origin Collected), so the CRF states no value for it"
+  IT.CRF.K_LBSCAT:
+    annotation: LBSCAT
+    reasons:
+      - "LB.LBSCAT: the Define has no LB.LBSCAT"
+  IT.CRF.K_LBNAM:
+    annotation: LBNAM
+    reasons:
+      - "LB.LBNAM: the Define has no LB.LBNAM"
+  IT.CRF.K_LBCLSIG:
+    annotation: LBCLSIG
+    reasons:
+      - "LB.LBCLSIG: the Define has no LB.LBCLSIG"
+  IG.CON.KBLD_DENORMALIZED:
+    annotation: LBSCAT
+    reasons:
+      - "hidden item IT.CRF.K_LBSCAT is not prefilled (origin Collected), so the CRF states no value for it"
+  IT.CRF.SODIUM_LBSCAT:
+    annotation: LBSCAT
+    reasons:
+      - "LB.LBSCAT: the Define has no LB.LBSCAT"
+  IT.CRF.SODIUM_LBNAM:
+    annotation: LBNAM
+    reasons:
+      - "LB.LBNAM: the Define has no LB.LBNAM"
+  IT.CRF.SODIUM_LBCLSIG:
+    annotation: LBCLSIG
+    reasons:
+      - "LB.LBCLSIG: the Define has no LB.LBCLSIG"
+  IG.CON.SODIUMBLD_DENORMALIZED:
+    annotation: LBSCAT
+    reasons:
+      - "hidden item IT.CRF.SODIUM_LBSCAT is not prefilled (origin Collected), so the CRF states no value for it"
+  IT.CRF.CL_LBSCAT:
+    annotation: LBSCAT
+    reasons:
+      - "LB.LBSCAT: the Define has no LB.LBSCAT"
+  IT.CRF.CL_LBNAM:
+    annotation: LBNAM
+    reasons:
+      - "LB.LBNAM: the Define has no LB.LBNAM"
+  IT.CRF.CL_LBCLSIG:
+    annotation: LBCLSIG
+    reasons:
+      - "LB.LBCLSIG: the Define has no LB.LBCLSIG"
+  IG.CON.CLBLD_DENORMALIZED:
+    annotation: LBSCAT
+    reasons:
+      - "hidden item IT.CRF.CL_LBSCAT is not prefilled (origin Collected), so the CRF states no value for it"
+  IT.CRF.CO2_LBSCAT:
+    annotation: LBSCAT
+    reasons:
+      - "LB.LBSCAT: the Define has no LB.LBSCAT"
+  IT.CRF.CO2_LBNAM:
+    annotation: LBNAM
+    reasons:
+      - "LB.LBNAM: the Define has no LB.LBNAM"
+  IT.CRF.CO2_LBCLSIG:
+    annotation: LBCLSIG
+    reasons:
+      - "LB.LBCLSIG: the Define has no LB.LBCLSIG"
+  IG.CON.CO2BLD_DENORMALIZED:
+    annotation: LBSCAT
+    reasons:
+      - "hidden item IT.CRF.CO2_LBSCAT is not prefilled (origin Collected), so the CRF states no value for it"
+  IT.CRF.CA_LBSCAT:
+    annotation: LBSCAT
+    reasons:
+      - "LB.LBSCAT: the Define has no LB.LBSCAT"
+  IT.CRF.CA_LBNAM:
+    annotation: LBNAM
+    reasons:
+      - "LB.LBNAM: the Define has no LB.LBNAM"
+  IT.CRF.CA_LBCLSIG:
+    annotation: LBCLSIG
+    reasons:
+      - "LB.LBCLSIG: the Define has no LB.LBCLSIG"
+  IG.CON.CABLD_DENORMALIZED:
+    annotation: LBSCAT
+    reasons:
+      - "hidden item IT.CRF.CA_LBSCAT is not prefilled (origin Collected), so the CRF states no value for it"
+  IT.CRF.UREAN_LBSCAT:
+    annotation: LBSCAT
+    reasons:
+      - "LB.LBSCAT: the Define has no LB.LBSCAT"
+  IT.CRF.UREAN_LBNAM:
+    annotation: LBNAM
+    reasons:
+      - "LB.LBNAM: the Define has no LB.LBNAM"
+  IT.CRF.UREAN_LBCLSIG:
+    annotation: LBCLSIG
+    reasons:
+      - "LB.LBCLSIG: the Define has no LB.LBCLSIG"
+  IG.CON.UREANSERPL_DENORMALIZED:
+    annotation: LBSCAT
+    reasons:
+      - "hidden item IT.CRF.UREAN_LBSCAT is not prefilled (origin Collected), so the CRF states no value for it"
+  IT.CRF.PROT_LBSCAT:
+    annotation: LBSCAT
+    reasons:
+      - "LB.LBSCAT: the Define has no LB.LBSCAT"
+  IT.CRF.PROT_LBNAM:
+    annotation: LBNAM
+    reasons:
+      - "LB.LBNAM: the Define has no LB.LBNAM"
+  IT.CRF.PROT_LBCLSIG:
+    annotation: LBCLSIG
+    reasons:
+      - "LB.LBCLSIG: the Define has no LB.LBCLSIG"
+  IG.CON.PROTSERPL_DENORMALIZED:
+    annotation: LBSCAT
+    reasons:
+      - "hidden item IT.CRF.PROT_LBSCAT is not prefilled (origin Collected), so the CRF states no value for it"
+  IT.CRF.ALP_LBSCAT:
+    annotation: LBSCAT
+    reasons:
+      - "LB.LBSCAT: the Define has no LB.LBSCAT"
+  IT.CRF.ALP_LBNAM:
+    annotation: LBNAM
+    reasons:
+      - "LB.LBNAM: the Define has no LB.LBNAM"
+  IT.CRF.ALP_LBCLSIG:
+    annotation: LBCLSIG
+    reasons:
+      - "LB.LBCLSIG: the Define has no LB.LBCLSIG"
+  IG.CON.ALPSERPL_DENORMALIZED:
+    annotation: LBSCAT
+    reasons:
+      - "hidden item IT.CRF.ALP_LBSCAT is not prefilled (origin Collected), so the CRF states no value for it"
+  IT.CRF.URATE_LBSCAT:
+    annotation: LBSCAT
+    reasons:
+      - "LB.LBSCAT: the Define has no LB.LBSCAT"
+  IT.CRF.URATE_LBNAM:
+    annotation: LBNAM
+    reasons:
+      - "LB.LBNAM: the Define has no LB.LBNAM"
+  IT.CRF.URATE_LBCLSIG:
+    annotation: LBCLSIG
+    reasons:
+      - "LB.LBCLSIG: the Define has no LB.LBCLSIG"
+  IG.CON.URATESERPL_DENORMALIZED:
+    annotation: LBSCAT
+    reasons:
+      - "hidden item IT.CRF.URATE_LBSCAT is not prefilled (origin Collected), so the CRF states no value for it"
+  IT.CRF.PHOS_LBSCAT:
+    annotation: LBSCAT
+    reasons:
+      - "LB.LBSCAT: the Define has no LB.LBSCAT"
+  IT.CRF.PHOS_LBNAM:
+    annotation: LBNAM
+    reasons:
+      - "LB.LBNAM: the Define has no LB.LBNAM"
+  IT.CRF.PHOS_LBCLSIG:
+    annotation: LBCLSIG
+    reasons:
+      - "LB.LBCLSIG: the Define has no LB.LBCLSIG"
+  IG.CON.PHOSSERPL_DENORMALIZED:
+    annotation: LBSCAT
+    reasons:
+      - "hidden item IT.CRF.PHOS_LBSCAT is not prefilled (origin Collected), so the CRF states no value for it"
+  IT.CRF.GLUC_LBSCAT:
+    annotation: LBSCAT
+    reasons:
+      - "LB.LBSCAT: the Define has no LB.LBSCAT"
+  IT.CRF.GLUC_LBNAM:
+    annotation: LBNAM
+    reasons:
+      - "LB.LBNAM: the Define has no LB.LBNAM"
+  IT.CRF.GLUC_LBCLSIG:
+    annotation: LBCLSIG
+    reasons:
+      - "LB.LBCLSIG: the Define has no LB.LBCLSIG"
+  IG.CON.GLUCBLD_DENORMALIZED:
+    annotation: LBSCAT
+    reasons:
+      - "hidden item IT.CRF.GLUC_LBSCAT is not prefilled (origin Collected), so the CRF states no value for it"
+  IT.CRF.TRIG_LBSCAT:
+    annotation: LBSCAT
+    reasons:
+      - "LB.LBSCAT: the Define has no LB.LBSCAT"
+  IT.CRF.TRIG_LBNAM:
+    annotation: LBNAM
+    reasons:
+      - "LB.LBNAM: the Define has no LB.LBNAM"
+  IT.CRF.TRIG_LBCLSIG:
+    annotation: LBCLSIG
+    reasons:
+      - "LB.LBCLSIG: the Define has no LB.LBCLSIG"
+  IG.CON.TRIGSERPL_DENORMALIZED:
+    annotation: LBSCAT
+    reasons:
+      - "hidden item IT.CRF.TRIG_LBSCAT is not prefilled (origin Collected), so the CRF states no value for it"
+  IT.CRF.CHOL_LBSCAT:
+    annotation: LBSCAT
+    reasons:
+      - "LB.LBSCAT: the Define has no LB.LBSCAT"
+  IT.CRF.CHOL_LBNAM:
+    annotation: LBNAM
+    reasons:
+      - "LB.LBNAM: the Define has no LB.LBNAM"
+  IT.CRF.CHOL_LBCLSIG:
+    annotation: LBCLSIG
+    reasons:
+      - "LB.LBCLSIG: the Define has no LB.LBCLSIG"
+  IG.CON.CHOLSERPL_DENORMALIZED:
+    annotation: LBSCAT
+    reasons:
+      - "hidden item IT.CRF.CHOL_LBSCAT is not prefilled (origin Collected), so the CRF states no value for it"
+  IT.CRF.HDL_LBSCAT:
+    annotation: LBSCAT
+    reasons:
+      - "LB.LBSCAT: the Define has no LB.LBSCAT"
+  IT.CRF.HDL_LBNAM:
+    annotation: LBNAM
+    reasons:
+      - "LB.LBNAM: the Define has no LB.LBNAM"
+  IT.CRF.HDL_LBCLSIG:
+    annotation: LBCLSIG
+    reasons:
+      - "LB.LBCLSIG: the Define has no LB.LBCLSIG"
+  IG.CON.HDLSERPL_DENORMALIZED:
+    annotation: LBSCAT
+    reasons:
+      - "hidden item IT.CRF.HDL_LBSCAT is not prefilled (origin Collected), so the CRF states no value for it"
+  IT.CRF.LDL_LBSCAT:
+    annotation: LBSCAT
+    reasons:
+      - "LB.LBSCAT: the Define has no LB.LBSCAT"
+  IT.CRF.LDL_LBNAM:
+    annotation: LBNAM
+    reasons:
+      - "LB.LBNAM: the Define has no LB.LBNAM"
+  IT.CRF.LDL_LBCLSIG:
+    annotation: LBCLSIG
+    reasons:
+      - "LB.LBCLSIG: the Define has no LB.LBCLSIG"
+  IG.CON.LDLSERPL_DENORMALIZED:
+    annotation: LBSCAT
+    reasons:
+      - "hidden item IT.CRF.LDL_LBSCAT is not prefilled (origin Collected), so the CRF states no value for it"
+  IT.CRF.ECLOT:
+    annotation: ECLOT
+    reasons:
+      - "EC.ECLOT: the Define has no EC.ECLOT"
+  IT.CRF.ECFAST:
+    annotation: ECFAST
+    reasons:
+      - "EC.ECFAST: the Define has no EC.ECFAST"
+  IT.CRF.ECDOSADJ:
+    annotation: ECDOSADJ
+    reasons:
+      - "CDASHIG says this field does not map to an SDTMIG variable, but the annotation names targets"
+      - "EC.ECDOSADJ: the Define has no EC.ECDOSADJ"
+  IT.CRF.ECADJ:
+    annotation: ECADJ
+    reasons:
+      - "EC.ECADJ: the Define has no EC.ECADJ"

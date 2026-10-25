@@ -116,6 +116,10 @@ class DefineGenerator:
             logging.error(f"Invalid JSON in {self.dds_file}: {e.msg} at line {e.lineno}")
             print(f"ERROR: Invalid JSON in {self.dds_file}: {e.msg} at line {e.lineno}", file=sys.stderr)
             sys.exit(1)
+        # the aCRF leaf every def:DocumentRef points at comes from the DDS when it names one
+        acrfs = template_objects.get("annotatedCRFs") or template_objects.get("annotatedCRF") or []
+        if acrfs and isinstance(acrfs[0], dict) and acrfs[0].get("leafID"):
+            self.acrf = acrfs[0]["leafID"]
         self._init_define_objects()
         self._load_study(template_objects)
         # explicit dispatch order — no dependency on JSON key order.
@@ -198,9 +202,9 @@ class DefineGenerator:
         else:
             odm.Study.MetaDataVersion.AnnotatedCRF = supp_docs.create_annotatedcrf(self.acrf)
         # Only add a fallback acrf leaf if the annotatedCRF loader didn't produce one.
-        if self._find_leaf(ACRF_LEAF_ID) is None:
+        if self._find_leaf(self.acrf) is None:
             self.define_objects["leaf"].append(
-                supp_docs.create_leaf_object(leaf_id=ACRF_LEAF_ID, href="acrf.pdf", title="Annotated CRF")
+                supp_docs.create_leaf_object(leaf_id=self.acrf, href="acrf.pdf", title="Annotated CRF")
             )
         for elem in ELEMENTS:
             self._load_elements(odm, elem)

@@ -93,6 +93,26 @@ class TestAnnotations:
                  if a.get("Context") == "CDASH"]
         assert "VSORRES" in names
 
+    def test_define_item_oids_and_mapping_type_on_item_defs(self, odm20):
+        """crfpdf joins page references to Define ItemDefs on SDTMItemOIDs."""
+        _, _, xml = odm20
+        items = {i.get("OID"): {a.get("Context"): a.get("Name") for a in i.findall("odm:Alias", NS)}
+                 for i in find_all(xml, ".//odm:ItemDef")}
+        assert items["IT.CRF.SYSBP_VSORRES"]["SDTMItemOIDs"] == "VS.VSORRES=IT.VS.VSORRES.SYSBP"
+        assert items["IT.CRF.SYSBP_VSORRES"]["SDTMMappingType"] == "direct"
+        assert items["IT.CRF.VSDAT"]["SDTMMappingType"] == "concatenated"
+        # an unlinked target is left out, and no pairs means no alias
+        assert "SDTMItemOIDs" not in items["IT.CRF.SYSBP_VSORRESU"]
+        assert "SDTMItemOIDs" not in items["IT.CRF.DIABP_VSORRES"]
+
+    def test_concept_fixed_values(self, odm20):
+        _, _, xml = odm20
+        concept = next(g for g in find_all(xml, ".//odm:ItemGroupDef")
+                       if g.get("OID") == "IG.CON.SYSBP_DENORMALIZED")
+        aliases = {a.get("Context"): a.get("Name") for a in concept.findall("odm:Alias", NS)}
+        assert aliases["SDTM"] == "VSTESTCD = SYSBP; VSTEST = Systolic Blood Pressure"
+        assert aliases["SDTMItemOIDs"] == "VS.VSTESTCD=IT.VS.VSTESTCD VS.VSTEST=IT.VS.VSTEST"
+
     def test_retired_phase1_contexts_are_not_emitted(self, odm20):
         _, _, xml = odm20
         contexts = {a.get("Context") for a in find_all(xml, ".//odm:Alias")}

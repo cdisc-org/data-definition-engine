@@ -1,5 +1,6 @@
 from odmlib.define_2_1 import model as DEFINE
 import define_object
+from constants import DEFINE_STANDARD_NAMES
 
 class Standards(define_object.DefineObject):
     """ create a Define-XML v2.1 Standards element template """
@@ -17,6 +18,11 @@ class Standards(define_object.DefineObject):
         standards = DEFINE.Standards()
         self.lang = lang
         for standard in template:
+            if standard.get("name") not in DEFINE_STANDARD_NAMES:
+                # a CRF-only standard (CDASHIG) in a combined DDS: Define-XML 2.1 has no name for it
+                self.logger.info("skipping standard %s: %r is not a Define-XML 2.1 standard name",
+                                 standard.get("OID"), standard.get("name"))
+                continue
             std = self._create_standard_object(standard)
             standards.Standard.append(std)
         define_objects["Standards"] = standards

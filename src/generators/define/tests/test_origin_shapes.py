@@ -181,6 +181,58 @@ class TestOriginListShape:
         assert "10" not in page_refs_per_origin[1]
 
 
+class TestOriginDocuments:
+    """The DDS schema shape the pagerefs loader writes: origin.documents[].pages (integers)."""
+
+    @staticmethod
+    def _refs(origin):
+        return [(dr.leafID, pr.PageRefs, getattr(pr, "FirstPage", None), getattr(pr, "LastPage", None))
+                for dr in origin.DocumentRef for pr in dr.PDFPageRef]
+
+    def test_pages_replace_the_placeholder(self, items_instance):
+        item = _new_itemdef()
+        obj = {"origin": [{"type": "Collected", "source": "Investigator",
+                           "documents": [{"leafID": "LF.acrf", "pages": [12, 5]}]}]}
+        items_instance._add_origin(item, obj)
+        assert self._refs(item.Origin[0]) == [("LF.acrf", "5 12", None, None)]
+
+    def test_a_contiguous_range_becomes_first_and_last_page(self, items_instance):
+        item = _new_itemdef()
+        obj = {"origin": [{"type": "Collected", "source": "Investigator",
+                           "documents": [{"leafID": "LF.acrf", "pages": [7, 5, 6]}]}]}
+        items_instance._add_origin(item, obj)
+        assert self._refs(item.Origin[0]) == [("LF.acrf", None, 5, 7)]
+
+    def test_no_pages_keeps_the_placeholder_and_a_missing_leaf_falls_back(self, items_instance):
+        item = _new_itemdef()
+        obj = {"origin": [{"type": "Collected", "source": "Investigator", "documents": [{"pages": []}]},
+                          {"type": "Protocol", "source": "Sponsor", "documents": [{"pages": [3]}]}]}
+        items_instance._add_origin(item, obj)
+        assert self._refs(item.Origin[0]) == [("LF.ACRF", "__PLACEHOLDER__", None, None)]
+        assert self._refs(item.Origin[1]) == [("LF.ACRF", "3", None, None)]
+
+    def test_derived_with_pages_and_no_placeholder(self, items_instance):
+        item = _new_itemdef()
+        obj = {"origin": [{"type": "Derived", "source": "Sponsor", "documents": [{"leafID": "LF.acrf", "pages": [9]}]}]}
+        items_instance._add_origin(item, obj)
+        assert self._refs(item.Origin[0]) == [("LF.acrf", "9", None, None)]
+
+
+class TestLeafFromTheDds:
+    def test_the_annotated_crf_leaf_id_reaches_every_document_ref(self, tmp_path):
+        import json
+        import define_generator
+        dds = json.loads(open("tests/fixtures/define-360i.json").read())
+        dds["annotatedCRFs"] = [{"leafID": "LF.study-acrf", "title": "Annotated CRF", "href": "acrf.pdf"}]
+        path = tmp_path / "dds.json"
+        path.write_text(json.dumps(dds))
+        out = tmp_path / "define.xml"
+        generator = define_generator.DefineGenerator(str(path), str(out))
+        generator.create()
+        xml = out.read_text()
+        assert 'leafID="LF.acrf"' not in xml and 'leafID="LF.study-acrf"' in xml
+
+
 class TestPostProcessingMultiOrigin:
     """post_processing._add_derived_methods must trigger when ANY origin is Derived."""
 

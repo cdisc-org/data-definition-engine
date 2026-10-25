@@ -76,9 +76,10 @@
         <div class="container">
             <h2><xsl:value-of select="@Name"/></h2>
             <!-- <p><xsl:value-of select="odm:Description/odm:TranslatedText"/></p> -->
+            <!-- the generator writes the form's domains as Context='SDTM'; formAnnotation is the retired name -->
             <xsl:if test="$displayAnnotations = 1">
-              <xsl:if test="odm:Alias[@Context='formAnnotation']">
-                  <div class='annotation'><xsl:value-of select="odm:Alias[@Context='formAnnotation']/@Name"/></div>
+              <xsl:if test="odm:Alias[@Context='SDTM' or @Context='formAnnotation']">
+                  <div class='annotation'><xsl:value-of select="(odm:Alias[@Context='SDTM'], odm:Alias[@Context='formAnnotation'])[1]/@Name"/></div>
               </xsl:if>
             </xsl:if>
 
@@ -98,13 +99,14 @@
             </h3>
             <!-- <p><xsl:value-of select="odm:Description/odm:TranslatedText"/></p> -->
 
+            <!-- the generator writes Context='SDTM' and 'completionInstructions'; the formSection* names are retired -->
             <xsl:if test="$displayAnnotations = 1">
-            <xsl:if test="odm:Alias[@Context='formSectionAnnotation']">
-                <div><xsl:value-of select="odm:Alias[@Context='formSectionAnnotation']/@Name"/></div>
+            <xsl:if test="odm:Alias[@Context='SDTM' or @Context='formSectionAnnotation']">
+                <div class='annotation'><xsl:value-of select="(odm:Alias[@Context='SDTM'], odm:Alias[@Context='formSectionAnnotation'])[1]/@Name"/></div>
             </xsl:if>
             </xsl:if>
-            <xsl:if test="odm:Alias[@Context='formSectionCompletionInstruction']">
-                <div class='form-instruction'><xsl:value-of select="odm:Alias[@Context='formSectionCompletionInstruction']/@Name"/></div>
+            <xsl:if test="odm:Alias[@Context='completionInstructions' or @Context='formSectionCompletionInstruction']">
+                <div class='form-instruction'><xsl:value-of select="(odm:Alias[@Context='completionInstructions'], odm:Alias[@Context='formSectionCompletionInstruction'])[1]/@Name"/></div>
             </xsl:if>
 
             <xsl:for-each select="odm:ItemGroupRef">
@@ -120,6 +122,10 @@
             <!-- <p><xsl:value-of select="odm:Description/odm:TranslatedText"/></p> -->
 
             <xsl:if test="$displayAnnotations = 1">
+              <!-- the concept's fixed values: test code and name, hidden prefilled items -->
+              <xsl:if test="odm:Alias[@Context='SDTM']">
+                  <div class='annotation'><xsl:value-of select="odm:Alias[@Context='SDTM']/@Name"/></div>
+              </xsl:if>
               <xsl:for-each select="odm:Coding">
                       <div class="coding-info">
                           <xsl:value-of select="@SystemName"/>: <xsl:value-of select="@Code"/> (<xsl:value-of select="@System"/>)

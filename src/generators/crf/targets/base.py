@@ -38,6 +38,33 @@ def as_list(value: Any) -> list[Any]:
     return [value]
 
 
+def sdtm_item_oids(links: list[dict[str, Any]] | None) -> str:
+    """The ``SDTMItemOIDs`` alias value: space-separated ``DATASET.VARIABLE=OID`` pairs for
+    the linked targets of ``crfSdtmTarget.links`` (unlinked targets are left out)."""
+    return " ".join(f"{link['dataset']}.{link['variable']}={link['item']}"
+                    for link in as_list(links) if isinstance(link, dict) and link.get("item"))
+
+
+def require_unique_alias_contexts(element: Any) -> Any:
+    """Fail when an element carries two Aliases with the same Context.
+
+    The XSD keys Alias/@Context per element (UC-ID-1 on ItemDef, UC-IGD-4 on ItemGroupDef),
+    and the generator assembles aliases from several DDS fields, so a DDS alias that
+    repeats one the generator writes itself (``SDTM``, ``mappingInstructions``) would
+    otherwise reach the file and fail schema validation far from its cause. ``vars()`` is
+    read so an element with no Alias list is not given one (see
+    ``post_processing.peek``).
+    """
+    seen: set[str] = set()
+    for alias in vars(element).get("Alias") or []:
+        context = getattr(alias, "Context", None)
+        if context in seen:
+            raise ValueError(f"{type(element).__name__} {getattr(element, 'OID', '')} would get "
+                             f"two Alias elements with Context={context!r}")
+        seen.add(context)
+    return element
+
+
 class OdmTarget(ABC):
     """Builds odmlib objects for one ODM version."""
 
@@ -57,6 +84,18 @@ class OdmTarget(ABC):
     def set_item_index(self, index: dict[str, dict[str, Any]]) -> None:
         """Give the target a lookup from item OID to the DDS item dict."""
         self.item_index = index
+
+    #: Form OID -> the DDS Form dict, so a visit's form reference can carry the form's
+    #: own Mandatory value rather than always Yes.
+    form_index: dict[str, dict[str, Any]] = {}
+
+    def set_form_index(self, index: dict[str, dict[str, Any]]) -> None:
+        """Give the target a lookup from Form OID to the DDS Form dict."""
+        self.form_index = index
+
+    def form_mandatory(self, form_oid: str) -> bool:
+        """The Form's ``mandatory`` flag; a form the DDS does not describe counts as mandatory."""
+        return bool((self.form_index.get(form_oid) or {}).get("mandatory", True))
 
     # -- text -----------------------------------------------------------------
     @abstractmethod

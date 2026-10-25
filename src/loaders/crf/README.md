@@ -81,6 +81,29 @@ It also runs as a module from `src/`: `python -m loaders.crf.crf_loader ...`.
 6. **Build codelists** from CDASH CT (falling back to SDTM CT), as full lists, subsets,
    or value-list-only lists.
 7. **Build items, forms and study events**, then assemble and validate.
+8. **Link every SDTM target to a Define item** (`builders/sdtm_links.py`). The Define
+   items, value lists and where clauses are already in the input DDS, so each item's
+   `crfSdtmTarget` gets:
+   - `links: [{dataset, variable, item}]`, one per target of its annotation. A target whose
+     variable has a value list links to the value-level ItemDef: first by the concept's
+     SDTM dataset specialization (the Define loader codes each value-level item with it),
+     then by the where clause with "admits" semantics (EQ equal, IN listed, NE different;
+     the concept's prefilled values must be admitted where the where clause tests their
+     variable). Exactly one match is required; a target with no where clause and no
+     value-level match links to the variable. `item` is null when nothing fits, and the
+     target goes to `mappingReview`. VSTESTCD/VSTEST stay out of item links: they belong
+     to the concept.
+   - `mapping`: `direct | concatenated | relative_timing | split | not_submitted` (the CSV
+     `sdtm_mapping` column when filled, else NOT SUBMITTED alone, all-relative-timing
+     targets, DAT/TIM -> --DTC Library targets, the CDASHIG phrase rules, a lone own
+     variable).
+   - the annotation corrected to the CDASHIG `sdtmigDatasetMappingTargets` when its target
+     is neither a Library target nor a Define variable (AESTDAT -> AESTDTC), logged in the
+     summary.
+   Each Concept also gets `aliases` stating its fixed values (`SDTM`: `VSTESTCD = SYSBP;
+   VSTEST = Systolic Blood Pressure`, plus the values of hidden items prefilled with a
+   direct mapping, `LBCAT = CHEMISTRY`) and their links (`SDTMItemOIDs`). A shared item
+   whose prefilled value or links differ between concepts splits into a concept-scoped OID.
 
 ### OID conventions
 
@@ -113,7 +136,20 @@ crfGroupChoices:
   C25298: {selected: SYSBP_DENORMALIZED, candidates: [SYSBP_DENORMALIZED, SYSBP_NORMALIZED]}
 uncoveredConcepts:
   - {code: C102408, name: ECOG Performance Status, activity: ECOG PERFORMANCE STATUS}
+mappingReview:
+  IT.CRF.ECDOSADJ:
+    annotation: ECDOSADJ
+    reasons: ["EC.ECDOSADJ: the Define has no EC.ECDOSADJ"]
+items:
+  IT.CRF.ECDOSADJ:
+    crfSdtmTarget: {annotation: __PLACEHOLDER__, mapping: __PLACEHOLDER__, links: __PLACEHOLDER__}
 ```
+
+`mappingReview` lists the targets that could not be linked to exactly one Define item, and
+hidden items the CRF states no value for. Answer one under `items.<OID>.crfSdtmTarget`: a
+new `annotation` recomputes the links (with the concept's prefilled values and
+specialization), `links` may be given outright as `DATASET.VARIABLE=OID` pairs, and
+`mapping` must be one of the mapping codes.
 
 Values left as `__PLACEHOLDER__` are ignored on apply, so a partly completed file is safe.
 The file is regenerated on every run; answers survive because applying them removes the
@@ -149,7 +185,9 @@ forms for each visit.
 cd src/loaders/crf && pytest
 ```
 
-117 tests, no network access — the Library client is a `MagicMock` throughout. Fixtures
+147 tests, no network access — the Library client is a `MagicMock` throughout. Fixtures
 in `tests/fixtures/` cover the four group-selection priorities, CDASHIG class-level
 fallback, codelist subsetting, form/section/concept nesting and order, timing mapping,
-the empty-`activityIds` warning, patch round-tripping, and profile validation.
+the empty-`activityIds` warning, patch round-tripping, profile validation, and the SDTM
+links (`test_sdtm_links.py`: parsing, CDASHIG corrections, links by specialization and by
+"admits", mapping codes, concept fixed values, splits on prefilled values).

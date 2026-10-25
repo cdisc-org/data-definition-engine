@@ -1,0 +1,26 @@
+# The DDE pipeline for NCT01797120: python -m pipeline --study ../data/protocols/NCT01797120/pipeline.yaml
+# (run from src/). Paths are relative to this file. The review files sit beside it: they hold the
+# answers a person gives, and each stage applies its file when it exists and writes it back.
+study: NCT01797120
+usdm_file: NCT01797120-latest.json
+crf_spec_file: ../../crf_specializations/cdisc_crf_specializations_draft.csv
+# Stage A's output, the Define DDS (DDS1)
+dds_define: ../../../src/define-xml/output/NCT_DDS.json
+# everything generated after Stage A: dds-crf.json, crf-2.0.xml, acrf.pdf, acrf.pagerefs.json,
+# dds-origin.json, define.xml, pipeline-run.json
+output_dir: ../../../output/NCT01797120
+sdtmig: "3.4"
+# 2026-03-27 does not have every codelist the SDTMIG variables link to (C102580), and the
+# Define loader stops on a missing codelist; 2025-09-26 is what the 2026-08 and 2026-09 runs used
+sdtmct: "2025-09-26"
+cdashig: "2.3"
+cdashct: "2026-03-27"
+page_size: letter
+review:
+  define_patch: define-patch.yaml
+  crf_refinement: crf-refinement.yaml
+  origin_review: origin-review.yaml
+# crfutils is a separate install; these are looked up on PATH unless given as paths
+commands:
+  crfvalidate: crfvalidate
+  crfpdf: crfpdf

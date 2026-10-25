@@ -1,0 +1,572 @@
+# Origin review file - written by loaders/pagerefs (Stage E)
+#
+# Answer each pin and re-run with --apply_patch:
+#   crf     accept the origin and pages the aCRF gives
+#   stageA  keep the Define loader's origin
+#   ack     acknowledged; change nothing
+#   {type: Collected, source: Vendor}   use this origin
+# Under pins, a key may be an item OID, a ValueListDef OID (VL.LB.LBORRES) or
+# DATASET.VARIABLE, so one pin covers a whole value list.
+#
+# This file is regenerated on every run; answered pins are carried over.
+
+replaced:
+  IT.DS.DSCAT:
+    stageA: Assigned/Sponsor
+    crf: Protocol/Sponsor p. 3 4 5
+    pin: __PLACEHOLDER__
+  IT.DS.DSDECOD.PROTOCOL-MILESTONE:
+    stageA: Assigned/Sponsor
+    crf: Protocol/Sponsor p. 3 4 5
+    pin: __PLACEHOLDER__
+  IT.VS.VSORRESU.DIABP:
+    stageA: Collected/Investigator
+    crf: Protocol/Sponsor p. 10
+    pin: __PLACEHOLDER__
+  IT.VS.VSORRESU.HR:
+    stageA: Collected/Investigator
+    crf: Protocol/Sponsor p. 11
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRES.ALT:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 26
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRES.AST:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 27
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRES.BILI:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 27
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRES.CREAT:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 28
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRES.ALB:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 28
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRES.PT:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 15
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRES.GLUC:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 36
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRES.TRIG:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 37
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRES.CHOL:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 38
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRES.HDL:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 38
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRES.LDL:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 39
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRES.WBC:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 18
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRES.RBC:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 19
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRES.PLAT:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 19
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRES.K:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 29
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRES.SODIUM:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 30
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRES.CL:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 30
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRES.CO2:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 31
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRES.CA:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 31
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRES.UREAN:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 32
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRES.PROT:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 33
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRES.ALP:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 33
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRES.URATE:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 34
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRES.PH:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 16
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRES.COLOR:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 16
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRES.SPGRAV:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 17
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRES.HCT:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 20
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRES.HGB:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 20
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRES.MCH:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 21
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRES.MONO:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 21
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRES.NEUT:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 22
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRES.BASO:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 23
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRES.EOS:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 23
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRES.NEUTB:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 24
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRES.PHOS:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 34
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRES.MCV:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 24
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRESU.ALT:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 26
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRESU.AST:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 27
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRESU.BILI:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 27
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRESU.CREAT:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 28
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRESU.ALB:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 28
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRESU.PT:
+    stageA: Collected/Vendor
+    crf: Protocol/Sponsor p. 15
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRESU.GLUC:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 36
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRESU.TRIG:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 37
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRESU.CHOL:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 38
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRESU.HDL:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 38
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRESU.LDL:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 39
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRESU.WBC:
+    stageA: Collected/Vendor
+    crf: Protocol/Sponsor p. 18
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRESU.RBC:
+    stageA: Collected/Vendor
+    crf: Protocol/Sponsor p. 19
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRESU.PLAT:
+    stageA: Collected/Vendor
+    crf: Protocol/Sponsor p. 19
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRESU.K:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 29
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRESU.SODIUM:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 30
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRESU.CL:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 30
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRESU.CO2:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 31
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRESU.CA:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 31
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRESU.UREAN:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 32
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRESU.PROT:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 33
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRESU.ALP:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 33
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRESU.URATE:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 34
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRESU.HCT:
+    stageA: Collected/Vendor
+    crf: Protocol/Sponsor p. 20
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRESU.HGB:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 20
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRESU.MCH:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 21
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRESU.MONO:
+    stageA: Collected/Vendor
+    crf: Protocol/Sponsor p. 22
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRESU.NEUT:
+    stageA: Collected/Vendor
+    crf: Protocol/Sponsor p. 22
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRESU.BASO:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 23
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRESU.EOS:
+    stageA: Collected/Vendor
+    crf: Protocol/Sponsor p. 23
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRESU.NEUTB:
+    stageA: Collected/Vendor
+    crf: Protocol/Sponsor p. 24
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRESU.PHOS:
+    stageA: Collected/Vendor
+    crf: Collected/Investigator p. 34
+    pin: __PLACEHOLDER__
+  IT.LB.LBORRESU.MCV:
+    stageA: Collected/Vendor
+    crf: Protocol/Sponsor p. 24
+    pin: __PLACEHOLDER__
+  IT.CM.CMDOSE:
+    stageA: Collected/Investigator
+    crf: Derived/Sponsor p. 8
+    pin: __PLACEHOLDER__
+  IT.CM.CMDOSTXT:
+    stageA: Collected/Investigator
+    crf: Derived/Sponsor p. 8
+    pin: __PLACEHOLDER__
+  IT.CM.CMSTRF:
+    stageA: Assigned/Sponsor
+    crf: Derived/Sponsor p. 9
+    pin: __PLACEHOLDER__
+  IT.CM.CMENRF:
+    stageA: Assigned/Sponsor
+    crf: Derived/Sponsor p. 9
+    pin: __PLACEHOLDER__
+  IT.CM.CMSTRTPT:
+    stageA: Assigned/Sponsor
+    crf: Derived/Sponsor p. 9
+    pin: __PLACEHOLDER__
+  IT.CM.CMSTTPT:
+    stageA: Assigned/Sponsor
+    crf: Derived/Sponsor p. 9
+    pin: __PLACEHOLDER__
+  IT.CM.CMENRTPT:
+    stageA: Assigned/Sponsor
+    crf: Derived/Sponsor p. 9
+    pin: __PLACEHOLDER__
+  IT.CM.CMENTPT:
+    stageA: Assigned/Sponsor
+    crf: Derived/Sponsor p. 9
+    pin: __PLACEHOLDER__
+  IT.MH.MHTERM:
+    stageA: Collected/Investigator
+    crf: Collected/Investigator p. 6; Protocol/Sponsor p. 7
+    pin: __PLACEHOLDER__
+  IT.MH.MHCAT:
+    stageA: Assigned/Sponsor
+    crf: Protocol/Sponsor p. 6
+    pin: __PLACEHOLDER__
+  IT.MH.MHPRESP:
+    stageA: Assigned/Sponsor
+    crf: Protocol/Sponsor p. 7
+    pin: __PLACEHOLDER__
+  IT.MH.MHOCCUR:
+    stageA: Collected/Investigator
+    crf: Protocol/Sponsor p. 7
+    pin: __PLACEHOLDER__
+  IT.MH.MHENRF:
+    stageA: Assigned/Sponsor
+    crf: Derived/Sponsor p. 6
+    pin: __PLACEHOLDER__
+  IT.MH.MHENRTPT:
+    stageA: Assigned/Sponsor
+    crf: Derived/Sponsor p. 6
+    pin: __PLACEHOLDER__
+  IT.MH.MHENTPT:
+    stageA: Assigned/Sponsor
+    crf: Derived/Sponsor p. 6
+    pin: __PLACEHOLDER__
+  IT.EC.ECDOSE:
+    stageA: Collected/Investigator
+    crf: Derived/Sponsor p. 40
+    pin: __PLACEHOLDER__
+  IT.EC.ECDOSTXT:
+    stageA: Collected/Investigator
+    crf: Derived/Sponsor p. 40
+    pin: __PLACEHOLDER__
+  IT.AE.AEENRF:
+    stageA: Assigned/Sponsor
+    crf: Derived/Sponsor p. 13
+    pin: __PLACEHOLDER__
+  IT.AE.AEENRTPT:
+    stageA: Assigned/Sponsor
+    crf: Derived/Sponsor p. 13
+    pin: __PLACEHOLDER__
+  IT.AE.AEENTPT:
+    stageA: Assigned/Sponsor
+    crf: Derived/Sponsor p. 13
+    pin: __PLACEHOLDER__
+
+noPages:
+  IT.DS.DSTERM:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.RS.RSDTC:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.RS.RSORRES.ECOG101:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.RS.RSORRES.NEWLPROG:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.RS.RSORRES.TRGRESP:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.RS.RSORRES.NTRGRESP:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.RS.RSORRES.BESTRESP:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.RS.RSORRES.OVRLRESP:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.CM.CMOCCUR:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.RE.REORRES.FVC:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.RE.REORRES.FEV1:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.RE.REORRES.FEV6:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.RE.REORRES.PEF:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.RE.REORRES.TV:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.RE.REORRES.IC:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.RE.REORRES.ERV:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.RE.REORRES.IRV:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.RE.REORRES.SVC:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.RE.REORRES.DLCO:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.RE.REORRESU.FVC:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.RE.REORRESU.FEV1:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.RE.REORRESU.FEV6:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.RE.REORRESU.PEF:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.RE.REORRESU.TV:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.RE.REORRESU.IC:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.RE.REORRESU.ERV:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.RE.REORRESU.IRV:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.RE.REORRESU.SVC:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.RE.REORRESU.DLCO:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.EC.ECDOSFRM:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.EC.ECDOSRGM:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.EC.ECLOC:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.EC.ECLAT:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.EC.ECDIR:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.AE.AELOC:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.AE.AERELNST:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.AE.AEPATT:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.AE.AESCAN:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.AE.AESOD:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.AE.AECONTRT:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.AE.AETOXGR:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.TR.TRMETHOD:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.TR.TRDTC:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.TR.TRORRES.LNSTATE:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.TR.TRORRES.TUMSTATE:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.TR.TRORRES.LDIAM:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.TR.TRORRES.LPERP:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.TR.TRORRESU.LDIAM:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.TR.TRORRESU.LPERP:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.TU.TULOC:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.TU.TULAT:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.TU.TUDIR:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.TU.TUMETHOD:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.TU.TUDTC:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.TU.TUORRES.NTIND:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.TU.TUORRES.TIND:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.TU.TUORRES.TUMERGE:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.TU.TUORRES.TUSPLIT:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+  IT.TU.TUORRES.TUMIDENT:
+    origin: Collected/Investigator
+    pin: __PLACEHOLDER__
+
+unknownOids: {}
+
+unpaired:
+  "MHPRESP = Y; MHOCCUR = Y; MHEVDTYP = SYMPTOM ONSET: target MH.MHEVDTYP has no SDTMItemOIDs pair":
+    pin: __PLACEHOLDER__
+
+pins: {}

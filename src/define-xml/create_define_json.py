@@ -28,6 +28,11 @@ from datetime import datetime
 # specialization path directly in BiomedicalConcept.reference instead.
 SDTM_SPECIALIZATION_EXT_URL = "http://www.cdisc.org/usdm/extensions/specializations/sdtm"
 
+# Coding system for the SDTM Dataset Specialization a value-level item comes from. The
+# CRF loader codes a CRF concept's specialization with the same system
+# (loaders/crf/constants.py SDTM_DSS_SYSTEM), so the two can be joined.
+SDTM_DSS_SYSTEM = "https://library.cdisc.org/api/mdr/specializations/sdtm/datasetspecializations"
+
 
 class USDMDefineJSONProcessor:
     """
@@ -58,8 +63,8 @@ class USDMDefineJSONProcessor:
     """
     
     def __init__(self, usdm_file, output_template, sdtmig, sdtmct,
-                 studyversion, studydesign, docversion, cdisc_api_key, base_api_url,
-                 cosmosversion, debug):
+                 studyversion, studydesign, docversion, cdisc_api_key, base_api_url=None,
+                 cosmosversion="v2", debug=False):
         """
         Initialize the USDM processor.
         
@@ -409,6 +414,7 @@ class USDMDefineJSONProcessor:
             candidate['codelist_name'] = variable_data.get('codelist', {}).get('submissionValue')
             candidate['assigned_value'] = variable_data.get('assignedTerm', {}).get('value')
             candidate['where_clause'] = filtered_where_clause
+            candidate['dss_id'] = dss_response.get('datasetSpecializationId')
 
             self.grouping_candidates.setdefault(variable_name, []).append(candidate)
 
@@ -445,6 +451,8 @@ class USDMDefineJSONProcessor:
                     }
 
                 vlm_data['WhereClause'] = candidate['where_clause']
+                if candidate.get('dss_id'):
+                    vlm_data['dss_id'] = candidate['dss_id']
                 self.bc_dict[bc_id].append({variable_name: vlm_data})
 
     def _process_variables(self, variables, dataset_name, bc):
@@ -646,6 +654,8 @@ class USDMDefineJSONProcessor:
                     }
 
                 vlm_data['WhereClause'] = where_clause
+                if dss_response.get('datasetSpecializationId'):
+                    vlm_data['dss_id'] = dss_response['datasetSpecializationId']
                 variable_dict = {variable_name: vlm_data}
                 self.bc_dict[bc.get('id')].append(variable_dict)
 
@@ -1254,7 +1264,7 @@ class USDMDefineJSONProcessor:
                         # Create VLM item with optional fields
                         data_type = vlm_data.get('dataType', self._convert_data_type(var))
                         vlm_item = {
-                            "OID": f"IT.{dataset}.{var['name']}.{param}" if param else f"IT.{dataset}.{var['name']}",
+                            "OID": self._value_level_oid(dataset, var['name'], param),
                             "mandatory": False,
                             "name": var['name'] or "__PLACEHOLDER__",
                             "dataType": data_type or "__PLACEHOLDER__",
@@ -1287,14 +1297,15 @@ class USDMDefineJSONProcessor:
                                 "source": "__PLACEHOLDER__"
                             }]
 
+                        # The dataset specialization this value-level rule comes from
+                        if vlm_data.get('dss_id'):
+                            vlm_item['coding'] = [{"code": vlm_data['dss_id'], "codeSystem": SDTM_DSS_SYSTEM}]
+
                         # Add applicableWhen as the last attribute
                         vlm_item['applicableWhen'] = where_clause_oids
 
                         # Group VLM items by variable name for slices
-                        vlm_key = f"{dataset}.{var['name']}"
-                        if vlm_key not in self.vlm_items_by_variable:
-                            self.vlm_items_by_variable[vlm_key] = []
-                        self.vlm_items_by_variable[vlm_key].append(vlm_item)
+                        self._add_vlm_item(f"{dataset}.{var['name']}", vlm_item)
 
         # Remove codeList from parent items only when at least one of its
         # VLM slice items carries a codeList (the codelist then belongs on
@@ -1736,13 +1747,61 @@ class USDMDefineJSONProcessor:
         hex_hash = self._generate_hex_oid(where_clause_content, "").replace(".", "")
         where_clause_oid = f"WC.{dataset}.{hex_hash}"
 
-        where_clause = {
-            "OID": where_clause_oid,
-            "conditions": condition_oids
-        }
-
-        self.where_clauses.append(where_clause)
+        # The OID is a hash of its content, so an existing OID is the same where clause.
+        if not any(wc["OID"] == where_clause_oid for wc in self.where_clauses):
+            self.where_clauses.append({
+                "OID": where_clause_oid,
+                "conditions": condition_oids
+            })
         return where_clause_oid
+
+    @staticmethod
+    def _value_level_oid(dataset, variable_name, param):
+        """
+        Build a value-level item OID from the first where-clause value.
+
+        Whitespace and '=' become '-' so the OID is a safe token (the CRF lists OIDs
+        space-separated as DATASET.VARIABLE=OID pairs); OIDs that are already safe are
+        unchanged.
+
+        Args:
+            dataset (str): Dataset domain name
+            variable_name (str): Variable name
+            param (str): First value of the item's where clause, or None
+
+        Returns:
+            str: Item OID, e.g. "IT.DS.DSDECOD.PROTOCOL-MILESTONE"
+        """
+        if not param:
+            return f"IT.{dataset}.{variable_name}"
+        return f"IT.{dataset}.{variable_name}.{re.sub(r'[\s=]+', '-', str(param).strip())}"
+
+    def _add_vlm_item(self, vlm_key, vlm_item):
+        """
+        Add a value-level item to its variable's slice, keeping item OIDs unique.
+
+        Items with the same OID and the same where clauses are one item: several dataset
+        specializations can share a value-level rule (three DSDECOD milestones all
+        conditioned on DSCAT = PROTOCOL MILESTONE), so only their codings are merged.
+        The same OID with different where clauses gets a numeric suffix.
+
+        Args:
+            vlm_key (str): "DATASET.VARIABLE"
+            vlm_item (dict): The value-level item
+        """
+        items = self.vlm_items_by_variable.setdefault(vlm_key, [])
+        for existing in items:
+            if existing['OID'] == vlm_item['OID'] and existing['applicableWhen'] == vlm_item['applicableWhen']:
+                for code in vlm_item.get('coding', []):
+                    if code not in existing.setdefault('coding', []):
+                        existing['coding'].append(code)
+                return
+        taken = {item['OID'] for item in items}
+        base, suffix = vlm_item['OID'], 2
+        while vlm_item['OID'] in taken:
+            vlm_item['OID'] = f"{base}-{suffix}"
+            suffix += 1
+        items.append(vlm_item)
 
     def _create_condition_key(self, range_checks):
         """

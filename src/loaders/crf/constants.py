@@ -22,7 +22,8 @@ CONCEPT_REF_OID_PREFIX = "CONC"
 STD_CDASHIG_OID = "STD.CDASHIG"
 STD_CDASHCT_OID = "STD.CDASHCT"
 ACRF_LEAF_ID = "LF.acrf"
-ACRF_HREF = "acrf.html"
+# the PDF crfpdf renders from the CRF; Define-XML def:DocumentRef page references point into it
+ACRF_HREF = "acrf.pdf"
 
 CRF_PROFILE_URI = "https://cdisc.org/dds/profiles/crf/1.0"
 DEFINE_PROFILE_URI = "https://cdisc.org/dds/profiles/define-xml/1.0"
@@ -69,6 +70,7 @@ ALIAS_CONTEXTS = frozenset({
     "cdiscNotes", "definition", "mappingInstructions", "preSpecifiedValue",
     "selectionType", "renderingHint", "subsetOf", "timing", "section", "sectionOrder",
     "BC", "SDTMSpecialization", "CRFSpecialization", "USDM", "nci:ExtCodeID", "Standard",
+    "SDTMItemOIDs", "SDTMMappingType",
 })
 
 #: Origins assigned to CRF items by how the item is populated.

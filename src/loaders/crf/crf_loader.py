@@ -43,6 +43,7 @@ from loaders.crf import patch as crf_patch  # noqa: E402
 from loaders.crf.builders.codelists import CodeListBuilder  # noqa: E402
 from loaders.crf.builders.forms import FormBuilder  # noqa: E402
 from loaders.crf.builders.items import ItemBuilder  # noqa: E402
+from loaders.crf.builders.sdtm_links import DefineIndex  # noqa: E402
 from loaders.crf.builders.study_events import StudyEventBuilder  # noqa: E402
 from loaders.crf.constants import (ACRF_HREF, ACRF_LEAF_ID, CRF_PROFILE_URI,  # noqa: E402
                                    DEFAULT_CDASHIG_VERSION,
@@ -107,6 +108,7 @@ class CrfLoader:
             "forms": 0, "concepts": 0, "items": 0, "codeLists": 0,
             "uncovered": [], "groupChoices": {}, "unboundEvents": [],
             "placeholders": [], "conflicts": [], "normalized": [],
+            "mappingReview": [], "corrections": [], "links": 0,
         }
         self.debug_data: dict[str, Any] = {}
 
@@ -282,7 +284,10 @@ class CrfLoader:
         property_by_dec = self._property_index()
 
         self.codelist_builder = CodeListBuilder(self.cdash_ct, self.cdashct or "")
-        self.item_builder = ItemBuilder(self.cdashig, self.codelist_builder, sdtm_item_oids)
+        # Built before any CRF group is added, so it holds only the Define side.
+        define_index = DefineIndex(self.dds)
+        self.item_builder = ItemBuilder(self.cdashig, self.codelist_builder, sdtm_item_oids,
+                                        define_index)
         package_date = next(
             (g.package_date for g in self.spec_source.groups().values() if g.package_date), "")
         self.form_builder = FormBuilder(self.item_builder, package_date)
@@ -321,6 +326,11 @@ class CrfLoader:
             len(s.get("slices") or []) for f in forms for s in f.get("slices") or [])
         self.report["conflicts"] = self.item_builder.conflicts
         self.report["placeholders"] = sorted(self.item_builder.placeholders)
+        self.report["mappingReview"] = self.item_builder.mapping_review
+        self.report["corrections"] = self.item_builder.corrections
+        self.report["links"] = sum(
+            1 for item in self.item_builder.items.values()
+            for link in (item.get("crfSdtmTarget") or {}).get("links") or [] if link.get("item"))
         print(f"✅ forms built — {len(forms)} form(s), {self.report['concepts']} concept(s)")
         return forms
 
@@ -395,6 +405,7 @@ class CrfLoader:
             "crfGroupChoices": self.report["groupChoices"],
             "uncoveredConcepts": self.report["uncovered"],
             "formCandidates": sorted(self.form_oid_by_activity.values()),
+            "mappingReview": self.report["mappingReview"],
         })
         print(f"✅ refinement file written to {path}")
 
@@ -434,11 +445,16 @@ class CrfLoader:
             f"  unbound study events ..... {len(r['unboundEvents'])}",
             f"  question placeholders .... {len(r['placeholders'])}",
             f"  item conflicts ........... {len(r['conflicts'])}",
+            f"  Define item links ........ {r['links']}",
+            f"  SDTM corrections ......... {len(r['corrections'])}",
+            f"  mapping review ........... {len(r['mappingReview'])}",
         ]
         if isinstance(self.client, CachingLibraryClient):
             lines.append(f"  {self.client.summary()}")
         for conflict in r["conflicts"][:5]:
             lines.append(f"    ! {conflict}")
+        for correction in r["corrections"]:
+            lines.append(f"    ~ {correction}")
         return "\n".join(lines)
 
 
