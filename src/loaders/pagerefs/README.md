@@ -3,7 +3,9 @@
 An enrichment loader (DDS in, DDS out), run after the CRF loader, the CRF generator and
 crfutils `crfpdf`. It reads the `acrf.pagerefs.json` crfpdf writes beside the annotated CRF
 and writes each Define item's `origin` — type, source and the aCRF pages — into a new DDS,
-which the Define generator turns into `def:Origin` with `def:DocumentRef/def:PDFPageRef`.
+which the Define generator turns into `def:Origin` with `def:DocumentRef/def:PDFPageRef`. In the
+pipeline its output goes to the defaults loader (stage F) first, which fills what is still
+unfilled from well-known defaults.
 
 Origin with pages cannot exist earlier: the Define loader has no CRF and the CRF loader has
 no PDF. Keeping it a loader keeps the generators reading only the DDS.
@@ -24,7 +26,8 @@ python -m loaders.pagerefs \
 
 `--dds_in` is the CRF-enriched DDS the CRF was generated from; `--dds_out` must be a new
 file, so a re-run starts from the same input and replaces the CRF origins rather than
-stacking them. The pipeline (`src/pipeline`) runs it as stage E.
+stacking them. The pipeline (`src/pipeline`) runs it as stage E, before the defaults loader
+(stage F) and the Define generator (stage G).
 
 ## Identity checks
 

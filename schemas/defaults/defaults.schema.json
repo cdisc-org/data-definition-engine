@@ -1,0 +1,185 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/cdisc-org/data-definition-engine/schemas/defaults/defaults.schema.json",
+  "title": "DDE defaults dictionary",
+  "description": "Well-known default values the defaults loader (src/loaders/defaults, pipeline stage F) writes into a DDS where no other loader supplied a value. Entries are grouped by the kind of DDS object they fill. Values use DDS attribute names. See DEFAULT_METADATA_LOADER.md.",
+  "type": "object",
+  "required": ["schemaVersion"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {"type": "string"},
+    "schemaVersion": {
+      "description": "The dictionary format version, MAJOR.MINOR. The loader refuses an unknown major version.",
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+$"
+    },
+    "name": {"type": "string"},
+    "description": {"type": "string"},
+    "items": {
+      "description": "Define items (Define-XML ItemDef): the items of tabulation itemGroups and of their ValueList slices.",
+      "type": "array",
+      "items": {"$ref": "#/$defs/itemEntry"}
+    },
+    "itemGroups": {
+      "description": "Tabulation itemGroups (Define-XML ItemGroupDef).",
+      "type": "array",
+      "items": {"$ref": "#/$defs/itemGroupEntry"}
+    },
+    "crfItems": {
+      "description": "CRF items (ODM ItemDef): the items in the Concept slices of Form itemGroups.",
+      "type": "array",
+      "items": {"$ref": "#/$defs/crfItemEntry"}
+    },
+    "crfSections": {
+      "description": "CRF sections (ODM 2.0 ItemGroupDef Type=\"Section\"): the Section slices of Form itemGroups.",
+      "type": "array",
+      "items": {"$ref": "#/$defs/crfSectionEntry"}
+    }
+  },
+  "$defs": {
+    "name": {
+      "description": "The DDS object's name. A leading -- matches any longer name that ends with the rest (--SEQ matches LBSEQ). * matches every object in the section and needs domains.",
+      "type": "string",
+      "minLength": 1,
+      "not": {"const": "--"}
+    },
+    "domainList": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^[A-Z][A-Z0-9]{1,7}$"}
+    },
+    "starNeedsDomains": {
+      "if": {"required": ["name"], "properties": {"name": {"const": "*"}}},
+      "then": {"required": ["domains"]}
+    },
+    "dataType": {
+      "description": "The DDS DataType enum (schemas/dds/dds.yaml).",
+      "enum": ["text", "integer", "float", "date", "time", "datetime", "boolean", "double", "hex",
+               "base64", "hexBinary", "durationDatetime"]
+    },
+    "length": {
+      "description": "An integer, or a length computed from a DDS study-level string: its length plus an optional constant.",
+      "oneOf": [
+        {"type": "integer", "minimum": 1},
+        {
+          "type": "object",
+          "required": ["lengthOf"],
+          "additionalProperties": false,
+          "properties": {
+            "lengthOf": {"enum": ["studyName", "protocolName"]},
+            "plus": {"type": "integer", "minimum": 0}
+          }
+        }
+      ]
+    },
+    "origin": {
+      "description": "One or more origins, using the DDS OriginType and OriginSource enums.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["type", "source"],
+        "additionalProperties": false,
+        "properties": {
+          "type": {"enum": ["Assigned", "Collected", "Derived", "Not Available", "Other", "Predecessor",
+                            "Protocol"]},
+          "source": {"enum": ["Investigator", "Sponsor", "Subject", "Vendor"]}
+        }
+      }
+    },
+    "text": {"type": "string", "minLength": 1},
+    "itemEntry": {
+      "type": "object",
+      "required": ["name", "values"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {"$ref": "#/$defs/name"},
+        "domains": {"$ref": "#/$defs/domainList"},
+        "excludeDomains": {"$ref": "#/$defs/domainList"},
+        "description": {"type": "string"},
+        "values": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": false,
+          "properties": {
+            "dataType": {"$ref": "#/$defs/dataType"},
+            "length": {"$ref": "#/$defs/length"},
+            "significantDigits": {"type": "integer", "minimum": 0},
+            "displayFormat": {"$ref": "#/$defs/text"},
+            "origin": {"$ref": "#/$defs/origin"}
+          }
+        }
+      },
+      "allOf": [{"$ref": "#/$defs/starNeedsDomains"}]
+    },
+    "itemGroupEntry": {
+      "type": "object",
+      "required": ["name", "values"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {"$ref": "#/$defs/name"},
+        "domains": {"$ref": "#/$defs/domainList"},
+        "excludeDomains": {"$ref": "#/$defs/domainList"},
+        "description": {"type": "string"},
+        "values": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": false,
+          "properties": {
+            "keySequence": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/text"}},
+            "structure": {"$ref": "#/$defs/text"},
+            "purpose": {"$ref": "#/$defs/text"},
+            "description": {"$ref": "#/$defs/text"}
+          }
+        }
+      },
+      "allOf": [{"$ref": "#/$defs/starNeedsDomains"}]
+    },
+    "crfItemEntry": {
+      "type": "object",
+      "required": ["name", "values"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {"$ref": "#/$defs/name"},
+        "domains": {"$ref": "#/$defs/domainList"},
+        "excludeDomains": {"$ref": "#/$defs/domainList"},
+        "description": {"type": "string"},
+        "values": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": false,
+          "properties": {
+            "dataType": {"$ref": "#/$defs/dataType"},
+            "length": {"$ref": "#/$defs/length"},
+            "origin": {"$ref": "#/$defs/origin"},
+            "question": {"$ref": "#/$defs/text"},
+            "prompt": {"$ref": "#/$defs/text"},
+            "crfCompletionInstructions": {"$ref": "#/$defs/text"}
+          }
+        }
+      },
+      "allOf": [{"$ref": "#/$defs/starNeedsDomains"}]
+    },
+    "crfSectionEntry": {
+      "type": "object",
+      "required": ["name", "values"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {"$ref": "#/$defs/name"},
+        "domains": {"$ref": "#/$defs/domainList"},
+        "excludeDomains": {"$ref": "#/$defs/domainList"},
+        "description": {"type": "string"},
+        "values": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": false,
+          "properties": {
+            "crfSectionInstructions": {"$ref": "#/$defs/text"}
+          }
+        }
+      },
+      "allOf": [{"$ref": "#/$defs/starNeedsDomains"}]
+    }
+  }
+}

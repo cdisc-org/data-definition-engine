@@ -8,12 +8,13 @@ The Data Definition Engine (DDE) is part of the CDISC 360i program. It populates
 
 ## Repository layout
 
-Five programs live in `src/` — three loaders and two generators — plus the driver that runs them in order:
+Six programs live in `src/` — four loaders and two generators — plus the driver that runs them in order:
 
 - `src/define-xml/` — **Define loader**. `create_define_json.py` reads a USDM JSON study design, calls the CDISC Library API for Biomedical Concepts and Dataset Specializations, and writes a Define-JSON file. Validation is against `define.yaml` (a LinkML/YAML schema). Unique structural feature: variable-level metadata is stored as `slices` *inside* each itemGroup, rather than as separate `DataSpecialization` itemGroups.
 - `src/loaders/crf/` — **CRF loader**. `crf_loader.py` is an *enrichment* loader: DDS in → DDS out. It reads the Define DDS plus the USDM, resolves each Biomedical Concept to a CRF Specialization, enriches it from CDASHIG and CDASH CT, and writes a **combined DDS** carrying both Define-XML and CRF metadata. Shared utilities live in `src/loaders/common/`.
 - `src/loaders/pagerefs/` — **Pagerefs loader** (Stage E). Another enrichment loader: it reads the `acrf.pagerefs.json` crfutils `crfpdf` writes beside the annotated CRF and writes each Define item's `origin` with its aCRF pages (`origin[].documents[].pages`). It refuses a pagerefs file that does not belong to its DDS and CRF (crf sha256, header OIDs, PDF name) and writes `origin-review.yaml`.
-- `src/pipeline/` — **the driver**. `python -m pipeline --study data/protocols/<study>/pipeline.yaml` runs stages A (Define loader) → B (CRF loader) → C (CRF generator) → D (crfutils crfvalidate/crfpdf) → E (pagerefs loader) → F (Define generator + defineutils), each as a subprocess in its own folder, and ends with the open review items (`--strict` fails while any is open).
+- `src/loaders/defaults/` — **Defaults loader** (Stage F). The last enrichment loader: it fills what is still unfilled from a dictionary of well-known defaults (`data/defaults/well_known_defaults.json`, schema `schemas/defaults/defaults.schema.json`; sponsor-editable, later files win), never changes a value another loader wrote, rewrites `define-patch.yaml` with what is still open plus every answered value, and writes `defaults-report.yaml`.
+- `src/pipeline/` — **the driver**. `python -m pipeline --study data/protocols/<study>/pipeline.yaml` runs stages A (Define loader) → B (CRF loader) → C (CRF generator) → D (crfutils crfvalidate/crfpdf) → E (pagerefs loader) → F (defaults loader) → G (Define generator + defineutils), each as a subprocess in its own folder, and ends with the open review items (`--strict` fails while any is open).
 - `src/generators/define/` — **Define generator**. `define_generator.py` reads a DDS JSON file and emits Define-XML v2.1 using `odmlib`.
 - `src/generators/crf/` — **CRF generator**. `crf_generator.py` reads a DDS JSON file and emits ODM v1.3.2 or v2.0 CRFs. SDTM mapping annotations are always embedded, so one file is both the blank CRF and the aCRF; which you see is a rendering choice, not a different document. Requires **odmlib >= 0.2.1**.
 
@@ -87,17 +88,21 @@ cd src/loaders/crf && pytest           # 147 tests, no network
 
 Library responses are cached on disk under `.cache/cdisc_library/` (`--no_cache` to bypass), which makes the refinement loop free after the first run.
 
-### Pipeline (`src/pipeline/`) and pagerefs loader (`src/loaders/pagerefs/`)
+### Pipeline (`src/pipeline/`), pagerefs loader (`src/loaders/pagerefs/`) and defaults loader (`src/loaders/defaults/`)
 
 ```bash
 cd src
-python -m pipeline --study ../data/protocols/NCT01797120/pipeline.yaml            # stages A-F
+python -m pipeline --study ../data/protocols/NCT01797120/pipeline.yaml            # stages A-G
 python -m pipeline --study ../data/protocols/NCT01797120/pipeline.yaml --from E   # after answering origin-review.yaml
-cd src/pipeline && pytest           # 8 tests, stages stubbed
+python -m pipeline --study ../data/protocols/NCT01797120/pipeline.yaml --from F   # after answering define-patch.yaml or editing a defaults dictionary
+python -m loaders.defaults --dds_in ../output/NCT01797120/dds-origin.json --dds_out /tmp/dds-defaults.json \
+    --report /tmp/defaults-report.yaml   # standalone; add --patch_file to rewrite a define patch
+cd src/pipeline && pytest           # 10 tests, stages stubbed
 cd src/loaders/pagerefs && pytest   # 22 tests, no network
+cd src/loaders/defaults && pytest   # 58 tests, no network
 ```
 
-Stage D needs crfutils (`crfvalidate`, `crfpdf`) on `PATH` or named under `commands:` in the study YAML. The review files (`define-patch.yaml`, `crf-refinement.yaml`, `origin-review.yaml`) sit beside the study YAML; generated files go to `output_dir`.
+Stage D needs crfutils (`crfvalidate`, `crfpdf`) on `PATH` or named under `commands:` in the study YAML. The review files (`define-patch.yaml`, `crf-refinement.yaml`, `origin-review.yaml`) sit beside the study YAML; generated files go to `output_dir`. The define patch has one writer: stage A applies it but writes its full list to `output_dir/define-patch-stageA.yaml`, and stage F rewrites it. `defaults:` in the study YAML lists the defaults dictionaries (default: the shared one).
 
 ### Loader (`src/define-xml/`)
 
@@ -137,6 +142,15 @@ Three rules follow, and breaking any of them silently produces a structurally va
 1. **Resolve specializations through `_usdm_dataset_specialization_ids()`**, which reads the extension attribute first and falls back to `reference`. Only when it returns nothing does the CDISC Library get asked — and that fallback fans out to *every* specialization of the concept, which is why it must stay a fallback rather than the default path.
 2. **Drive `_build_where_clause()` from the specialization's `comparator` variables, not from BC properties.** The specialization is the authority on what discriminates a value list. Iterating BC properties drops `WHERE xxTESTCD EQ ...` for any producer that omits the discriminator, leaving value lists keyed on their qualifier variables — output that looks complete and is wrong.
 3. **Never assume a field the USDM merely *usually* fills.** `studyType`, `studyPhase`, `blindingSchema`, `plannedAge`, and `plannedEnrollmentNumber` are all `null` in SoA Workbench exports; `eligibilityCriteria`, `characteristics`, `administrations`, and `dictionaries` are all empty. Absent a Study Acronym title, `populate_study_elements()` falls back to `study.name`, then the first study identifier, then `"STUDY"` — without it the literal string `None` is interpolated into every OID.
+
+## Defaults loader architecture
+
+`DefaultsLoader.process()` (`src/loaders/defaults/defaults_loader.py`) applies `define-patch.yaml` answers to values still unfilled → fills each tabulation itemGroup, Define item (variable and value level), CRF Section and CRF item from the dictionary → collects what is still open. The define.xml it feeds is a **specification** made before any data exist, so the defaults are specification values (lengths are estimates the sponsor sets from the data at submission); the seed's entries each state their basis in `description`.
+
+- **Only unfilled values change**: missing, null, `""` or `__PLACEHOLDER__`. An origin counts as unfilled only when an entry's type or source is `__PLACEHOLDER__`; a missing origin is never filled, because the pagerefs loader removes a value-list parent's origin on purpose. `length` goes only on text/integer/float items, `significantDigits` only on float, and an entry whose `dataType` disagrees with a real one contributes no type-dependent field (a reported conflict).
+- **The dictionary has one section per kind of object** (`items`, `itemGroups`, `crfItems`, `crfSections`): Define-XML and ODM both call items `ItemDef`, and 33 NCT01797120 CRF item names are also Define item names. Names are exact, a suffix (`--SEQ`), or `*` (which needs `domains`). Ranking (`dictionary.py`): exact > longer suffix > shorter suffix > `*`; then domain-filtered; then later file. Each field cascades to the next entry that sets it.
+- **`loaders/common/define_patch.py`** reads, applies, collects and writes the define patch in Stage A's format, so Stage A's `--apply_patch` reads the rewritten file. It lists `length` only for text/integer/float items and skips `standard` when `standardOID` is set (both differ from Stage A, see `FIXES.md` §6.2). Answered values are carried over; answers for OIDs no longer in the DDS are dropped.
+- Each Derived origin it fills gets a MethodDef placeholder from the Define generator, and a Collected/Investigator origin without aCRF pages is reported under `noPages` (the generator writes a page placeholder for it). CRF defaults land in `dds-defaults.json` but not in the CRF, which stage C rendered earlier.
 
 ## Generator architecture
 
@@ -205,6 +219,8 @@ For research and codebase exploration, use parallel Explore subagents by default
 - `documents/Solution_Overview.md` — full architecture diagram (loaders/DDS/generators) and rationale.
 - `documents/glossary.md` — CDISC and DDE terminology.
 - `src/generators/define/README.md`, `src/define-xml/README.md`, `src/loaders/crf/README.md`, `src/generators/crf/README.md` — per-program usage notes.
+- `DEFAULT_METADATA_LOADER.md` — the defaults loader plan: decisions, dictionary format, the seed tables with each entry's basis, and what it leaves for a person.
+- `data/defaults/README.md`, `src/loaders/defaults/README.md` — the defaults dictionary (provenance, how to change it) and the loader.
 - `FIXES.md` — issues found while implementing CRF generation: what was fixed, what is pre-existing and still open (including the loader/generator drift above), and what to report upstream to odmlib and the CDISC ODM team.
 - `CRF_GEN_PLAN.md` — the CRF generation plan (milestones, DDS model additions, mapping tables). M0 and M2–M5 are implemented; M1 (upstream DDS PRs) and M6 (XSLT stylesheets) are not.
 - `schemas/dds/profiles/crf/README.md` — the CRF profile: why the hand-written JSON Schema is what `--validate` uses today, and what unblocks the LinkML one.

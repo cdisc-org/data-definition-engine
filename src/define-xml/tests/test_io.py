@@ -353,6 +353,53 @@ class TestApplyPatch:
         processor.apply_patch(patch_file)  # should not raise
 
 
+# ── a define patch rewritten by the defaults loader (stage F) ─────────────────
+
+class TestPatchWrittenByStageF:
+    """In the pipeline, stage F rewrites define-patch.yaml with loaders.common.define_patch; the
+    next run's stage A must still read it with apply_patch."""
+
+    def test_answers_in_a_stage_f_patch_are_applied(self, processor, tmp_path):
+        import copy
+        import sys
+        from pathlib import Path
+
+        src = str(Path(__file__).resolve().parents[2])
+        if src not in sys.path:
+            sys.path.insert(0, src)
+        from loaders.common import define_patch
+
+        placeholder = "__PLACEHOLDER__"
+        ig = {**_minimal_item_group(), "items": [
+            {"OID": "IT.VS.VSTESTCD", "name": "VSTESTCD", "dataType": "text",
+             "origin": [{"type": placeholder, "source": placeholder}]},
+            {"OID": "IT.VS.VSPOS", "name": "VSPOS", "dataType": "text",
+             "origin": [{"type": placeholder, "source": placeholder}]}]}
+        cl = {"OID": "CL.X", "name": "X", "codeListItems": [{"codedValue": placeholder, "decode": placeholder}]}
+        dds = {"studyName": "S", "itemGroups": [copy.deepcopy(ig)], "codeLists": [copy.deepcopy(cl)]}
+        answers = define_patch.empty()
+        answers["itemGroups"]["IG.VS"] = {"keySequence": ["STUDYID", "USUBJID", "VSTESTCD"]}
+        answers["items"]["IT.VS.VSTESTCD"] = {"length": 8, "origin": [{"type": "Assigned", "source": "Sponsor"}]}
+        answers["codeLists"]["CL.X"] = {"codeListItems": [{"codedValue": "Y", "decode": "Yes"}]}
+        path = tmp_path / "define-patch.yaml"
+        define_patch.write(path, dds, define_patch.collect_remaining(dds), answers)
+
+        processor.item_groups = [ig]
+        processor.template["itemGroups"] = processor.item_groups
+        processor.code_lists_map = {"CL.X": cl}
+        processor.template["codeLists"] = list(processor.code_lists_map.values())
+        processor.apply_patch(str(path))
+
+        group = processor.template["itemGroups"][0]
+        assert group["keySequence"] == ["STUDYID", "USUBJID", "VSTESTCD"]
+        assert group["items"][0]["length"] == 8
+        assert group["items"][0]["origin"] == [{"type": "Assigned", "source": "Sponsor"}]
+        # an open value (length: null, a placeholder origin) leaves the item as it was
+        assert "length" not in group["items"][1]
+        assert group["items"][1]["origin"] == [{"type": placeholder, "source": placeholder}]
+        assert processor.template["codeLists"][0]["codeListItems"] == [{"codedValue": "Y", "decode": "Yes"}]
+
+
 # ── _basic_schema_validation ──────────────────────────────────────────────────
 
 class TestBasicSchemaValidation:

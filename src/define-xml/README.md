@@ -118,6 +118,13 @@ python create_define_json.py \
   --patch_file patch.yaml
 ```
 
+In the pipeline (`src/pipeline`), stage A applies the study's `define-patch.yaml` but writes its
+full placeholder list to `output_dir/define-patch-stageA.yaml`. The defaults loader (stage F)
+then fills well-known defaults and rewrites `define-patch.yaml` with what is still open plus every
+value already answered, so the file you edit lists only what the defaults could not supply and
+keeps your answers. Run on its own, this script still drops an answered value from the patch it
+rewrites (see `FIXES.md` §6.2).
+
 ### Specifying a custom SDTMIG version and API key
 
 ```bash

@@ -1,921 +1,121 @@
 # ====================================================================
 # Define-JSON Placeholder Patch File
 # Study    : NCT01797120
-# Generated: 2026-10-25
+# Generated: 2026-10-26
+# Written by loaders/defaults (pipeline stage F): what is still open once the
+# defaults are filled, plus every value already answered.
 #
 # Instructions:
 #   1. Replace every __PLACEHOLDER__ with a valid value
 #   2. Fill every null with an appropriate number
-#   3. Apply with: --apply_patch <this_file> on your next run
+#   3. Re-run the pipeline: stage A and stage F apply the answers (--from F is enough)
 #
 # Valid values for origin[].type:
-#   Collected | Derived | Assigned | Protocol | eDT | Predecessor | Not Available
+#   Assigned | Collected | Derived | Not Available | Other | Predecessor | Protocol
 # Valid values for origin[].source:
 #   Investigator | Sponsor | Subject | Vendor
 # ====================================================================
 
-# itemGroup fields may also be placeholder values when source data is missing
-# keySequence: ordered list of variable names that form the sort / primary key
-# Example:  keySequence: [STUDYID, USUBJID, DSSEQ]
 itemGroups:
-  IG.DS:  #  - 
-    standard: null
-    keySequence: ['__PLACEHOLDER__']
-  IG.RS:  #  - 
-    standard: null
-    keySequence: ['__PLACEHOLDER__']
-  IG.VS:  #  - 
-    standard: null
-    keySequence: ['__PLACEHOLDER__']
-  IG.LB:  #  - 
-    standard: null
-    keySequence: ['__PLACEHOLDER__']
-  IG.CM:  #  - 
-    standard: null
-    keySequence: ['__PLACEHOLDER__']
-  IG.MH:  #  - 
-    standard: null
-    keySequence: ['__PLACEHOLDER__']
-  IG.RE:  #  - 
-    standard: null
-    keySequence: ['__PLACEHOLDER__']
-  IG.MB:  #  - 
-    standard: null
-    keySequence: ['__PLACEHOLDER__']
-  IG.EC:  #  - 
-    standard: null
-    keySequence: ['__PLACEHOLDER__']
-  IG.AE:  #  - 
-    standard: null
-    keySequence: ['__PLACEHOLDER__']
-  IG.TR:  #  - 
-    standard: null
-    keySequence: ['__PLACEHOLDER__']
-  IG.TU:  #  - 
-    standard: null
-    keySequence: ['__PLACEHOLDER__']
-  IG.TS:  #  - 
-    standard: null
-    keySequence: ['__PLACEHOLDER__']
-  IG.TA:  #  - 
-    standard: null
-    keySequence: ['__PLACEHOLDER__']
-  IG.TE:  #  - 
-    standard: null
-    keySequence: ['__PLACEHOLDER__']
-  IG.SV:  #  - 
-    standard: null
-    keySequence: ['__PLACEHOLDER__']
-  IG.SE:  #  - 
-    standard: null
-    keySequence: ['__PLACEHOLDER__']
+  # keySequence: ordered list of variable names that form the sort / primary key
+  # Example:  keySequence: [STUDYID, USUBJID, DSSEQ]
+  IG.DS:  # DS - Disposition
+    keySequence: [__PLACEHOLDER__]
+  IG.RS:  # RS - Disease Response and Clin Classification
+    keySequence: [__PLACEHOLDER__]
+  IG.VS:  # VS - Vital Signs
+    keySequence: [__PLACEHOLDER__]
+  IG.LB:  # LB - Laboratory Test Results
+    keySequence: [__PLACEHOLDER__]
+  IG.CM:  # CM - Concomitant/Prior Medications
+    keySequence: [__PLACEHOLDER__]
+  IG.MH:  # MH - Medical History
+    keySequence: [__PLACEHOLDER__]
+  IG.RE:  # RE - Respiratory System Findings
+    keySequence: [__PLACEHOLDER__]
+  IG.MB:  # MB - Microbiology Specimen
+    keySequence: [__PLACEHOLDER__]
+  IG.EC:  # EC - Exposure as Collected
+    keySequence: [__PLACEHOLDER__]
+  IG.AE:  # AE - Adverse Events
+    keySequence: [__PLACEHOLDER__]
+  IG.TR:  # TR - Tumor/Lesion Results
+    keySequence: [__PLACEHOLDER__]
+  IG.TU:  # TU - Tumor/Lesion Identification
+    keySequence: [__PLACEHOLDER__]
+  IG.TS:  # TS - Trial Summary
+    keySequence: [__PLACEHOLDER__]
+  IG.TA:  # TA - Trial Arms
+    keySequence: [__PLACEHOLDER__]
+  IG.TE:  # TE - Trial Elements
+    keySequence: [__PLACEHOLDER__]
+  IG.SV:  # SV - Subject Visits
+    keySequence: [__PLACEHOLDER__]
+  IG.SE:  # SE - Subject Elements
+    keySequence: [__PLACEHOLDER__]
 
-# Applies to both standard items and VLM slice items
-# name/description/role/dataType: replace __PLACEHOLDER__ with valid text
-# length: integer (number of characters / digits for the variable)
-# significantDigits: integer for float variables
-# origin: list of one or more origin entries
-# each entry requires type and source; add multiple entries when needed
 items:
-  IT.DS.STUDYID:  # STUDYID - Study Identifier
+  # Applies to both standard items and VLM slice items
+  # length: integer (characters or digits); significantDigits: integer for float variables
+  # origin: one or more entries, each with a type and a source
+  IT.RS.RSORRES.NEWLPROG:  # RSORRES
     length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.DS.DOMAIN:  # DOMAIN - Domain Abbreviation
+  IT.RS.RSORRES.TRGRESP:  # RSORRES
     length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.DS.USUBJID:  # USUBJID - Unique Subject Identifier
+  IT.RS.RSORRES.NTRGRESP:  # RSORRES
     length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.DS.DSSEQ:  # DSSEQ - Sequence Number
+  IT.RS.RSORRES.BESTRESP:  # RSORRES
     length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.DS.DSSTDTC:  # DSSTDTC - Start Date/Time of Disposition Event
+  IT.RS.RSORRES.OVRLRESP:  # RSORRES
     length: null
-  IT.DS.DSSTDY:  # DSSTDY - Study Day of Start of Disposition Event
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.RS.STUDYID:  # STUDYID - Study Identifier
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.RS.DOMAIN:  # DOMAIN - Domain Abbreviation
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.RS.USUBJID:  # USUBJID - Unique Subject Identifier
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.RS.RSSEQ:  # RSSEQ - Sequence Number
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.RS.RSLNKGRP:  # RSLNKGRP - Link Group ID
-    length: null
-  IT.RS.RSTESTCD:  # RSTESTCD - Assessment Short Name
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.RS.RSTEST:  # RSTEST - Assessment Name
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.RS.RSCAT:  # RSCAT - Category for Assessment
-    length: null
-  IT.RS.RSEVAL:  # RSEVAL - Evaluator
-    length: null
-  IT.RS.RSEVALID:  # RSEVALID - Evaluator Identifier
-    length: null
-  IT.RS.VISITNUM:  # VISITNUM - Visit Number
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.RS.RSDTC:  # RSDTC - Date/Time of Assessment
-    length: null
-  IT.RS.RSCAT.ECOG101:  # RSCAT - 
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.RS.RSCAT.NEWLPROG:  # RSCAT - 
-    length: null
-  IT.RS.RSCAT.TRGRESP:  # RSCAT - 
-    length: null
-  IT.RS.RSCAT.NTRGRESP:  # RSCAT - 
-    length: null
-  IT.RS.RSCAT.BESTRESP:  # RSCAT - 
-    length: null
-  IT.RS.RSCAT.OVRLRESP:  # RSCAT - 
-    length: null
-  IT.RS.RSORRES.NEWLPROG:  # RSORRES - 
-    length: null
-  IT.RS.RSORRES.TRGRESP:  # RSORRES - 
-    length: null
-  IT.RS.RSORRES.NTRGRESP:  # RSORRES - 
-    length: null
-  IT.RS.RSORRES.BESTRESP:  # RSORRES - 
-    length: null
-  IT.RS.RSORRES.OVRLRESP:  # RSORRES - 
-    length: null
-  IT.VS.STUDYID:  # STUDYID - Study Identifier
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.VS.DOMAIN:  # DOMAIN - Domain Abbreviation
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.VS.USUBJID:  # USUBJID - Unique Subject Identifier
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.VS.VSSEQ:  # VSSEQ - Sequence Number
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.VS.VSTESTCD:  # VSTESTCD - Vital Signs Test Short Name
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.VS.VSTEST:  # VSTEST - Vital Signs Test Name
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.VS.VSPOS:  # VSPOS - Vital Signs Position of Subject
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.VS.VSLOC:  # VSLOC - Location of Vital Signs Measurement
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.VS.VSLAT:  # VSLAT - Laterality
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.VS.VSLOBXFL:  # VSLOBXFL - Last Observation Before Exposure Flag
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.VS.VISITNUM:  # VISITNUM - Visit Number
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.VS.VSDTC:  # VSDTC - Date/Time of Measurements
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.LB.STUDYID:  # STUDYID - Study Identifier
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.LB.DOMAIN:  # DOMAIN - Domain Abbreviation
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.LB.USUBJID:  # USUBJID - Unique Subject Identifier
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.LB.LBSEQ:  # LBSEQ - Sequence Number
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.LB.LBTESTCD:  # LBTESTCD - Lab Test or Examination Short Name
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.LB.LBTEST:  # LBTEST - Lab Test or Examination Name
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.LB.LBCAT:  # LBCAT - Category for Lab Test
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.LB.LBORNRLO:  # LBORNRLO - Reference Range Lower Limit in Orig Unit
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.LB.LBORNRHI:  # LBORNRHI - Reference Range Upper Limit in Orig Unit
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.LB.LBSTNRLO:  # LBSTNRLO - Reference Range Lower Limit-Std Units
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.LB.LBSTNRHI:  # LBSTNRHI - Reference Range Upper Limit-Std Units
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.LB.LBNRIND:  # LBNRIND - Reference Range Indicator
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.LB.LBSPEC:  # LBSPEC - Specimen Type
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.LB.LBMETHOD:  # LBMETHOD - Method of Test or Examination
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.LB.LBLOBXFL:  # LBLOBXFL - Last Observation Before Exposure Flag
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
   IT.LB.LBFAST:  # LBFAST - Fasting Status
     length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.LB.VISITNUM:  # VISITNUM - Visit Number
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.LB.LBDTC:  # LBDTC - Date/Time of Specimen Collection
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.CM.STUDYID:  # STUDYID - Study Identifier
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.CM.DOMAIN:  # DOMAIN - Domain Abbreviation
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.CM.USUBJID:  # USUBJID - Unique Subject Identifier
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.CM.CMSEQ:  # CMSEQ - Sequence Number
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.CM.CMSTDTC:  # CMSTDTC - Start Date/Time of Medication
-    length: null
-  IT.CM.CMENDTC:  # CMENDTC - End Date/Time of Medication
-    length: null
-  IT.MH.STUDYID:  # STUDYID - Study Identifier
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.MH.DOMAIN:  # DOMAIN - Domain Abbreviation
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.MH.USUBJID:  # USUBJID - Unique Subject Identifier
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.MH.MHSEQ:  # MHSEQ - Sequence Number
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.MH.MHSTDTC:  # MHSTDTC - Start Date/Time of Medical History Event
-    length: null
-  IT.MH.MHENDTC:  # MHENDTC - End Date/Time of Medical History Event
-    length: null
-  IT.RE.STUDYID:  # STUDYID - Study Identifier
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.RE.DOMAIN:  # DOMAIN - Domain Abbreviation
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.RE.USUBJID:  # USUBJID - Unique Subject Identifier
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.RE.RESEQ:  # RESEQ - Sequence Number
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.RE.RETESTCD:  # RETESTCD - Short Name of Respiratory Test
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.RE.RETEST:  # RETEST - Name of Respiratory Test
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.RE.RELOBXFL:  # RELOBXFL - Last Observation Before Exposure Flag
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.RE.VISITNUM:  # VISITNUM - Visit Number
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.RE.REDTC:  # REDTC - Date/Time of Collection
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.MB.STUDYID:  # STUDYID - Study Identifier
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.MB.DOMAIN:  # DOMAIN - Domain Abbreviation
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.MB.USUBJID:  # USUBJID - Unique Subject Identifier
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.MB.MBSEQ:  # MBSEQ - Sequence Number
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.MB.MBTESTCD:  # MBTESTCD - Microbiology Test or Finding Short Name
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.MB.MBTEST:  # MBTEST - Microbiology Test or Finding Name
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
   IT.MB.MBTSTDTL:  # MBTSTDTL - Measurement, Test or Examination Detail
     length: null
     origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.MB.MBSPEC:  # MBSPEC - Specimen Material Type
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.MB.MBMETHOD:  # MBMETHOD - Method of Test or Examination
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.MB.VISITNUM:  # VISITNUM - Visit Number
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.MB.MBDTC:  # MBDTC - Date/Time of Collection
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.EC.STUDYID:  # STUDYID - Study Identifier
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.EC.DOMAIN:  # DOMAIN - Domain Abbreviation
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.EC.USUBJID:  # USUBJID - Unique Subject Identifier
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.EC.ECSEQ:  # ECSEQ - Sequence Number
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.EC.ECREFID:  # ECREFID - Reference ID
-    length: null
+      - type: __PLACEHOLDER__
+        source: __PLACEHOLDER__
   IT.EC.ECDOSRGM:  # ECDOSRGM - Intended Dose Regimen
     length: null
-  IT.EC.ECDIR:  # ECDIR - Directionality
-    length: null
-  IT.EC.ECSTDTC:  # ECSTDTC - Start Date/Time of Treatment
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.EC.ECENDTC:  # ECENDTC - End Date/Time of Treatment
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.AE.STUDYID:  # STUDYID - Study Identifier
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.AE.DOMAIN:  # DOMAIN - Domain Abbreviation
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.AE.USUBJID:  # USUBJID - Unique Subject Identifier
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.AE.AESEQ:  # AESEQ - Sequence Number
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.AE.AELLT:  # AELLT - Lowest Level Term
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.AE.AELLTCD:  # AELLTCD - Lowest Level Term Code
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.AE.AEPTCD:  # AEPTCD - Preferred Term Code
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.AE.AEHLT:  # AEHLT - High Level Term
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.AE.AEHLTCD:  # AEHLTCD - High Level Term Code
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.AE.AEHLGT:  # AEHLGT - High Level Group Term
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.AE.AEHLGTCD:  # AEHLGTCD - High Level Group Term Code
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.AE.AEBODSYS:  # AEBODSYS - Body System or Organ Class
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.AE.AEBDSYCD:  # AEBDSYCD - Body System or Organ Class Code
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.AE.AESOC:  # AESOC - Primary System Organ Class
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.AE.AESOCCD:  # AESOCCD - Primary System Organ Class Code
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.AE.AESTDTC:  # AESTDTC - Start Date/Time of Adverse Event
-    length: null
-  IT.AE.AEENDTC:  # AEENDTC - End Date/Time of Adverse Event
-    length: null
-  IT.TR.STUDYID:  # STUDYID - Study Identifier
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.TR.DOMAIN:  # DOMAIN - Domain Abbreviation
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.TR.USUBJID:  # USUBJID - Unique Subject Identifier
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.TR.TRSEQ:  # TRSEQ - Sequence Number
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.TR.TRGRPID:  # TRGRPID - Group ID
-    length: null
-  IT.TR.TRREFID:  # TRREFID - Reference ID
-    length: null
-  IT.TR.TRLNKID:  # TRLNKID - Link ID
-    length: null
-  IT.TR.TRLNKGRP:  # TRLNKGRP - Link Group
-    length: null
-  IT.TR.TRTESTCD:  # TRTESTCD - Tumor/Lesion Assessment Short Name
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.TR.TRTEST:  # TRTEST - Tumor/Lesion Assessment Test Name
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
   IT.TR.TRSTRESN:  # TRSTRESN - Numeric Result/Finding in Standard Units
     length: null
-  IT.TR.TRMETHOD:  # TRMETHOD - Method Used to Identify the Tumor/Lesion
+  IT.TR.TRORRES.LDIAM:  # TRORRES
     length: null
-  IT.TR.TRLOBXFL:  # TRLOBXFL - Last Observation Before Exposure Flag
+  IT.TR.TRORRES.LPERP:  # TRORRES
     length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.TR.TREVAL:  # TREVAL - Evaluator
-    length: null
-  IT.TR.TREVALID:  # TREVALID - Evaluator Identifier
-    length: null
-  IT.TR.VISITNUM:  # VISITNUM - Visit Number
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.TR.TRDTC:  # TRDTC - Date/Time of Tumor/Lesion Measurement
-    length: null
-  IT.TR.TRORRES.LDIAM:  # TRORRES - 
-    length: null
-  IT.TR.TRORRES.LPERP:  # TRORRES - 
-    length: null
-  IT.TU.STUDYID:  # STUDYID - Study Identifier
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.TU.DOMAIN:  # DOMAIN - Domain Abbreviation
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.TU.USUBJID:  # USUBJID - Unique Subject Identifier
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.TU.TUSEQ:  # TUSEQ - Sequence Number
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.TU.TUREFID:  # TUREFID - Reference ID
-    length: null
-  IT.TU.TULNKID:  # TULNKID - Link ID
-    length: null
-  IT.TU.TUTESTCD:  # TUTESTCD - Tumor/Lesion ID Short Name
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.TU.TUTEST:  # TUTEST - Tumor/Lesion ID Test Name
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.TU.TULOC:  # TULOC - Location of the Tumor/Lesion
-    length: null
-  IT.TU.TULAT:  # TULAT - Laterality
-    length: null
-  IT.TU.TUDIR:  # TUDIR - Directionality
-    length: null
-  IT.TU.TUMETHOD:  # TUMETHOD - Method of Identification
-    length: null
-  IT.TU.TULOBXFL:  # TULOBXFL - Last Observation Before Exposure Flag
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.TU.TUEVAL:  # TUEVAL - Evaluator
-    length: null
-  IT.TU.TUEVALID:  # TUEVALID - Evaluator Identifier
-    length: null
-  IT.TU.VISITNUM:  # VISITNUM - Visit Number
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.TU.TUDTC:  # TUDTC - Date/Time of Tumor/Lesion Identification
-    length: null
-  IT.TS.STUDYID:  # STUDYID - Study Identifier
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.TS.DOMAIN:  # DOMAIN - Domain Abbreviation
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.TS.TSSEQ:  # TSSEQ - Sequence Number
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.TS.TSPARMCD:  # TSPARMCD - Trial Summary Parameter Short Name
-    length: null
-  IT.TS.TSPARM:  # TSPARM - Trial Summary Parameter
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.TS.TSVAL:  # TSVAL - Parameter Value
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
   IT.TS.TSVALCD:  # TSVALCD - Parameter Value Code
     length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
   IT.TS.TSVCDREF:  # TSVCDREF - Name of the Reference Terminology
     length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
   IT.TS.TSVCDVER:  # TSVCDVER - Version of the Reference Terminology
     length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.TA.STUDYID:  # STUDYID - Study Identifier
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.TA.DOMAIN:  # DOMAIN - Domain Abbreviation
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.TA.ARMCD:  # ARMCD - Planned Arm Code
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
   IT.TA.ARM:  # ARM - Description of Planned Arm
     length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
   IT.TA.TAETORD:  # TAETORD - Planned Order of Element within Arm
     length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.TA.ETCD:  # ETCD - Element Code
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
   IT.TA.ELEMENT:  # ELEMENT - Description of Element
     length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
   IT.TA.TABRANCH:  # TABRANCH - Branch
     length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
   IT.TA.TATRANS:  # TATRANS - Transition Rule
     length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
   IT.TA.EPOCH:  # EPOCH - Epoch
     length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.TE.STUDYID:  # STUDYID - Study Identifier
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.TE.DOMAIN:  # DOMAIN - Domain Abbreviation
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.TE.ETCD:  # ETCD - Element Code
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
   IT.TE.ELEMENT:  # ELEMENT - Description of Element
     length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
   IT.TE.TESTRL:  # TESTRL - Rule for Start of Element
     length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.SV.STUDYID:  # STUDYID - Study Identifier
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.SV.DOMAIN:  # DOMAIN - Domain Abbreviation
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.SV.USUBJID:  # USUBJID - Unique Subject Identifier
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.SV.VISITNUM:  # VISITNUM - Visit Number
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.SV.VISIT:  # VISIT - Visit Name
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.SV.SVPRESP:  # SVPRESP - Pre-specified
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
   IT.SV.SVOCCUR:  # SVOCCUR - Occurrence
     length: null
     origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
+      - type: __PLACEHOLDER__
+        source: __PLACEHOLDER__
   IT.SV.SVCNTMOD:  # SVCNTMOD - Contact Mode
     length: null
     origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.SV.SVSTDTC:  # SVSTDTC - Start Date/Time of Observation
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.SV.SVENDTC:  # SVENDTC - End Date/Time of Observation
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.SE.STUDYID:  # STUDYID - Study Identifier
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.SE.DOMAIN:  # DOMAIN - Domain Abbreviation
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.SE.USUBJID:  # USUBJID - Unique Subject Identifier
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.SE.SESEQ:  # SESEQ - Sequence Number
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.SE.ETCD:  # ETCD - Element Code
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
+      - type: __PLACEHOLDER__
+        source: __PLACEHOLDER__
   IT.SE.ELEMENT:  # ELEMENT - Description of Element
     length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.SE.EPOCH:  # EPOCH - Epoch
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.SE.SESTDTC:  # SESTDTC - Start Date/Time of Element
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
-  IT.SE.SEENDTC:  # SEENDTC - End Date/Time of Element
-    length: null
-    origin:
-      - type: "__PLACEHOLDER__"
-        source: "__PLACEHOLDER__"
+
+codeLists: {}

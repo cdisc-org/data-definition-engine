@@ -31,7 +31,9 @@ following Define-XML element types under `MetaDataVersion`:
   Collected/Investigator origin with no pages, and every `def:DocumentRef` uses the DDS `annotatedCRFs[0].leafID`
 - `ValueListDef` / `WhereClauseDef` — value-level metadata derived from itemGroup `slices`
 - `CodeList` — enumerated and external codelists
-- `MethodDef` — derivation methods (auto-created for `Derived` origins during post-processing)
+- `MethodDef` — derivation methods (auto-created for `Derived` origins during post-processing). In the
+  pipeline (stage G) the generator reads `dds-defaults.json`, where the defaults loader (`src/loaders/defaults/`,
+  stage F) has filled well-known lengths and origins; each Derived origin it fills gets one of these placeholders
 - `CommentDef` — comments
 - `def:leaf` / Documents — supporting document references, including the annotated CRF
 

@@ -137,7 +137,7 @@ class PagerefsLoader:
                                 + "\n  - ".join(problems))
         leaf_id = self._leaf().get("leafID") or DEFAULT_LEAF_ID
         define = DefineIndex(self.dds)
-        items = self._define_items()
+        items = dds_io.define_items(self.dds)
         evidence_by_oid = self.refs.get("define_items") or {}
 
         for oid in evidence_by_oid:
@@ -181,25 +181,6 @@ class PagerefsLoader:
                 text = warning.get("text") or ""
                 self.review["unpaired"][text] = {"pin": self._answer("unpaired", text)}
         return self.dds
-
-    def _define_items(self) -> dict[str, tuple[str, str, dict[str, Any], str | None]]:
-        """OID -> (dataset, variable, item dict, ValueListDef OID or None) for every Define item."""
-        found: dict[str, tuple[str, str, dict[str, Any], str | None]] = {}
-        for group in self.dds.get("itemGroups") or []:
-            if group.get("type") in ("Form", "Section", "Concept"):
-                continue
-            dataset = group.get("domain") or group.get("name")
-            for item in group.get("items") or []:
-                if item.get("OID"):
-                    found.setdefault(item["OID"], (dataset, item.get("name"), item, None))
-            for slice_ in group.get("slices") or []:
-                if slice_.get("type") != "ValueList":
-                    continue
-                for item in slice_.get("items") or []:
-                    if item.get("OID"):
-                        found.setdefault(item["OID"], (dataset, item.get("name"), item,
-                                                       slice_.get("OID")))
-        return found
 
     def _fallback(self, oid: str, dataset: str, variable: str, vl_oid: str | None,
                   define: DefineIndex) -> list[dict[str, Any]]:

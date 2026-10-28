@@ -48,11 +48,15 @@ flowchart LR
     USDM["USDM 4.0 JSON<br/>(E2J or SoA Workbench)"]
     LIB[("CDISC Library<br/>BCs · Specializations<br/>CDASHIG · CT")]
     CSV["CRF Specializations<br/>(draft CSV)"]
+    DICT["Defaults dictionary<br/>(JSON)"]
 
     DL["Define loader<br/>create_define_json.py"]
     CL["CRF loader<br/>crf_loader.py"]
     DDS[/"Define DDS"/]
     CDDS[/"Combined DDS<br/>Define + CRF metadata"/]
+    PR["Pagerefs loader<br/>aCRF pages → Origin"]
+    DFL["Defaults loader<br/>well-known defaults"]
+    FDDS[/"Final DDS"/]
 
     DG["Define generator<br/>define_generator.py"]
     CG["CRF generator<br/>crf_generator.py"]
@@ -68,14 +72,21 @@ flowchart LR
     LIB --> CL
     CL --> CDDS
     DDS --> DG
-    CDDS --> DG
     CDDS --> CG
-    DG --> DX
     CG --> ODM
+    ODM -- "crfpdf: acrf.pdf + page refs" --> PR
+    CDDS --> PR
+    PR --> DFL
+    DICT --> DFL
+    DFL --> FDDS
+    FDDS --> DG
+    DG --> DX
 ```
 
 - The **Define loader** reads the USDM, resolves each Biomedical Concept to its SDTM Dataset Specialization in the CDISC Library, and writes a Define DDS: datasets, variables, value-level metadata, codelists, and study-level metadata.
 - The **CRF loader** is an *enrichment* loader — DDS in, DDS out. It reads the Define DDS and the USDM schedule of activities, picks a CRF Specialization for each Biomedical Concept, fills it out from CDASHIG and CDASH Controlled Terminology, and writes a **combined DDS** carrying both Define-XML and CRF metadata.
+- The **pagerefs loader** reads the page each annotation lands on in the rendered aCRF (crfutils `crfpdf`) and writes each Define item's Origin with its aCRF pages.
+- The **defaults loader** fills what is still unfilled from a dictionary of well-known defaults (STUDYID is Protocol/Sponsor, --SEQ is Derived/Sponsor with length 3, --TESTCD has at most 8 characters) and never changes a value another loader wrote. The define.xml at this stage is a specification built before any data exist, so these are specification values, which the sponsor can change.
 - Each **generator** reads the whole DDS file and ignores the sections it does not own: the Define generator skips forms, sections and study events; the CRF generator skips tabulation datasets, where clauses and methods.
 - The CRF generator always embeds the SDTM mapping annotations, so **one ODM file is both the blank CRF and the annotated CRF (aCRF)**. Which one you see is a rendering choice.
 
@@ -150,6 +161,15 @@ You can instead set `CDISC_API_KEY` in your environment, or pass `--cdisc_api_ke
 
 This runs the whole pipeline on the study in the repository, [NCT01797120](data/protocols/NCT01797120), a SoA Workbench export. All output goes to the repository's git-ignored `output/` directory.
 
+The pipeline driver runs every stage in order, from the study's [`pipeline.yaml`](data/protocols/NCT01797120/pipeline.yaml), and ends with the review items still open. Its stages D (crfutils `crfvalidate`/`crfpdf`), E (pagerefs loader) and F (defaults loader) are not in the step-by-step version below:
+
+```bash
+cd src
+python -m pipeline --study ../data/protocols/NCT01797120/pipeline.yaml   # stages A-G
+```
+
+The steps below run the four main programs one at a time.
+
 The Define programs must run from their own directory (see [The Programs](#the-programs)), so each step `cd`s from the repository root.
 
 ```bash
@@ -194,7 +214,7 @@ xsltproc src/generators/define/define2-1.xsl output/define.xml > output/define.h
 
 To render the CRFs, install `saxonche` and add `--html ../../../output --stylesheet ../../../stylesheets/odm_2-0_transform.xsl` to the 2.0 command in step 4 (or `odm_1-3-2_transform.xsl` for 1.3.2). It writes `crf-2.0_crf.html` (blank) and `crf-2.0_acrf.html` (annotated).
 
-**What to expect.** Both ODM files pass odmlib and XSD validation, though some form text is still `__PLACEHOLDER__` and every visit collects no forms (see the CRF loader below). The Define-XML is a **draft**: values the loader cannot derive from USDM, such as variable `Length` and `Origin`, are written as `__PLACEHOLDER__`, so it will not pass schema validation yet. To finish it, fill in `output/define-patch.yaml` and re-run step 1 with `--apply_patch ../../output/define-patch.yaml` added, then step 3 with `-v`.
+**What to expect.** Both ODM files pass odmlib and XSD validation, though some form text is still `__PLACEHOLDER__` and every visit collects no forms (see the CRF loader below). The Define-XML is a **draft**: values the loader cannot derive from USDM, such as variable `Length` and `Origin`, are written as `__PLACEHOLDER__`, so it will not pass schema validation yet. To finish it, fill in `output/define-patch.yaml` and re-run step 1 with `--apply_patch ../../output/define-patch.yaml` added, then step 3 with `-v`. The pipeline fills most of these values for you: the pagerefs loader writes CRF-evidenced origins, the defaults loader fills well-known lengths and origins, and the `define-patch.yaml` beside `pipeline.yaml` is left listing only what neither could supply.
 
 ---
 
@@ -258,6 +278,21 @@ Combined DDS → ODM CRF, version 1.3.2 or 2.0 from the same input. Requires **o
 | `--html` / `--stylesheet` | Also render the blank CRF and aCRF as HTML (needs `saxonche`) |
 | `--forms` | Emit only these Form OIDs (comma-separated) |
 
+### Defaults loader — `src/loaders/defaults`
+
+DDS → DDS with well-known defaults (pipeline stage F). Fills lengths, origins and display formats that are still unfilled from one or more dictionaries ([`data/defaults/`](data/defaults/README.md), schema [`schemas/defaults/`](schemas/defaults/defaults.schema.json)), then rewrites `define-patch.yaml` with what is still open. [Full reference](src/loaders/defaults/README.md); design and seed tables in [`DEFAULT_METADATA_LOADER.md`](DEFAULT_METADATA_LOADER.md).
+
+| Option | Purpose |
+|---|---|
+| `--dds_in`, `--dds_out` | Input DDS (the pagerefs loader's) and output DDS (required) |
+| `--defaults` | One or more dictionaries, later files win (default `data/defaults/well_known_defaults.json`) |
+| `--patch_file` | The define patch: its answers are applied, then it is rewritten with what is still open plus every answered value |
+| `--report` | Write `defaults-report.yaml`: what was filled, dataType conflicts, Collected/Investigator origins without aCRF pages, unmatched entries |
+
+### Pipeline — `src/pipeline`
+
+Runs stages A-G for one study from its `pipeline.yaml`: the Define loader, CRF loader, CRF generator, crfutils `crfvalidate`/`crfpdf`, the pagerefs loader (`src/loaders/pagerefs`), the defaults loader and the Define generator. `--from`/`--to` re-run part of it, `--strict` fails while a review item is open, and `--dry-run` prints the commands. [Full reference](src/pipeline/README.md).
+
 ---
 
 ## Project Structure
@@ -267,10 +302,12 @@ data-definition-engine/
 ├── data/                          # Inputs (see data/README.md)
 │   ├── protocols/NCT01797120/     # USDM 4.0 study from SoA Workbench
 │   ├── crf_specializations/       # Draft CDISC CRF Specializations (CSV) + PROVENANCE.md
+│   ├── defaults/                  # Well-known defaults dictionaries for the defaults loader
 │   └── metadata_xlsx/             # SDTM/ADaM metadata spreadsheets and the Define Excel template
 ├── documents/                     # Solution overview, glossary, presentations
 ├── schemas/                       # Vendored schemas (see schemas/README.md)
 │   ├── dds/                       # DDS LinkML model, and profiles/crf (CRF profile)
+│   ├── defaults/                  # JSON Schema of the defaults dictionary (DDE-owned)
 │   ├── define/                    # Define-XML 2.0 and 2.1 XSDs
 │   └── odm/                       # ODM 1.3.2 and 2.0 XSDs
 ├── stylesheets/                   # ODM 1.3.2 and 2.0 CRF stylesheets (XSLT 2.0)
@@ -279,7 +316,10 @@ data-definition-engine/
     ├── define-xml/                # Define loader: USDM -> Define DDS
     ├── loaders/
     │   ├── common/                # Shared loader utilities (DDS I/O, USDM, Library cache, patching)
-    │   └── crf/                   # CRF loader: Define DDS + USDM -> combined DDS
+    │   ├── crf/                   # CRF loader: Define DDS + USDM -> combined DDS
+    │   ├── pagerefs/              # Pagerefs loader: aCRF page references -> Define Origin
+    │   └── defaults/              # Defaults loader: well-known defaults for what is still unfilled
+    ├── pipeline/                  # The driver: stages A-G for one study
     ├── generators/
     │   ├── define/                # Define generator: DDS -> Define-XML v2.1 (+ define2-1.xsl)
     │   └── crf/                   # CRF generator: DDS -> ODM 1.3.2 / 2.0 (targets/ holds version differences)
@@ -295,6 +335,9 @@ None of the suites call the network. Run each from its own directory:
 ```bash
 cd src/define-xml         && pytest tests
 cd src/loaders/crf        && pytest
+cd src/loaders/pagerefs   && pytest
+cd src/loaders/defaults   && pytest
+cd src/pipeline           && pytest
 cd src/generators/define  && pytest
 cd src/generators/crf     && pytest
 ```
@@ -319,6 +362,7 @@ cd src/generators/crf     && pytest
 | **CDISC 360i** | A CDISC initiative to make the full clinical trial lifecycle — from protocol to submission — machine-readable and interoperable. |
 | **DDS** (Data Definition Specification) | The central intermediate JSON model in the DDE pipeline. It aggregates metadata from all sources and is the single input for all generators. |
 | **Combined DDS** | A DDS carrying both Define-XML and CRF metadata, written by the CRF loader. Each generator reads the sections it owns. |
+| **Defaults dictionary** | A JSON file of well-known default values (lengths, origins, display formats) the defaults loader writes where no other loader supplied a value. Sponsor-editable; see [`data/defaults/`](data/defaults/README.md). |
 | **Define-XML** | An XML file submitted alongside clinical trial datasets that describes their structure, variables, permitted values, and controlled terminology. Required by the FDA. Define-XML v2.1 is an extension of ODM v1.3.2. |
 | **ODM** (Operational Data Model) | The CDISC XML standard for exchanging clinical study metadata and data, including CRF definitions. The DDE generates CRFs in ODM v1.3.2 and v2.0. |
 | **aCRF** (annotated CRF) | A CRF annotated with the SDTM variables each field maps to. The DDE emits one ODM file that renders as either the blank CRF or the aCRF. |
