@@ -86,6 +86,17 @@ class TestAliasFallbacks:
         assert item.get("SDSVarName") == "VSORRES"
         assert "when VSTESTCD = SYSBP" in aliases(item)["SDTM"][0]
 
+    def test_define_item_oids_mapping_type_and_concept_values(self, odm132):
+        """The alias vocabulary is shared, so 1.3.2 carries the same Origin facts."""
+        _, _, xml = odm132
+        item = next(i for i in find_all(xml, ".//odm:ItemDef")
+                    if i.get("OID") == "IT.CRF.SYSBP_VSORRES")
+        assert aliases(item)["SDTMItemOIDs"] == ["VS.VSORRES=IT.VS.VSORRES.SYSBP"]
+        assert aliases(item)["SDTMMappingType"] == ["direct"]
+        concept = next(g for g in find_all(xml, ".//odm:ItemGroupDef")
+                       if g.get("OID") == "IG.CON.SYSBP_DENORMALIZED")
+        assert aliases(concept)["SDTM"] == ["VSTESTCD = SYSBP; VSTEST = Systolic Blood Pressure"]
+
     def test_coding_becomes_provenance_aliases(self, odm132):
         _, _, xml = odm132
         concept = next(g for g in find_all(xml, ".//odm:ItemGroupDef")

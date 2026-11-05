@@ -74,7 +74,14 @@ One contract for both emitters and both stylesheets:
 `SDTM`, `CDASH`, `prompt`, `definition`, `completionInstructions`, `implementationNotes`,
 `cdiscNotes`, `mappingInstructions`, `preSpecifiedValue`, `selectionType`, `subsetOf`,
 `timing`, `section`, `sectionOrder`, `BC`, `SDTMSpecialization`, `CRFSpecialization`,
-`USDM`, `nci:ExtCodeID`, `Standard`.
+`USDM`, `nci:ExtCodeID`, `Standard`, `SDTMItemOIDs`, `SDTMMappingType`.
+
+`SDTMItemOIDs` (ItemDef and Concept) lists the Define-XML ItemDefs a field populates as
+space-separated `DATASET.VARIABLE=OID` pairs, from `crfSdtmTarget.links`; `SDTMMappingType`
+(ItemDef) is `crfSdtmTarget.mapping`. A Concept's `SDTM` alias states its fixed values
+(`VSTESTCD = SYSBP; VSTEST = Systolic Blood Pressure`). crfutils `crfpdf` reads all three to
+write exact Define-XML page references. Both emitters fail on an element that would carry
+two Aliases with one Context (the XSD keys Alias/@Context per element).
 
 The Phase 1 POC contexts `formAnnotation`, `formSectionAnnotation` and
 `formSectionCompletionInstruction` are retired in favour of `SDTM` on the form and
@@ -121,7 +128,7 @@ root.
 cd src/generators/crf && pytest
 ```
 
-70 tests over `tests/fixtures/dds-360i-crf.json`, a trimmed real combined DDS (two forms,
+77 tests over `tests/fixtures/dds-360i-crf.json`, a trimmed real combined DDS (two forms,
 three visits, one Define-side tabulation dataset). They assert the structure and native
 elements of both versions, the 1.3.2 flattening and measurement units, XSD validity of
 both outputs, namespace isolation when both are built in one process, and — in

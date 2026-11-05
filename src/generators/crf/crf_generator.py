@@ -145,6 +145,8 @@ class CrfGenerator:
         # A target sometimes needs a sibling it is not being handed: ODM 1.3.2 reads the
         # unit value off the item that a result item's ``unitsItem`` points at.
         self.target.set_item_index(_index_items(template))
+        self.target.set_form_index({g["OID"]: g for g in template.get("itemGroups") or []
+                                    if g.get("type") == "Form" and g.get("OID")})
         if hasattr(self.target, "codelist_index"):
             self.target.codelist_index = {
                 cl["OID"]: cl for cl in template.get("codeLists") or [] if cl.get("OID")

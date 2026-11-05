@@ -2,7 +2,15 @@ import define_object
 
 
 class Concepts(define_object.DefineObject):
-    """Create Define-XML v2.1 CodeList elements for biomedical concepts."""
+    """
+    Read the DDS ``concepts`` section.
+
+    In the DDS schema ``concepts`` holds ReifiedConcepts (Biomedical Concepts, with
+    ``properties``), which the Define and CRF loaders write; external dictionaries belong
+    in ``dictionaries``. Define-XML 2.1 has no element for a Biomedical Concept, so those
+    entries are skipped. An entry in the legacy dictionary shape (``shortName``,
+    ``dictionary``, ``version``) still becomes an external CodeList.
+    """
     def __init__(self):
         super().__init__()
 
@@ -14,6 +22,8 @@ class Concepts(define_object.DefineObject):
         for concept in template:
             short_name = concept.get("shortName") or concept.get("Short Name")
             if not short_name:
+                if concept.get("dictionary") is None:
+                    continue  # a ReifiedConcept: nothing to emit in Define-XML
                 raise ValueError("Required field 'shortName' missing in Concepts")
             cl_oid = self.generate_oid(["CL", short_name])
             if self.find_object(objects["CodeList"], cl_oid) is not None:

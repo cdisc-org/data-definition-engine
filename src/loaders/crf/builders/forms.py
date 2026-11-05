@@ -16,8 +16,9 @@ from typing import Any
 
 from ..constants import (BC_SYSTEM, CONCEPT_OID_PREFIX, CRF_PROFILE_URI, CRF_SPEC_SYSTEM,
                          FORM_OID_PREFIX, PLACEHOLDER, SDTM_DSS_SYSTEM,
-                         SECTION_OID_PREFIX, STD_CDASHIG_OID, generate_oid)
+                         SECTION_OID_PREFIX, STD_CDASHIG_OID, YES_NO, generate_oid)
 from ..sources.crf_specializations import CrfGroup
+from . import sdtm_links
 
 logger = logging.getLogger(__name__)
 
@@ -111,7 +112,95 @@ class FormBuilder:
             concept["crfScenario"] = group.scenario
         if resolution.get("concept_oid"):
             concept["implementsConcept"] = resolution["concept_oid"]
+        aliases = self._fixed_value_aliases(concept["OID"], group, items)
+        if aliases:
+            concept["aliases"] = aliases
         return concept
+
+    def _fixed_value_aliases(self, concept_oid: str, group: CrfGroup,
+                             items: list[dict[str, Any]]) -> list[dict[str, str]]:
+        """The concept's fixed SDTM values as ``SDTM`` and ``SDTMItemOIDs`` aliases.
+
+        A concept fixes values no field collects: its test codes and names, read from its
+        items' when-clauses (``VSTESTCD = SYSBP; VSTEST = Systolic Blood Pressure``), and
+        the values of its hidden prefilled items (``LBCAT = CHEMISTRY``), which the CRF
+        generator does not render. Each gets its Define item link. A hidden item that is
+        not prefilled has no value to state and goes to ``mappingReview``.
+        """
+        define = self.item_builder.define_index
+        context = self.item_builder.group_context(group)
+        segments: list[str] = []
+        links: list[dict[str, Any]] = []
+        seen: set[tuple[str, str]] = set()
+
+        def add(variable: str, value: str) -> None:
+            if (variable, value) in seen:
+                return
+            seen.add((variable, value))
+            segments.append(f"{variable} = {value}")
+            if define is None:
+                return
+            dataset = sdtm_links.target_dataset(sdtm_links.Target(variable), group.domain, define)
+            own = {k: v for k, v in context.items() if k != variable}
+            link = define.link(dataset or "", variable, (), own, group.vlm_group_id or None)
+            if link.item:
+                if link.as_dict() not in links:
+                    links.append(link.as_dict())
+            else:
+                self._review(concept_oid, f"{variable} = {value}", f"{dataset}.{variable}",
+                             link.basis)
+
+        for spec in group.items:
+            for target in sdtm_links.parse_annotation(spec.sdtm_annotation).targets:
+                for condition in target.conditions:
+                    name_variable = sdtm_links.paired_name_variable(condition.variable)
+                    if condition.comparator != "EQ" or len(condition.values) != 1 \
+                            or not name_variable:
+                        continue
+                    add(condition.variable, condition.values[0])
+                    if define is not None:
+                        dataset = sdtm_links.target_dataset(
+                            sdtm_links.Target(condition.variable), group.domain, define)
+                        name = define.decode(dataset or "", condition.variable,
+                                             condition.values[0])
+                        if name:
+                            add(name_variable, name)
+
+        for spec, item in zip(group.items, items):
+            if not YES_NO.get(spec.display_hidden.upper(), False):
+                continue
+            annotation = (item.get("crfSdtmTarget") or {}).get("annotation") or ""
+            origin = next(iter(item.get("origin") or []), {}).get("type")
+            if not spec.prepopulated_term or origin != "Protocol":
+                if annotation and not sdtm_links.parse_annotation(annotation).not_submitted:
+                    self._review(concept_oid, annotation, "",
+                                 f"hidden item {item['OID']} is not prefilled "
+                                 f"(origin {origin}), so the CRF states no value for it")
+                continue
+            targets = sdtm_links.parse_annotation(annotation).targets
+            direct = (len(targets) == 1 and not targets[0].conditions and not targets[0].qnam
+                      and (targets[0].value is not None or targets[0].variable == spec.variable_name))
+            if not direct:
+                # MHONGO prefilled Y feeds MHENRF;MHENRTPT;MHENTPT through a derivation: the
+                # prefilled value is the CDASH field's, not an SDTM value
+                self._review(concept_oid, annotation, "",
+                             f"hidden item {item['OID']} is prefilled {spec.prepopulated_term!r} but "
+                             "does not map directly to one SDTM variable, so its SDTM value is not stated")
+                continue
+            add(targets[0].variable, targets[0].value or spec.prepopulated_term)
+
+        aliases = []
+        if segments:
+            aliases.append({"context": "SDTM", "name": "; ".join(segments)})
+        pairs = sdtm_links.oid_pairs(links)
+        if pairs:
+            aliases.append({"context": "SDTMItemOIDs", "name": pairs})
+        return aliases
+
+    def _review(self, oid: str, annotation: str, target: str, reason: str) -> None:
+        entry = {"item": oid, "annotation": annotation, "target": target, "reason": reason}
+        if entry not in self.item_builder.mapping_review:
+            self.item_builder.mapping_review.append(entry)
 
     def _coding(self, resolution: dict[str, Any], group: CrfGroup) -> list[dict[str, Any]]:
         coding: list[dict[str, Any]] = []

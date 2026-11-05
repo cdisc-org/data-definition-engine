@@ -7,11 +7,13 @@ from typing import Any
 
 import odmlib.odm_2_0.model as ODM
 
-from generators.crf.constants import (ACRF_HREF, ACRF_LEAF_ID, CTX_SDTM, CTX_STANDARD,
+from generators.crf.constants import (ACRF_HREF, ACRF_LEAF_ID, CODELIST_DATATYPE_20, CTX_SDTM,
+                                      CTX_SDTM_ITEM_OIDS, CTX_SDTM_MAPPING_TYPE, CTX_STANDARD,
                                       DATATYPE_TO_ODM, DEFAULT_ORIGINATOR,
                                       DEFAULT_SOURCE_SYSTEM, NS_URI, ODM20_CONTEXT,
                                       ODM20_STANDARD_NAMES, STANDARD_STATUS)
-from generators.crf.targets.base import OdmTarget, as_list
+from generators.crf.targets.base import (OdmTarget, as_list, require_unique_alias_contexts,
+                                         sdtm_item_oids)
 
 logger = logging.getLogger(__name__)
 
@@ -127,7 +129,7 @@ class Odm20Target(OdmTarget):
                 ItemGroupOID=oid, OrderNumber=order,
                 Mandatory="Yes" if mandatory else "No"))
         self._add_aliases(form, group)
-        return form
+        return require_unique_alias_contexts(form)
 
     def section(self, group: dict[str, Any], child_oids: list[tuple[str, bool]],
                 lang: str) -> Any:
@@ -143,7 +145,7 @@ class Odm20Target(OdmTarget):
                 ItemGroupOID=oid, OrderNumber=order,
                 Mandatory="Yes" if mandatory else "No"))
         self._add_aliases(section, group)
-        return section
+        return require_unique_alias_contexts(section)
 
     def concept(self, group: dict[str, Any], item_refs: list[Any], lang: str,
                 section: dict[str, Any] | None = None) -> Any:
@@ -161,7 +163,7 @@ class Odm20Target(OdmTarget):
         for coding in as_list(group.get("coding")):
             concept.Coding.append(self._coding(coding))
         self._add_aliases(concept, group)
-        return concept
+        return require_unique_alias_contexts(concept)
 
     def item_def(self, item: dict[str, Any], lang: str) -> Any:
         attrs: dict[str, Any] = {
@@ -200,9 +202,14 @@ class Odm20Target(OdmTarget):
         target = item.get("crfSdtmTarget") or {}
         if target.get("annotation"):
             item_def.Alias.append(self.alias(CTX_SDTM, target["annotation"]))
+        pairs = sdtm_item_oids(target.get("links"))
+        if pairs:
+            item_def.Alias.append(self.alias(CTX_SDTM_ITEM_OIDS, pairs))
+        if target.get("mapping"):
+            item_def.Alias.append(self.alias(CTX_SDTM_MAPPING_TYPE, target["mapping"]))
         if item.get("crfSelectionType"):
             item_def.Alias.append(self.alias("selectionType", item["crfSelectionType"]))
-        return item_def
+        return require_unique_alias_contexts(item_def)
 
     def item_ref(self, item: dict[str, Any], order: int) -> Any:
         attrs: dict[str, Any] = {
@@ -225,7 +232,7 @@ class Odm20Target(OdmTarget):
         attrs: dict[str, Any] = {
             "OID": codelist["OID"],
             "Name": codelist.get("name") or codelist["OID"],
-            "DataType": codelist.get("dataType") or "text",
+            "DataType": CODELIST_DATATYPE_20.get(codelist.get("dataType") or "text", "text"),
         }
         if codelist.get("standard"):
             attrs["StandardOID"] = codelist["standard"]
@@ -259,7 +266,8 @@ class Odm20Target(OdmTarget):
             sed.Description = self.description(text, lang)
         for order, form_oid in enumerate(event.get("itemGroups") or [], start=1):
             sed.ItemGroupRef.append(ODM.ItemGroupRef(
-                ItemGroupOID=form_oid, OrderNumber=order, Mandatory="Yes"))
+                ItemGroupOID=form_oid, OrderNumber=order,
+                Mandatory="Yes" if self.form_mandatory(form_oid) else "No"))
         for coding in as_list(event.get("coding")):
             sed.Coding.append(self._coding(coding))
         timing = (event.get("occurrence") or {}).get("timing") or {}

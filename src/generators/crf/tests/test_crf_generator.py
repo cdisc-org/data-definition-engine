@@ -188,3 +188,45 @@ def _group(xml, oid):
     ns = "{http://www.cdisc.org/ns/odm/v2.0}"
     return next(g for g in ET.fromstring(xml).findall(f".//{ns}ItemGroupDef")
                 if g.get("OID") == oid)
+
+
+class TestAliasGuard:
+    """Alias/@Context is unique per element in the XSD; a collision fails at generation."""
+
+    def test_two_aliases_with_one_context_are_refused(self):
+        import odmlib.odm_2_0.model as ODM
+        import pytest
+        from generators.crf.targets.base import require_unique_alias_contexts
+
+        item = ODM.ItemDef(OID="IT.X", Name="X", DataType="text")
+        item.Alias.append(ODM.Alias(Context="SDTM", Name="A"))
+        item.Alias.append(ODM.Alias(Context="SDTM", Name="B"))
+        with pytest.raises(ValueError, match="Context='SDTM'"):
+            require_unique_alias_contexts(item)
+
+    def test_an_element_without_aliases_is_left_alone(self):
+        import odmlib.odm_2_0.model as ODM
+        from generators.crf.targets.base import require_unique_alias_contexts
+
+        item = ODM.ItemDef(OID="IT.X", Name="X", DataType="text")
+        require_unique_alias_contexts(item)
+        assert "Alias" not in vars(item)
+
+    def test_sdtm_item_oids_skips_unlinked_targets(self):
+        from generators.crf.targets.base import sdtm_item_oids
+        assert sdtm_item_oids([{"dataset": "VS", "variable": "VSORRES", "item": "IT.VS.VSORRES.SYSBP"},
+                               {"dataset": "VS", "variable": "VSORRESU", "item": None}]) == \
+            "VS.VSORRES=IT.VS.VSORRES.SYSBP"
+        assert sdtm_item_oids(None) == ""
+
+
+class TestCodeListDataType:
+    """CodeList/@DataType is a closed set per version; Define-XML's float has to be mapped."""
+
+    def test_float_becomes_decimal_in_2_0_and_stays_float_in_1_3_2(self):
+        from generators.crf.targets.odm132 import Odm132Target
+        from generators.crf.targets.odm20 import Odm20Target
+        codelist = {"OID": "CL.LBSTRESC", "name": "Lab result", "dataType": "float", "codeListItems": []}
+        assert Odm20Target().codelist(codelist, "en").DataType == "decimal"
+        assert Odm132Target().codelist(codelist, "en").DataType == "float"
+        assert Odm20Target().codelist({**codelist, "dataType": "datetime"}, "en").DataType == "text"

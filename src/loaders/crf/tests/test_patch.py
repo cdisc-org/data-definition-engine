@@ -185,6 +185,51 @@ class TestPatchApplication:
             "crfSectionInstructions"] == "Answered."
 
 
+class TestMappingReview:
+    """Targets the loader could not link are listed, and answered under items.<OID>.crfSdtmTarget."""
+
+    def test_review_entries_are_listed_with_answer_stubs(self, processed, tmp_path):
+        assert processed.report["mappingReview"], "the minimal Define has no VSPOS, so VSPOS needs review"
+        path = tmp_path / "r.yaml"
+        processed.generate_patch_file(str(path))
+        content = yaml.safe_load(path.read_text(encoding="utf-8"))
+        review = content["mappingReview"]
+        oid = next(o for o in review if o.startswith("IT.CRF."))
+        assert review[oid]["reasons"]
+        stub = content["items"][oid]["crfSdtmTarget"]
+        assert stub["annotation"] == PLACEHOLDER and stub["links"] == PLACEHOLDER
+
+    def test_an_answered_annotation_recomputes_the_links(self, processed, tmp_path):
+        path = tmp_path / "a.yaml"
+        path.write_text(yaml.safe_dump({"items": {"IT.CRF.VSDAT": {"crfSdtmTarget": {
+            "annotation": "VSTESTCD", "mapping": "direct", "links": PLACEHOLDER}}}}), encoding="utf-8")
+        changes = crf_patch.apply_patch_file(str(path), processed.dds)
+        item = _item(processed.dds, "IT.CRF.VSDAT")
+        assert item["crfSdtmTarget"]["annotation"] == "VSTESTCD"
+        assert item["crfSdtmTarget"]["links"] == [
+            {"dataset": "VS", "variable": "VSTESTCD", "item": "IT.VS.VSTESTCD"}]
+        assert "item IT.CRF.VSDAT.crfSdtmTarget.links" in changes
+
+    def test_answered_links_and_an_invalid_mapping(self, processed, tmp_path):
+        path = tmp_path / "b.yaml"
+        path.write_text(yaml.safe_dump({"items": {"IT.CRF.VSDAT": {"crfSdtmTarget": {
+            "annotation": PLACEHOLDER, "mapping": "sideways",
+            "links": "VS.VSDTC=IT.VS.VSDTC"}}}}), encoding="utf-8")
+        before = _item(processed.dds, "IT.CRF.VSDAT")["crfSdtmTarget"].get("mapping")
+        crf_patch.apply_patch_file(str(path), processed.dds)
+        target = _item(processed.dds, "IT.CRF.VSDAT")["crfSdtmTarget"]
+        assert target["links"] == [{"dataset": "VS", "variable": "VSDTC", "item": "IT.VS.VSDTC"}]
+        assert target.get("mapping") == before
+
+
+def _item(dds, oid):
+    for concept in _concepts(dds):
+        for item in concept.get("items") or []:
+            if item.get("OID") == oid:
+                return item
+    raise AssertionError(f"item {oid} not found")
+
+
 def _section(dds, oid):
     for group in dds["itemGroups"]:
         for section in group.get("slices") or []:

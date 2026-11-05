@@ -18,6 +18,7 @@ from ..constants import (BC_SYSTEM, CDISC_ORG_SYSTEM, CRF_ITEM_OID_PREFIX, DATAT
                          ORIGIN_ASSIGNED, ORIGIN_COLLECTED, ORIGIN_PROTOCOL, PLACEHOLDER,
                          YES_NO, generate_oid)
 from ..sources.crf_specializations import CrfGroup, CrfItem
+from . import sdtm_links
 
 logger = logging.getLogger(__name__)
 
@@ -29,16 +30,24 @@ class ItemBuilder:
     """Accumulates DDS Items across every CRF group processed."""
 
     def __init__(self, cdashig: Any, codelists: Any,
-                 sdtm_item_oids: set[str] | None = None) -> None:
+                 sdtm_item_oids: set[str] | None = None,
+                 define_index: sdtm_links.DefineIndex | None = None) -> None:
         """
         :param cdashig: a :class:`CdashigSource`
         :param codelists: a :class:`CodeListBuilder`
         :param sdtm_item_oids: OIDs of the Define-side items already in the DDS, used to
             resolve ``crfSdtmTarget.items`` references to real targets
+        :param define_index: the Define items, value lists and where clauses of the input
+            DDS; without it no ``crfSdtmTarget.links`` are written
         """
         self.cdashig = cdashig
         self.codelists = codelists
         self.sdtm_item_oids = sdtm_item_oids or set()
+        self.define_index = define_index
+        #: targets that need a person: {"item", "annotation", "target", "reason"}
+        self.mapping_review: list[dict[str, str]] = []
+        #: annotation variables replaced by the CDASHIG mapping target
+        self.corrections: list[str] = []
         self.items: dict[str, dict[str, Any]] = {}
         self.conflicts: list[str] = []
         self.placeholders: set[str] = set()
@@ -63,7 +72,9 @@ class ItemBuilder:
         built: list[dict[str, Any]] = []
         units_by_base = self._units_index(group)
         for spec_item in group.items:
-            built.append(self._build(spec_item, group, units_by_base, property_by_dec))
+            item = self._build(spec_item, group, units_by_base, property_by_dec)
+            self._record_review(item)
+            built.append(item)
         return built
 
     @staticmethod
@@ -146,6 +157,17 @@ class ItemBuilder:
                 continue
             if left != right:
                 return False
+
+        # A prefilled value, or the Define items a field populates, belong to one concept:
+        # DSDECOD is prefilled ADVERSE EVENT on one disposition concept and collected on
+        # another, and links to a different value-level item per DSCAT. Merging them would
+        # show the first concept's value on every form and send its pages to the wrong
+        # Define item.
+        if existing.get("preSpecifiedValue") != candidate.get("preSpecifiedValue"):
+            return False
+        if (existing.get("crfSdtmTarget") or {}).get("links") != \
+                (candidate.get("crfSdtmTarget") or {}).get("links"):
+            return False
 
         left, right = existing.get("question"), candidate.get("question")
         if (left not in (None, "", PLACEHOLDER) and right not in (None, "", PLACEHOLDER)
@@ -247,7 +269,7 @@ class ItemBuilder:
         if spec.variable_name:
             item["aliases"] = [{"context": "CDASH", "name": spec.variable_name}]
 
-        sdtm_target = self._sdtm_target(spec, group)
+        sdtm_target = self._sdtm_target(oid, spec, group, field)
         if sdtm_target:
             item["crfSdtmTarget"] = sdtm_target
 
@@ -268,22 +290,106 @@ class ItemBuilder:
             return dict(ORIGIN_PROTOCOL)
         return dict(ORIGIN_COLLECTED)
 
-    def _sdtm_target(self, spec: CrfItem, group: CrfGroup) -> dict[str, Any] | None:
+    def _sdtm_target(self, oid: str, spec: CrfItem, group: CrfGroup,
+                     field: dict[str, Any]) -> dict[str, Any] | None:
+        """The item's ``crfSdtmTarget``: annotation, variables, links and mapping code.
+
+        The annotation is checked against CDASHIG's structured mapping targets first: a
+        target variable that is neither a Library target nor a variable of the Define
+        dataset (AESTDAT, a CDASH name) is replaced by the single Library target. Targets
+        that cannot be linked to exactly one Define item are kept for ``mappingReview``
+        under the private key ``_review``, which :meth:`_record_review` pops.
+        """
         if not spec.sdtm_annotation and not spec.sdtm_target_variable:
             return None
-        target: dict[str, Any] = {}
-        if spec.sdtm_annotation:
-            target["annotation"] = spec.sdtm_annotation
-        if spec.sdtm_target_variable:
-            target["variables"] = list(spec.sdtm_target_variable)
+        annotation_text = spec.sdtm_annotation
+        variables = list(spec.sdtm_target_variable)
+        annotation = sdtm_links.parse_annotation(annotation_text)
+        library = sdtm_links.library_targets(field)
+        instructions = field.get("mappingInstructions")
+        review: list[dict[str, str]] = []
+
+        if self.define_index is not None and len(library) == 1:
+            for target in annotation.targets:
+                dataset = sdtm_links.target_dataset(target, group.domain, self.define_index)
+                if (target.qnam is None and target.variable not in library
+                        and not self.define_index.has_variable(dataset, target.variable)):
+                    annotation_text = sdtm_links.replace_variable(
+                        annotation_text, target.variable, library[0])
+                    variables = [library[0] if v == target.variable else v for v in variables]
+                    message = (f"{oid}: {target.variable} -> {library[0]} "
+                               "(CDASHIG sdtmigDatasetMappingTargets)")
+                    if message not in self.corrections:
+                        self.corrections.append(message)
+                        logger.info("corrected SDTM annotation %s", message)
+            annotation = sdtm_links.parse_annotation(annotation_text)
+
+        if (field and not library and annotation.targets
+                and sdtm_links.classify_instructions(instructions) == sdtm_links.NOT_SUBMITTED):
+            review.append({"annotation": annotation_text, "target": "",
+                           "reason": "CDASHIG says this field does not map to an SDTMIG "
+                                     "variable, but the annotation names targets"})
+
+        target_dict: dict[str, Any] = {}
+        if annotation_text:
+            target_dict["annotation"] = annotation_text
+        if variables:
+            target_dict["variables"] = variables
             resolved = [
-                oid for oid in
-                (generate_oid(["IT", group.domain, v]) for v in spec.sdtm_target_variable)
-                if oid in self.sdtm_item_oids
+                item_oid for item_oid in
+                (generate_oid(["IT", group.domain, v]) for v in variables)
+                if item_oid in self.sdtm_item_oids
             ]
             if resolved:
-                target["items"] = resolved
-        return target or None
+                target_dict["items"] = resolved
+
+        if self.define_index is not None:
+            context = {k: v for k, v in self.group_context(group).items()
+                       if k != spec.variable_name}
+            links = []
+            for target in annotation.targets:
+                dataset = sdtm_links.target_dataset(target, group.domain, self.define_index)
+                link = self.define_index.link(dataset or "", target.variable, target.conditions,
+                                              context, group.vlm_group_id or None)
+                links.append(link.as_dict())
+                if link.item is None:
+                    review.append({"annotation": annotation_text,
+                                   "target": f"{dataset}.{target.variable}",
+                                   "reason": link.basis})
+            if links:
+                target_dict["links"] = links
+
+        mapping = spec.sdtm_mapping if spec.sdtm_mapping in sdtm_links.MAPPING_CODES else \
+            sdtm_links.mapping_type(spec.variable_name, annotation, library, instructions)
+        if mapping:
+            target_dict["mapping"] = mapping
+        if review:
+            target_dict["_review"] = review
+        return target_dict or None
+
+    def group_context(self, group: CrfGroup) -> dict[str, str]:
+        """The values a concept prefills, as SDTM variable -> value (LBSPEC -> URINE).
+
+        A prefilled row's own annotation names the variable; its value is the annotated
+        ``VAR = VALUE`` or else the prepopulated term.
+        """
+        context: dict[str, str] = {}
+        for spec in group.items:
+            if not spec.prepopulated_term:
+                continue
+            for target in sdtm_links.parse_annotation(spec.sdtm_annotation).targets:
+                if target.conditions or target.qnam:
+                    continue
+                context.setdefault(target.variable, target.value or spec.prepopulated_term)
+        return context
+
+    def _record_review(self, item: dict[str, Any]) -> None:
+        """Move an item's pending review entries into :attr:`mapping_review`, once each."""
+        pending = (item.get("crfSdtmTarget") or {}).pop("_review", None) or []
+        for entry in pending:
+            entry = {"item": item["OID"], **entry}
+            if entry not in self.mapping_review:
+                self.mapping_review.append(entry)
 
     def as_list(self) -> list[dict[str, Any]]:
         """Every distinct Item built."""

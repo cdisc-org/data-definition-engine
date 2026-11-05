@@ -16,15 +16,17 @@ from typing import Any
 
 import odmlib.odm_1_3_2.model as ODM
 
-from generators.crf.constants import (CTX_BC, CTX_CDISC_NOTES, CTX_COMPLETION,
+from generators.crf.constants import (CODELIST_DATATYPE_132, CTX_BC, CTX_CDISC_NOTES, CTX_COMPLETION,
                                       CTX_CRF_SPEC, CTX_DEFINITION, CTX_IMPLEMENTATION,
                                       CTX_MAPPING, CTX_NCI, CTX_PRESPECIFIED, CTX_PROMPT,
-                                      CTX_SDTM, CTX_SDTM_SPEC, CTX_SECTION,
+                                      CTX_SDTM, CTX_SDTM_ITEM_OIDS, CTX_SDTM_MAPPING_TYPE,
+                                      CTX_SDTM_SPEC, CTX_SECTION,
                                       CTX_SECTION_ORDER, CTX_SELECTION, CTX_STANDARD,
                                       CTX_SUBSET_OF, CTX_TIMING, CTX_USDM,
                                       DATATYPE_TO_ODM, DEFAULT_ORIGINATOR,
                                       DEFAULT_SOURCE_SYSTEM, NS_URI, REPEATING_TO_132)
-from generators.crf.targets.base import OdmTarget, as_list
+from generators.crf.targets.base import (OdmTarget, as_list, require_unique_alias_contexts,
+                                         sdtm_item_oids)
 
 logger = logging.getLogger(__name__)
 
@@ -140,7 +142,7 @@ class Odm132Target(OdmTarget):
         section_order = group.get("_sectionOrder") or []
         if section_order:
             form.Alias.append(self.alias(CTX_SECTION_ORDER, "|".join(section_order)))
-        return form
+        return require_unique_alias_contexts(form)
 
     def section(self, group: dict[str, Any], child_oids: list[tuple[str, bool]],
                 lang: str) -> None:
@@ -178,7 +180,7 @@ class Odm132Target(OdmTarget):
             igd.Alias.append(self.alias(CTX_CRF_SPEC, group["crfSpecializationRef"]))
         for alias in as_list(group.get("aliases")):
             igd.Alias.append(self.alias(alias["context"], alias["name"]))
-        return igd
+        return require_unique_alias_contexts(igd)
 
     def item_def(self, item: dict[str, Any], lang: str) -> Any:
         attrs: dict[str, Any] = {
@@ -229,9 +231,14 @@ class Odm132Target(OdmTarget):
             item_def.Alias.append(self.alias(alias["context"], alias["name"]))
         if target.get("annotation"):
             item_def.Alias.append(self.alias(CTX_SDTM, target["annotation"]))
+        pairs = sdtm_item_oids(target.get("links"))
+        if pairs:
+            item_def.Alias.append(self.alias(CTX_SDTM_ITEM_OIDS, pairs))
+        if target.get("mapping"):
+            item_def.Alias.append(self.alias(CTX_SDTM_MAPPING_TYPE, target["mapping"]))
         for coding in as_list(item.get("coding")):
             item_def.Alias.append(self.alias(CTX_NCI, coding.get("code")))
-        return item_def
+        return require_unique_alias_contexts(item_def)
 
     def item_ref(self, item: dict[str, Any], order: int) -> Any:
         attrs: dict[str, Any] = {
@@ -246,7 +253,7 @@ class Odm132Target(OdmTarget):
     def codelist(self, codelist: dict[str, Any], lang: str) -> Any:
         cl = ODM.CodeList(
             OID=codelist["OID"], Name=codelist.get("name") or codelist["OID"],
-            DataType=codelist.get("dataType") or "text",
+            DataType=CODELIST_DATATYPE_132.get(codelist.get("dataType") or "text", "text"),
         )
         for order, term in enumerate(codelist.get("codeListItems") or [], start=1):
             if not term.get("codedValue"):
@@ -278,7 +285,8 @@ class Odm132Target(OdmTarget):
             sed.Description = self.description(text, lang)
         for order, form_oid in enumerate(event.get("itemGroups") or [], start=1):
             sed.FormRef.append(ODM.FormRef(
-                FormOID=form_oid, OrderNumber=order, Mandatory="Yes"))
+                FormOID=form_oid, OrderNumber=order,
+                Mandatory="Yes" if self.form_mandatory(form_oid) else "No"))
         timing = (event.get("occurrence") or {}).get("timing") or {}
         if timing.get("value"):
             sed.Alias.append(self.alias(CTX_TIMING, _timing_text(timing)))

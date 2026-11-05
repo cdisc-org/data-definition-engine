@@ -9,6 +9,9 @@ data/
 ├── crf_specializations/            # CRF Specializations read by the CRF loader
 │   ├── cdisc_crf_specializations_draft.csv    # Draft CDISC CRF Specializations
 │   └── PROVENANCE.md                          # Where the CSV came from and its coverage gaps
+├── defaults/                       # Well-known defaults read by the defaults loader (stage F)
+│   ├── well_known_defaults.json               # The shared seed dictionary
+│   └── README.md                              # Its provenance, and how to change or add entries
 ├── metadata_xlsx/                  # Excel-based metadata specifications
 │   ├── LZZT/
 │   │   ├── CDISCPILOT01-ADaM-2026-02-23.xlsx  # ADaM metadata for CDISC Pilot 01 (LZZT)
@@ -18,7 +21,9 @@ data/
 └── protocols/
     └── NCT01797120/                # Study NCT01797120
         ├── NCT01797120-latest.json          # USDM 4.0 protocol export
-        └── NCT01797120-dds-latest.json      # DDS (Define-JSON) written by the Define loader
+        ├── NCT01797120-dds-latest.json      # DDS (Define-JSON) written by the Define loader
+        ├── pipeline.yaml                    # The study's pipeline configuration (src/pipeline)
+        └── define-patch.yaml, crf-refinement.yaml, origin-review.yaml   # Review files
 ```
 
 ## Subdirectories
@@ -26,6 +31,13 @@ data/
 ### `crf_specializations/`
 
 The draft CDISC CRF Specializations that `src/loaders/crf/crf_loader.py` reads with `--crf_spec_file`. The CDISC Library has no CRF Specialization endpoint yet, so this file stands in for it. See [PROVENANCE.md](crf_specializations/PROVENANCE.md) for its source, shape, and known coverage gaps.
+
+### `defaults/`
+
+The dictionaries of well-known defaults that `src/loaders/defaults` (pipeline stage F) writes into
+the DDS where no other loader supplied a value: lengths, origins, display formats. They are
+specification values, made before any data exist, and the sponsor may change any of them. A study
+can add its own file under `defaults:` in its `pipeline.yaml`. See [README.md](defaults/README.md).
 
 ### `metadata_xlsx/`
 

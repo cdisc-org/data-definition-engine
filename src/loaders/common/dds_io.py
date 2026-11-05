@@ -15,6 +15,8 @@ from typing import Any
 logger = logging.getLogger(__name__)
 
 WRAPPER_KEY = "metaDataVersion"
+# itemGroup types the CRF loader adds; every other itemGroup is a tabulation dataset
+CRF_GROUP_TYPES = ("Form", "Section", "Concept")
 
 
 def load_dds(path: str | Path) -> tuple[dict[str, Any], bool]:
@@ -81,6 +83,29 @@ def all_items(group: dict[str, Any]) -> list[dict[str, Any]]:
     for sl in group.get("slices") or []:
         items.extend(all_items(sl))
     return items
+
+
+def define_items(dds: dict[str, Any]) -> dict[str, tuple[str, str, dict[str, Any], str | None]]:
+    """OID -> (dataset, variable, item dict, ValueListDef OID or None) for every Define item.
+
+    Define items are the ``items`` of tabulation itemGroups and of their ``ValueList`` slices;
+    the CRF's Form/Section/Concept groups are skipped. The first item with an OID wins.
+    """
+    found: dict[str, tuple[str, str, dict[str, Any], str | None]] = {}
+    for group in dds.get("itemGroups") or []:
+        if group.get("type") in CRF_GROUP_TYPES:
+            continue
+        dataset = group.get("domain") or group.get("name")
+        for item in group.get("items") or []:
+            if item.get("OID"):
+                found.setdefault(item["OID"], (dataset, item.get("name"), item, None))
+        for slice_ in group.get("slices") or []:
+            if slice_.get("type") != "ValueList":
+                continue
+            for item in slice_.get("items") or []:
+                if item.get("OID"):
+                    found.setdefault(item["OID"], (dataset, item.get("name"), item, slice_.get("OID")))
+    return found
 
 
 def find_by_oid(objects: list[dict[str, Any]], oid: str) -> dict[str, Any] | None:

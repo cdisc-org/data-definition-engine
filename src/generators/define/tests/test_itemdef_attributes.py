@@ -74,3 +74,17 @@ class TestDisplayFormatFallback:
         add_attrs(attr, {"dataType": "text", "displayFormat": "8.3"})
         assert "SignificantDigits" not in attr
         assert attr["DisplayFormat"] == "8.3"
+
+
+class TestDefaultsLoaderValues:
+    """What the defaults loader (pipeline stage F) writes reaches the ItemDef unchanged."""
+
+    def test_a_defaults_filled_visitnum(self, add_attrs):
+        attr = {}
+        add_attrs(attr, {"name": "VISITNUM", "dataType": "integer", "length": 2, "displayFormat": "Z2."})
+        assert attr == {"Length": 2, "DisplayFormat": "Z2."}
+
+    def test_without_the_default_the_length_is_a_placeholder(self, add_attrs):
+        attr = {}
+        add_attrs(attr, {"name": "VISITNUM", "dataType": "integer"})
+        assert attr["Length"] == "__PLACEHOLDER__"
