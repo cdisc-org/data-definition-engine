@@ -55,10 +55,15 @@ CTX_SDTM_MAPPING_TYPE = "SDTMMappingType"
 REPEATING_TO_132 = {"No": "No", "Simple": "Yes", "Static": "Yes", "Dynamic": "Yes"}
 
 #: ODM 1.3.2 has no ``decimal``; the DDS canonical type is already ``float``.
+#: The ISO 8601 types (``durationDatetime`` in the DDS today, the other seven once PR-DDS-3 adds
+#: them, DDS_FOR_METHODS.md D5) have the same names in ODM 1.3.2 and 2.0, so they map to themselves.
+ISO8601_DATATYPES = ("partialDate", "partialTime", "partialDatetime", "durationDatetime",
+                     "intervalDatetime", "incompleteDatetime", "incompleteDate", "incompleteTime")
 DATATYPE_TO_ODM = {
     "text": "text", "integer": "integer", "float": "float", "decimal": "float",
     "date": "date", "time": "time", "datetime": "datetime", "boolean": "boolean",
     "string": "string",
+    **{t: t for t in ISO8601_DATATYPES},
 }
 
 #: CodeList/@DataType is a closed set in each version (ODM 2.0 CLDataType: integer, decimal, text,

@@ -1,0 +1,214 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/cdisc-org/data-definition-engine/schemas/methods/methods.schema.json",
+  "title": "DDE SDTM methods library",
+  "description": "Standard SDTM derivation methods the methods loader (src/loaders/methods) attaches to Derived items in a DDS. 'methods' holds finished, shared methods (MSG v2 style, generic -- text, OIDs without a domain); 'assignments' says which items get each one. A method entry is a DDS Method in the ODM v2.0 shape proposed as PR-DDS-3 (DDS_FOR_METHODS.md), plus the library-only 'basis'. The slot names are frozen to PR-DDS-3 and pinned by src/loaders/methods/tests; this schema is the interim check until DataExchange-DDS model/dds.yaml carries them. See 'Plan SDTM MethodDef Loader for the DDS.md'.",
+  "type": "object",
+  "required": ["schemaVersion"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {"type": "string"},
+    "schemaVersion": {
+      "description": "The library format version, MAJOR.MINOR. The loader refuses an unknown major version.",
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+$"
+    },
+    "name": {"type": "string"},
+    "description": {"type": "string"},
+    "methods": {
+      "description": "Method definitions. A later file that defines the same OID replaces the earlier entry as a whole.",
+      "type": "array",
+      "items": {"$ref": "#/$defs/method"}
+    },
+    "assignments": {
+      "description": "Which Derived items get which method. Ranked like defaults entries: exact name, then longer suffix, then shorter suffix, then *; then a where match, then a domain filter; then a later file.",
+      "type": "array",
+      "items": {"$ref": "#/$defs/assignment"}
+    }
+  },
+  "$defs": {
+    "method": {
+      "description": "A DDS Method (ODM v2.0 MethodDef). Define-XML 2.1 output keeps OID, name, type, description, inline expressions and documents, and drops the signature and ExternalCodeLib expressions.",
+      "type": "object",
+      "required": ["OID", "name", "type", "description"],
+      "additionalProperties": false,
+      "properties": {
+        "OID": {"type": "string", "pattern": "^MT\\.[A-Za-z0-9._-]+$"},
+        "name": {"type": "string", "minLength": 1},
+        "type": {
+          "description": "Define-XML 2.1 rule 209 allows Computation and Imputation only; both are also ODM v2.0 MethodType values.",
+          "enum": ["Computation", "Imputation"]
+        },
+        "description": {
+          "description": "Define-XML 2.1 rules 56 and 210: a non-empty description. A string, or a DDS TranslatedText.",
+          "oneOf": [
+            {"type": "string", "minLength": 1},
+            {"$ref": "#/$defs/translatedText"}
+          ]
+        },
+        "signature": {"$ref": "#/$defs/signature"},
+        "expressions": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/expression"}
+        },
+        "documents": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/document"}
+        },
+        "basis": {
+          "description": "Library only, never written to the DDS: where the wording and the signature come from.",
+          "type": "string"
+        }
+      }
+    },
+    "translatedText": {
+      "description": "DDS TranslatedText.",
+      "type": "object",
+      "required": ["translations"],
+      "additionalProperties": false,
+      "properties": {
+        "translations": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["language", "value"],
+            "additionalProperties": false,
+            "properties": {
+              "language": {"type": "string", "minLength": 1},
+              "value": {"type": "string", "minLength": 1}
+            }
+          }
+        }
+      }
+    },
+    "signature": {
+      "description": "PR-DDS-3 MethodSignature (ODM v2.0 MethodDef/MethodSignature): the method's named, typed and ordered inputs and outputs. ODM v2.0 requires one on every MethodDef; the loader writes an empty one for an entry without it.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "parameters": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/parameter"}
+        },
+        "returnValues": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/returnValue"}
+        }
+      }
+    },
+    "parameter": {
+      "description": "DDS Parameter with PR-DDS-3 orderNumber (ODM v2.0 Parameter: Name, DataType, Definition, OrderNumber).",
+      "type": "object",
+      "required": ["name", "dataType"],
+      "additionalProperties": false,
+      "properties": {
+        "OID": {"description": "DDS identifier (Parameter, ReturnValue and FormalExpression are IdentifiableElements, so the generated DDS JSON Schema requires it). Optional here: the loader generates PA.<method>.<name> when absent. ODM v2.0 has no such OID, so an ODM v2.0 export drops it.", "type": "string", "minLength": 1},
+        "name": {"type": "string", "minLength": 1},
+        "dataType": {"$ref": "#/$defs/dataType"},
+        "description": {"description": "ODM v2.0 @Definition.", "type": "string"},
+        "orderNumber": {"type": "integer", "minimum": 1}
+      }
+    },
+    "returnValue": {
+      "description": "DDS ReturnValue with PR-DDS-3 orderNumber (ODM v2.0 ReturnValue: Name, DataType, Definition, OrderNumber).",
+      "type": "object",
+      "required": ["name", "dataType"],
+      "additionalProperties": false,
+      "properties": {
+        "OID": {"description": "DDS identifier (Parameter, ReturnValue and FormalExpression are IdentifiableElements, so the generated DDS JSON Schema requires it). Optional here: the loader generates RV.<method>.<name> when absent. ODM v2.0 has no such OID, so an ODM v2.0 export drops it.", "type": "string", "minLength": 1},
+        "name": {"type": "string", "minLength": 1},
+        "dataType": {"$ref": "#/$defs/dataType"},
+        "description": {"description": "ODM v2.0 @Definition.", "type": "string"},
+        "orderNumber": {"type": "integer", "minimum": 1}
+      }
+    },
+    "expression": {
+      "description": "DDS FormalExpression with exactly one body: inline code (expression, ODM v2.0 Code) or an externalCodeLib reference (PR-DDS-3). context is required (Define-XML 2.1 rule 221).",
+      "type": "object",
+      "required": ["context"],
+      "additionalProperties": false,
+      "properties": {
+        "OID": {"description": "DDS identifier (Parameter, ReturnValue and FormalExpression are IdentifiableElements, so the generated DDS JSON Schema requires it). Optional here: the loader generates FE.<method>.<n> when absent. ODM v2.0 has no such OID, so an ODM v2.0 export drops it.", "type": "string", "minLength": 1},
+        "context": {"type": "string", "minLength": 1},
+        "expression": {"type": "string", "minLength": 1},
+        "externalCodeLib": {"$ref": "#/$defs/externalCodeLib"}
+      },
+      "oneOf": [
+        {"required": ["expression"], "not": {"required": ["externalCodeLib"]}},
+        {"required": ["externalCodeLib"], "not": {"required": ["expression"]}}
+      ]
+    },
+    "externalCodeLib": {
+      "description": "PR-DDS-3 ExternalCodeLib (ODM v2.0 ExternalCodeLib: @Library, @Method, @Version, @ref, @href).",
+      "type": "object",
+      "required": ["library"],
+      "additionalProperties": false,
+      "properties": {
+        "library": {"type": "string", "minLength": 1},
+        "method": {"type": "string", "minLength": 1},
+        "version": {"type": "string", "minLength": 1},
+        "ref": {"type": "string", "minLength": 1},
+        "href": {"type": "string", "minLength": 1}
+      }
+    },
+    "document": {
+      "description": "DDS DocumentReference for a supporting document: its leaf ID and optional integer (physical) pages.",
+      "type": "object",
+      "required": ["leafID"],
+      "additionalProperties": false,
+      "properties": {
+        "leafID": {"type": "string", "minLength": 1},
+        "pages": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "integer", "minimum": 1}
+        },
+        "title": {"type": "string"}
+      }
+    },
+    "dataType": {
+      "description": "The DDS DataType enum (schemas/dds/dds.yaml) plus the seven ISO 8601 types PR-DDS-3 adds (DDS_FOR_METHODS.md change 7, D5).",
+      "enum": ["text", "integer", "float", "date", "time", "datetime", "boolean", "double", "hex",
+               "base64", "hexBinary", "durationDatetime",
+               "partialDate", "partialTime", "partialDatetime", "intervalDatetime",
+               "incompleteDatetime", "incompleteDate", "incompleteTime"]
+    },
+    "assignment": {
+      "type": "object",
+      "required": ["name", "method"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "description": "The Derived item's name. A leading -- matches any longer name that ends with the rest (--SEQ matches LBSEQ). * matches every item and needs domains.",
+          "type": "string",
+          "minLength": 1,
+          "not": {"const": "--"}
+        },
+        "method": {
+          "description": "OID of a method some loaded library file defines.",
+          "type": "string",
+          "pattern": "^MT\\.[A-Za-z0-9._-]+$"
+        },
+        "domains": {"$ref": "#/$defs/domainList"},
+        "excludeDomains": {"$ref": "#/$defs/domainList"},
+        "where": {
+          "description": "Value-level only: {variable: value} matches a value-level item whose where clause admits the value (EQ equal, or IN listing it), e.g. {\"VSTESTCD\": \"BMI\"}.",
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": {"pattern": "^[A-Z][A-Z0-9]{0,7}$"},
+          "additionalProperties": {"type": "string", "minLength": 1}
+        },
+        "description": {"description": "A note on why the assignment exists.", "type": "string"}
+      },
+      "if": {"properties": {"name": {"const": "*"}}},
+      "then": {"required": ["domains"]}
+    },
+    "domainList": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^[A-Z][A-Z0-9]{1,7}$"}
+    }
+  }
+}

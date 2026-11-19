@@ -59,7 +59,7 @@ python crf_generator.py -t ../../../output/NCT01797120-dds-crf.json \
 python crf_generator.py -t ../../../output/NCT01797120-dds-crf.json \
     -o ../../../output/crf-1.3.2.xml --odm-version 1.3.2 --validate
 
-cd src/generators/crf && pytest        # 77 tests
+cd src/generators/crf && pytest        # 80 tests
 
 # Independent schema check against the vendored XSDs
 xmllint --noout --schema schemas/odm/2.0/ODM.xsd        output/crf-2.0.xml
@@ -99,7 +99,8 @@ python -m loaders.defaults --dds_in ../output/NCT01797120/dds-origin.json --dds_
     --report /tmp/defaults-report.yaml   # standalone; add --patch_file to rewrite a define patch
 cd src/pipeline && pytest           # 10 tests, stages stubbed
 cd src/loaders/pagerefs && pytest   # 22 tests, no network
-cd src/loaders/defaults && pytest   # 58 tests, no network
+cd src/loaders/defaults && pytest   # 65 tests, no network
+cd src/loaders/methods && pytest    # 49 tests, no network (library + seed so far; the loader is M2)
 ```
 
 Stage D needs crfutils (`crfvalidate`, `crfpdf`) on `PATH` or named under `commands:` in the study YAML. The review files (`define-patch.yaml`, `crf-refinement.yaml`, `origin-review.yaml`) sit beside the study YAML; generated files go to `output_dir`. The define patch has one writer: stage A applies it but writes its full list to `output_dir/define-patch-stageA.yaml`, and stage F rewrites it. `defaults:` in the study YAML lists the defaults dictionaries (default: the shared one).
@@ -223,6 +224,7 @@ For research and codebase exploration, use parallel Explore subagents by default
 - `src/generators/define/README.md`, `src/define-xml/README.md`, `src/loaders/crf/README.md`, `src/generators/crf/README.md` — per-program usage notes.
 - `DEFAULT_METADATA_LOADER.md` — the defaults loader plan: decisions, dictionary format, the seed tables with each entry's basis, and what it leaves for a person.
 - `data/defaults/README.md`, `src/loaders/defaults/README.md` — the defaults dictionary (provenance, how to change it) and the loader.
+- `Plan SDTM MethodDef Loader for the DDS.md`, `DDS_FOR_METHODS.md` — the methods loader plan (stage G, in progress: M0 generator and M1 library done) and the DDS model changes it needs (PR-DDS-3/4). `data/methods/README.md` — the SDTM method library (provenance, how to change it); `schemas/methods/methods.schema.json` freezes the PR-DDS-3 slot names until the upstream model carries them, so do not edit `schemas/dds/dds.yaml` locally.
 - `FIXES.md` — issues found while implementing CRF generation: what was fixed, what is pre-existing and still open (including the loader/generator drift above), and what to report upstream to odmlib and the CDISC ODM team.
 - `CRF_GEN_PLAN.md` — the CRF generation plan (milestones, DDS model additions, mapping tables). M0 and M2–M5 are implemented; M1 (upstream DDS PRs) and M6 (XSLT stylesheets) are not.
 - `schemas/dds/profiles/crf/README.md` — the CRF profile: why the hand-written JSON Schema is what `--validate` uses today, and what unblocks the LinkML one.

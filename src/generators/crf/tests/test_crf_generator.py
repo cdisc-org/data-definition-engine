@@ -230,3 +230,37 @@ class TestCodeListDataType:
         assert Odm20Target().codelist(codelist, "en").DataType == "decimal"
         assert Odm132Target().codelist(codelist, "en").DataType == "float"
         assert Odm20Target().codelist({**codelist, "dataType": "datetime"}, "en").DataType == "text"
+
+
+class TestIso8601DataTypes:
+    """The ISO 8601 types have the same name in ODM 1.3.2 and 2.0, so they map to themselves rather
+    than falling back to text (PR-DDS-3 adds seven of them to the DDS DataType; DDS_FOR_METHODS.md D5)."""
+
+    def test_each_iso_8601_type_maps_to_itself(self):
+        from generators.crf.constants import DATATYPE_TO_ODM, ISO8601_DATATYPES
+        assert len(ISO8601_DATATYPES) == 8
+        assert all(DATATYPE_TO_ODM[t] == t for t in ISO8601_DATATYPES)
+
+    @pytest.mark.parametrize("version", ["2.0", "1.3.2"])
+    def test_a_partial_date_item_is_emitted_and_valid(self, version, dds, tmp_path):
+        from generators.crf.validate import validate_odm
+
+        def retype(node):
+            if isinstance(node, dict):
+                if node.get("OID") == "IT.CRF.VSDAT":
+                    node["dataType"] = "partialDate"
+                for value in node.values():
+                    retype(value)
+            elif isinstance(node, list):
+                for value in node:
+                    retype(value)
+
+        retype(dds)
+        dds_path = tmp_path / "dds.json"
+        dds_path.write_text(json.dumps(dds), encoding="utf-8")
+        generator = CrfGenerator(dds_file=str(dds_path), odm_file=str(tmp_path / "crf.xml"), odm_version=version)
+        odm = generator.create()
+        xml = generator.write(odm)
+        item = next(e for e in ET.fromstring(xml).iter() if e.tag.endswith("ItemDef") and e.get("OID") == "IT.CRF.VSDAT")
+        assert item.get("DataType") == "partialDate"
+        assert validate_odm(odm, generator.target, xml) == []

@@ -59,6 +59,13 @@ class TestInvalid:
         with pytest.raises(DictionaryError, match="two entries for --SEQ"):
             Dictionary.load([_write(tmp_path, {"schemaVersion": "1.0", "items": [entry, entry]})])
 
+    @pytest.mark.parametrize("data_type", ["partialDate", "partialTime", "partialDatetime", "intervalDatetime",
+                                           "incompleteDatetime", "incompleteDate", "incompleteTime"])
+    def test_the_iso_8601_data_types_are_accepted(self, tmp_path, data_type):
+        # PR-DDS-3 adds them to the DDS DataType (DDS_FOR_METHODS.md D5); this enum is a hand copy.
+        content = {"schemaVersion": "1.0", "items": [{"name": "--DTC", "values": {"dataType": data_type}}]}
+        assert len(Dictionary.load([_write(tmp_path, content)]).entries) == 1
+
     def test_the_same_name_in_two_sections_or_with_other_domains_is_allowed(self, tmp_path):
         content = {"schemaVersion": "1.0",
                    "items": [{"name": "AETERM", "values": {"length": 200}},

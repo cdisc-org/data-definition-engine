@@ -12,6 +12,9 @@ data/
 ├── defaults/                       # Well-known defaults read by the defaults loader (stage F)
 │   ├── well_known_defaults.json               # The shared seed dictionary
 │   └── README.md                              # Its provenance, and how to change or add entries
+├── methods/                        # SDTM method library read by the methods loader (stage G)
+│   ├── sdtm_methods.json                      # The shared seed: 22 methods with signatures
+│   └── README.md                              # Its provenance, and how to change or add entries
 ├── metadata_xlsx/                  # Excel-based metadata specifications
 │   ├── LZZT/
 │   │   ├── CDISCPILOT01-ADaM-2026-02-23.xlsx  # ADaM metadata for CDISC Pilot 01 (LZZT)
@@ -38,6 +41,13 @@ The dictionaries of well-known defaults that `src/loaders/defaults` (pipeline st
 the DDS where no other loader supplied a value: lengths, origins, display formats. They are
 specification values, made before any data exist, and the sponsor may change any of them. A study
 can add its own file under `defaults:` in its `pipeline.yaml`. See [README.md](defaults/README.md).
+
+### `methods/`
+
+The SDTM method library that `src/loaders/methods` (pipeline stage G) attaches to Derived items, so
+the define.xml carries real MethodDefs instead of placeholders. Methods are shared, MSG v2 style, and
+held in ODM v2.0 form (each with a MethodSignature). A study can add its own file. See
+[README.md](methods/README.md).
 
 ### `metadata_xlsx/`
 
