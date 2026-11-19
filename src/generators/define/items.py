@@ -108,7 +108,7 @@ class Items(define_object.DefineObject):
             origin = DEFINE.Origin(**attr)
 
         # The DDS schema's page references: origin.documents[].pages, written by the pagerefs loader.
-        document_refs = [self._document_ref(doc) for doc in origin_in.get("documents") or []
+        document_refs = [self.document_ref(doc, self.acrf) for doc in origin_in.get("documents") or []
                          if isinstance(doc, dict) and doc.get("pages")]
         has_pages = bool(document_refs) or bool(origin_in.get("pages"))
 
@@ -131,19 +131,6 @@ class Items(define_object.DefineObject):
             dr.PDFPageRef.append(DEFINE.PDFPageRef(PageRefs=origin_in["pages"], Type="PhysicalRef"))
             origin.DocumentRef.append(dr)
         return origin
-
-    def _document_ref(self, doc: dict[str, Any]) -> Any:
-        """
-        A def:DocumentRef for one DDS DocumentReference: integer pages become one contiguous
-        FirstPage/LastPage range, or a space-separated PageRefs list.
-        """
-        pages = sorted({int(p) for p in doc["pages"]})
-        dr = DEFINE.DocumentRef(leafID=doc.get("leafID") or self.acrf)
-        if len(pages) > 1 and pages == list(range(pages[0], pages[-1] + 1)):
-            dr.PDFPageRef.append(DEFINE.PDFPageRef(FirstPage=pages[0], LastPage=pages[-1], Type="PhysicalRef"))
-        else:
-            dr.PDFPageRef.append(DEFINE.PDFPageRef(PageRefs=" ".join(str(p) for p in pages), Type="PhysicalRef"))
-        return dr
 
     @staticmethod
     def _add_optional_itemdef_attributes(attr, obj):

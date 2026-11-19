@@ -55,6 +55,45 @@ class DefineObject(ABC):
                 return o
         return None
 
+    def document_ref(self, doc: dict[str, Any], default_leaf_id: str | None = None) -> Any | None:
+        """
+        A def:DocumentRef for one DDS DocumentReference, shared by origins and methods.
+
+        Integer pages become one contiguous FirstPage/LastPage range, or a space-separated
+        PageRefs list, both Type="PhysicalRef". A reference with no pages points at the whole
+        document. Returns None when neither the reference nor the caller names a leaf.
+
+        :param doc: DDS DocumentReference dictionary (leafID, pages)
+        :param default_leaf_id: leaf to use when the reference has no leafID (the aCRF for origins)
+        :return: odmlib DocumentRef object, or None
+        """
+        leaf_id = doc.get("leafID") or default_leaf_id
+        if not leaf_id:
+            return None
+        dr = DEFINE.DocumentRef(leafID=leaf_id)
+        pages = sorted({int(p) for p in doc.get("pages") or []})
+        if len(pages) > 1 and pages == list(range(pages[0], pages[-1] + 1)):
+            dr.PDFPageRef.append(DEFINE.PDFPageRef(FirstPage=pages[0], LastPage=pages[-1], Type="PhysicalRef"))
+        elif pages:
+            dr.PDFPageRef.append(DEFINE.PDFPageRef(PageRefs=" ".join(str(p) for p in pages), Type="PhysicalRef"))
+        return dr
+
+    def translated_text(self, value: Any) -> list[Any]:
+        """
+        TranslatedText elements for a DDS text slot that is either a plain string or a
+        DDS TranslatedText ({"translations": [{"language": ..., "value": ...}]}).
+
+        :param value: string, DDS TranslatedText dictionary, or None
+        :return: list of odmlib TranslatedText objects (one per translation; one for a string)
+        """
+        if isinstance(value, dict):
+            return [
+                DEFINE.TranslatedText(_content=t.get("value", ""), lang=t.get("language") or self.lang)
+                for t in value.get("translations") or []
+                if isinstance(t, dict)
+            ]
+        return [DEFINE.TranslatedText(_content="" if value is None else str(value), lang=self.lang)]
+
     def create_external_codelist(
         self, cl_oid: str, name: str, data_type: str, dictionary: str, version: str | None = None
     ) -> Any:

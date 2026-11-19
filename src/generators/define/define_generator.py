@@ -106,6 +106,8 @@ class DefineGenerator:
         self.lang: str = DEFAULT_LANGUAGE
         self.acrf: str = ACRF_LEAF_ID
         self.define_objects: dict[str, Any] = {}
+        # Filled by create(): MethodDef count, post-processing placeholders, downgrade drops.
+        self.method_summary: dict[str, Any] = {"placeholders": []}
 
     def create(self) -> None:
         """Create the Define-XML v2.1 file from the DDS JSON input file."""
@@ -143,6 +145,7 @@ class DefineGenerator:
         self._post_process_elements(template_objects)
         odm = self._build_doc()
         self._write_define(odm)
+        self._log_method_summary()
 
 
     def _post_process_elements(self, template_objects) -> None:
@@ -152,6 +155,23 @@ class DefineGenerator:
         """
         pp = PP.PostProcessing(self.define_objects, template_objects, self.is_xpt, self.lang)
         pp.process_define_objects()
+        self.method_summary["placeholders"] = list(pp.placeholder_methods)
+
+    def _log_method_summary(self) -> None:
+        """
+        Log what became of the DDS methods: how many MethodDefs were written, how many lost ODM
+        v2.0 content Define-XML 2.1 cannot carry, and how many placeholders post-processing made.
+        """
+        downgrades = self.define_objects.get(methods.DOWNGRADE_KEY) or {}
+        self.method_summary["signaturesDropped"] = list(downgrades.get("signatures") or [])
+        self.method_summary["externalCodeLibsDropped"] = list(downgrades.get("externalCodeLibs") or [])
+        self.method_summary["methodDefs"] = len(self.define_objects["MethodDef"])
+        s = self.method_summary
+        logging.info(
+            f"MethodDefs: {s['methodDefs']} written ({len(s['placeholders'])} placeholders made by post-processing); "
+            f"downgraded for Define-XML 2.1: {len(s['signaturesDropped'])} MethodSignature(s) and "
+            f"{len(s['externalCodeLibsDropped'])} ExternalCodeLib expression(s) dropped"
+        )
 
     def _init_define_objects(self) -> None:
         """Initialize empty containers for each Define-XML element type."""
