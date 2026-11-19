@@ -31,9 +31,17 @@ following Define-XML element types under `MetaDataVersion`:
   Collected/Investigator origin with no pages, and every `def:DocumentRef` uses the DDS `annotatedCRFs[0].leafID`
 - `ValueListDef` / `WhereClauseDef` — value-level metadata derived from itemGroup `slices`
 - `CodeList` — enumerated and external codelists
-- `MethodDef` — derivation methods (auto-created for `Derived` origins during post-processing). In the
-  pipeline (stage G) the generator reads `dds-defaults.json`, where the defaults loader (`src/loaders/defaults/`,
-  stage F) has filled well-known lengths and origins; each Derived origin it fills gets one of these placeholders
+- `MethodDef` — derivation methods from the DDS `methods` section. A DDS Method is held in ODM v2.0 style and is
+  downgraded for Define-XML 2.1: `expressions[]` with inline `expression` become `FormalExpression`s (`context` is
+  required, rule 221), while the `signature` and any `externalCodeLib` expression are dropped and counted in the
+  run's method summary log line; `documents[]` become `def:DocumentRef`s (integer pages as `PhysicalRef`, the same
+  helper origins use); `description` may be a string or a DDS TranslatedText. `type` Computation and Imputation pass
+  through, Transformation becomes Computation with a warning, and Analysis, Display or any other value is refused
+  (rule 209). The legacy flat keys (`context`, `code`, `document`, `pages`) still work; string `pages` are
+  `NamedDestination`s. Post-processing remains a safety net: a `Derived` ItemDef whose ItemRef has no `MethodOID`
+  gets a `__PLACEHOLDER__` MethodDef, each one logged. In the pipeline (stage G) the generator reads
+  `dds-defaults.json`, where the defaults loader (`src/loaders/defaults/`, stage F) has filled well-known lengths
+  and origins; until the methods loader exists, each Derived origin gets one of these placeholders
 - `CommentDef` — comments
 - `def:leaf` / Documents — supporting document references, including the annotated CRF
 

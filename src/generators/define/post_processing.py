@@ -1,7 +1,10 @@
+import logging
 from typing import Any
 from odmlib.define_2_1 import model as DEFINE
-import methods
 import define_object
+
+logger = logging.getLogger(__name__)
+
 
 class PostProcessing:
     """
@@ -12,6 +15,9 @@ class PostProcessing:
         self.template_objects = template_objects
         self.is_xpt = is_xpt
         self.lang = lang
+        # OIDs of the placeholder MethodDefs _add_derived_methods made. On a DDS whose Derived
+        # items all carry a method (the methods loader's output) this stays empty.
+        self.placeholder_methods: list[str] = []
 
     def process_define_objects(self) -> None:
         self._add_derived_methods()
@@ -58,7 +64,9 @@ class PostProcessing:
 
     def _add_derived_methods(self) -> None:
         """
-        Add methods to ItemDefs where the def:Origin Type="Derived".
+        Safety net: add a placeholder MethodDef to each ItemDef whose def:Origin Type="Derived"
+        and whose ItemRef has no MethodOID (Define-XML 2.1 rule 73). The methods loader writes
+        real or placeholder methods into the DDS, so on its output this makes none.
         """
         for item_def in self.define_objects['ItemDef']:
             if any(getattr(o, "Type", None) == "Derived" for o in (item_def.Origin or [])):
@@ -69,6 +77,13 @@ class PostProcessing:
                 # create the MethodDef with the MethodOID attribute
                 if is_new_method:
                     self._create_method_def(method_oid, item_def)
+                    self.placeholder_methods.append(method_oid)
+                    logger.info(f"post-processing: placeholder MethodDef {method_oid} for Derived {item_def.OID}")
+        if self.placeholder_methods:
+            logger.warning(
+                f"post-processing made {len(self.placeholder_methods)} placeholder MethodDef(s) for Derived "
+                f"items without a method in the DDS"
+            )
 
     def _create_method_def(self, method_oid, item_def) -> None:
         item_oid_parts = item_def.OID.split('.')
