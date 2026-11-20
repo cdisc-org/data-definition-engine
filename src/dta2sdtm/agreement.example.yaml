@@ -3,9 +3,10 @@
 # (root class: DataTransferAgreement).
 #
 # Exercises every agreement-layer class: Study/StudySummary, DtaVersion,
-# BcSelection (+ faceted BcClassification incl. the is_used_by_dta edge), Party,
-# TransferRequirements, VisitMapping, Source. Study context is an illustrative
-# USDM projection; the model is study-agnostic.
+# BcSelection (+ faceted BcClassification incl. the is_used_by_dta edge), BcGroup,
+# TestSpecification, TransferDataset, Party, TransferRequirements, VisitMapping,
+# TimepointMapping, Source. Study context is an illustrative USDM projection; the
+# model is study- and dataset-agnostic (lab, ECG and imaging tests appear below).
 #
 # Validate:
 #   linkml-validate -s dta.linkml.yaml -C DataTransferAgreement agreement.example.yaml
@@ -39,12 +40,36 @@ study:
     bc_surrogates: 14
 
 dta_version:
-  version_number: "1.0"
-  version_date: "2026-06-11"
+  - version_number: "1.0"
+    version_date: "2026-06-11"
 
 data_types:
   - "Leukocyte Count (C51948)"
   - "Erythrocyte Count (C51946)"
+  - "ECG"
+  - "Imaging"
+
+# Structured data types (BC groups, USDM BiomedicalConceptCategory). Group names,
+# sub-groups, domains and members are verbatim from DTA_MVP_Inventory v2.xlsx:
+# BC_Groups (top level), ECG BC_Groups (sub-group headers; members are rows whose
+# bc_id is a C-code), Imaging BC_Groups (bc_categories / Domain columns).
+data_type_groups:
+  - bc_group_name: ECG
+    child_groups:
+      - bc_group_name: 12 LEAD STANDARD
+        sdtm_domain: EG
+        member_concepts: [C119259, C117773, C117779, C117786]
+  - bc_group_name: Imaging
+    child_groups:
+      - bc_group_name: Tumor/Lesion Identification
+        sdtm_domain: TU
+        member_concepts: [C94523, C178053, C161483]
+      - bc_group_name: Tumor/Lesion Results
+        sdtm_domain: TR
+        member_concepts: [C96684, C96685, C96643]
+      - bc_group_name: Disease Response
+        sdtm_domain: RS
+        member_concepts: [C94534, C94535, C96613]
 
 data_type_details:
   - key: "C51948||Leukocyte Count"
@@ -85,16 +110,21 @@ parties:
     source: "USDM + UI"
 
 transfer:
-  file_name: Safety_Lab
-  file_format: XPT
-  encoding_system: UTF8
-  delimiter: Not Applicable
-  transmission_method: sFTP
-  transmission_type: Cumulative
-  transfer_environment: Production
-  transfer_blinding: Blinded
-  folder_name_provider: provider_out
-  folder_name_recipient: sponsor_in
+  - file_name: Safety_Lab
+    file_format: XPT
+    encoding_system: UTF8
+    delimiter: Not Applicable
+    transmission_method: sFTP
+    transmission_type: Cumulative
+    transfer_blinding: true
+    environments:
+      - transfer_environment: Production
+        folder_name_provider: provider_out
+        folder_name_recipient: sponsor_in
+  - file_name: Safety_Lab_Test
+    file_format: CSV
+    environments:
+      - transfer_environment: Test
 
 visit_mapping:
   - protocol_visit_number: "PRE-STUDY"
@@ -122,7 +152,10 @@ timepoint_mapping:
 # data_provider_test_name -> ctest where the vendor code is absent.
 #
 # Row 1 is the worked example from the DTA MVP Inventory's Test_Specification
-# sheet verbatim. Rows 2-3 back the transmission.example.yaml payload. Row 4 shows a
+# sheet, copied as-is INCLUDING ITS ERRORS (still present in inventory v2):
+# bc_id C51950 is "Neutrophil Count" in NCI EVS, not Leukocytes (C51948), and
+# LOINC 26471-3 is "Leukocytes other/Leukocytes in Blood", not a WBC count.
+# Rows 2-3 back the transmission.example.yaml payload. Row 4 shows a
 # test identified by NAME ONLY — the flow-cytometry pattern, which is why the
 # natural key needs a name fallback.
 # ─────────────────────────────────────────────────────────────────────────────
@@ -143,7 +176,7 @@ test_specification:
     conventional_unit: mcL
     si_unit: mm3
     blinding_flag: true
-    agreement_status: Ordered
+    test_tracking_status: Ordered
 
   - test_panel_name: HEMATOLOGY
     category: HEMATOLOGY
@@ -158,8 +191,18 @@ test_specification:
     reported_unit: g/dL
     conventional_unit: g/dL
     si_unit: g/L
+    # Reference range: the most frequent HGB range in the pilot's out/sdtm/lb.csv
+    # (LBORNRLO/LBORNRHI 12 / 15.5 g/dL); SI is the same range in g/L (x10). In the
+    # pilot the range varies by subject (12-15.5 and 12-18 both occur), so an
+    # agreed per-test range is a declared default, not a per-subject fact.
+    reported_reference_range_low: "12"
+    reported_reference_range_high: "15.5"
+    conventional_reference_range_low: 12
+    conventional_reference_range_high: 15.5
+    si_reference_range_low: 120
+    si_reference_range_high: 155
     blinding_flag: false
-    agreement_status: Final
+    test_tracking_status: Final
 
   # Categorical test: data_type is what stops LBORRES "STRAW" being cast to LBSTRESN.
   - test_panel_name: URINALYSIS
@@ -174,7 +217,7 @@ test_specification:
     data_type: "<text 200>"
     result_values: CL_RESULT1
     blinding_flag: true
-    agreement_status: Final
+    test_tracking_status: Final
 
   # Identified by NAME only — no vendor test code (flow cytometry pattern).
   - test_panel_name: Revised T Cell Panel (V2_SP34-2)
@@ -188,7 +231,35 @@ test_specification:
     data_type: numeric
     reported_unit: "%"
     blinding_flag: false
-    agreement_status: Received
+    test_tracking_status: Received
+
+  # ECG test (EG) — ECG BC_Groups, 12 LEAD STANDARD row "QTcF Interval, Aggregate":
+  # EGTESTCD QTCFAG, EGORRESU ms, bc_id C117786. No specimen: not every column
+  # applies to every data type.
+  - sdtm_domain: EG
+    test_panel_name: 12 LEAD STANDARD
+    bc_id: C117786
+    test_name: QTcF Interval, Aggregate
+    test_code: QTCFAG
+    data_type: numeric
+    reported_unit: ms
+
+  # Imaging tests (TR, TU) — Imaging BC_Groups rows LDIAM "Longest Diameter"
+  # (bc_id C96684) and TUMIDENT "Tumor Identification" (C94523).
+  - sdtm_domain: TR
+    bc_id: C96684
+    test_name: Longest Diameter
+    test_code: LDIAM
+  - sdtm_domain: TU
+    bc_id: C94523
+    test_name: Tumor Identification
+    test_code: TUMIDENT
+
+  # Test with NO BC — the common case outside lab: Imaging BC_Groups row PPD
+  # "Product of Perpendicular Diameters" is marked "(no BC)", so bc_id is absent.
+  - sdtm_domain: TR
+    test_name: Product of Perpendicular Diameters
+    test_code: PPD
 
 # ─────────────────────────────────────────────────────────────────────────────
 # DATA STRUCTURE (new in v0.2.0) — the declared shape of the transferred file.
@@ -202,7 +273,7 @@ data_structure:
     - variable_name: STUDYID
       variable_label: Study Identifier
       variable_description: Unique identifier for a study.
-      variable_format: text
+      variable_data_type: text
       variable_length: 40
       mandatory_variable_flag: true
       mandatory_value: true
@@ -210,7 +281,7 @@ data_structure:
     - variable_name: DOMAIN
       variable_label: Domain Abbreviation
       variable_description: Two-character abbreviation for the domain.
-      variable_format: text
+      variable_data_type: text
       variable_length: 2
       controlled_terminology: DOMAIN
       example_values: [LB, CP, MB]
@@ -221,26 +292,26 @@ data_structure:
     - variable_name: LBORRES
       variable_label: Result or Finding in Original Units
       variable_description: Original result of the measurement or finding, as reported to the sites.
-      variable_format: text
+      variable_data_type: text
       variable_length: 200
       mandatory_variable_flag: true
 
     - variable_name: VISITNUM
       variable_label: Visit Number
       variable_description: Clinical encounter number. Numeric version of VISIT, used for sorting.
-      variable_format: numeric
+      variable_data_type: numeric
       variable_length: 8
 
     - variable_name: LBDTC
       variable_label: Date/Time of Specimen Collection
       variable_description: Specimen collection date or date and time, ISO 8601.
-      variable_format: datetime
+      variable_data_type: datetime
       variable_length: 19
 
     - variable_name: CTESTCD
       variable_label: External Vendor Test Code
       variable_description: Populated with the vendor internal test code.
-      variable_format: text
+      variable_data_type: text
       variable_length: 200
       vendor_variable_name: CTESTCD
       vendor_variable_label: Vendor Test Code

@@ -1,0 +1,51 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Mock BC GROUP (data type) instance — validates against dta.linkml.yaml
+# (root class: BcGroup, aligned to USDM BiomedicalConceptCategory).
+#
+# The PK/PD group from DTA_MVP_Inventory v2.xlsx / BC_Groups, verbatim. The sheet
+# lists "PK/PD" with no members of its own, followed by the six rows below; they
+# are read as its sub-groups from that row order (the sheet has no parent column,
+# and a threaded comment on it proposes "a vertical structure for all BCs under a
+# concept group"). Members are concept NAMES: the sheet gives no C-codes for PK/PD.
+#
+# Validate:
+#   linkml-validate -s dta.linkml.yaml -C BcGroup bc_group.example.yaml
+# ─────────────────────────────────────────────────────────────────────────────
+
+bc_group_name: PK/PD
+child_groups:
+  - bc_group_name: Parent Drug Concentration
+    member_concepts:
+      - Plasma Drug Concentration
+      - Serum Drug Concentration
+      - Whole Blood Drug Concentration
+      - Venous Blood Drug Concentration
+      - Capillary Blood Drug Concentration
+      - Capillary Plasma Drug Concentration
+      - Tissue Drug Concentration
+  - bc_group_name: Metabolite Concentration
+    member_concepts:
+      - Plasma Metabolite Concentration
+      - Serum Metabolite Concentration
+      - Urine Metabolite Concentration
+      - Blood Metabolite Concentration
+      - Tissue Metabolite Concentration
+      - Stool Metabolite Concentration
+      - Parent-Metabolite Relationship
+  - bc_group_name: Comparator or Reference Drug Concentration
+  - bc_group_name: Total Radioactivity Exposure (Liquid Scintillation Counting)
+    member_concepts:
+      - Mean Radioactivity
+      - Total Radioactivity
+      - Excreted Amount
+      - Recovery
+      - Cumulative Excreted Amount
+      - Cumulative Recovery
+  - bc_group_name: Antidrug Antibodies
+    member_concepts:
+      - Binding Antidrug Antibody
+      - Neutralizing Binding Antidrug Antibody
+      - Cross-Reactive Binding Antidrug Antibody
+  - bc_group_name: Treatment Induced Immunogenicity
+    member_concepts:
+      - T-Cell Response
