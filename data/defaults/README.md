@@ -7,7 +7,7 @@ DDS where no other loader supplied a value. The format is defined by
 
 | File | Contents |
 |---|---|
-| `well_known_defaults.json` | The shared seed: 95 `items` entries for SDTM variables most studies share |
+| `well_known_defaults.json` | The shared seed: 97 `items` entries for SDTM variables most studies share |
 
 ## Specification values, not submission values
 

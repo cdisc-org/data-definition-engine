@@ -18,8 +18,16 @@ def _write(tmp_path, content, name="d.json"):
 class TestSeed:
     def test_the_seed_validates_and_loads(self):
         loaded = Dictionary.load([DEFAULT_DICTIONARY])
-        assert len(loaded.entries) == 95
+        assert len(loaded.entries) == 97
         assert {e.section for e in loaded.entries} == {"items"}
+
+    @pytest.mark.parametrize("name, origin", [("ETCD", "Assigned"), ("ELEMENT", "Protocol"),
+                                              ("SESTDTC", "Derived"), ("EPOCH", "Derived")])
+    def test_se_origins_follow_msg_v2(self, name, origin):
+        # methods plan open item 1: SE.ETCD and SE.ELEMENT are not Derived, so they need no method
+        loaded = Dictionary.load([DEFAULT_DICTIONARY])
+        best = next(e for e in loaded.candidates("items", name, "SE") if "origin" in e.values)
+        assert best.values["origin"][0]["type"] == origin
 
     def test_every_seed_entry_states_its_basis(self):
         seed = json.loads(DEFAULT_DICTIONARY.read_text(encoding="utf-8"))

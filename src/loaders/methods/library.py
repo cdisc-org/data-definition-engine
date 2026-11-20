@@ -17,6 +17,11 @@ method any loaded file defines. Every file is checked before anything is used:
 - signature names are unique within a signature, and ``orderNumber`` values within each list;
 - every assignment names a defined method.
 
+``Library.best`` picks an item's assignment with the defaults ranking (``loaders/common/ranking.py``): an
+exact name, then a longer suffix, then ``*``; then a value-level ``where`` the item's where clause admits
+(EQ equal, or IN listing the value), which outranks no ``where``; then a domain filter; then a later
+file. ``Library.unmatched`` lists the assignments no item used.
+
 The DDS copy of a method (``Library.dds_method``) drops ``basis`` and fills in an empty signature and the
 OIDs the DDS model requires on signature entries and expressions (``element_oids``).
 """
@@ -28,6 +33,9 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
+
+from loaders.common import ranking
+from loaders.common.where_clauses import Where, admits
 
 SCHEMA_FILE = Path(__file__).resolve().parents[3] / "schemas" / "methods" / "methods.schema.json"
 SEED_FILE = Path(__file__).resolve().parents[3] / "data" / "methods" / "sdtm_methods.json"
@@ -67,6 +75,26 @@ class Assignment:
             text += " where " + ", ".join(f"{var}={value}" for var, value in self.where)
         return text
 
+    def admits_where(self, where: Where) -> bool:
+        """Whether a value-level item's where clause admits every ``where`` value of this assignment
+        (EQ equal to it, or IN listing it). An assignment without ``where`` admits any item; one with
+        ``where`` admits only value-level items."""
+        if not self.where:
+            return True
+        for variable, value in self.where:
+            tested = where.get(variable)
+            if tested is None or tested[0] not in ("EQ", "IN") or not admits(tested[0], tested[1], value):
+                return False
+        return True
+
+    def rank(self, name: str | None, domain: str | None, where: Where) -> tuple | None:
+        """This assignment's rank for an item, or None when it does not apply: the defaults ranking
+        (``loaders/common/ranking.py``) with a matching ``where`` outranking none at equal name rank."""
+        if not self.admits_where(where):
+            return None
+        return ranking.rank(self.name, name, domain, domains=self.domains, exclude=self.exclude,
+                            order=self.order, position=self.position, extra=(1 if self.where else 0,))
+
 
 class Library:
     def __init__(self, methods: dict[str, dict[str, Any]], method_files: dict[str, str],
@@ -75,6 +103,7 @@ class Library:
         self.method_files = method_files    # OID -> file the winning entry came from
         self.assignments = assignments
         self.files = files
+        self.matched: set[Assignment] = set()
 
     @classmethod
     def load(cls, paths: list[str | Path]) -> "Library":
@@ -134,6 +163,19 @@ class Library:
         if problems:
             raise LibraryError("the methods library is not usable:\n  - " + "\n  - ".join(problems))
         return cls(methods, method_files, assignments, [str(p) for p in paths])
+
+    def best(self, name: str | None, domain: str | None, where: Where | None = None) -> Assignment | None:
+        """The best assignment for an item, recorded as matched; None when none applies."""
+        ranked = [(rank, a) for a in self.assignments if (rank := a.rank(name, domain, where or {})) is not None]
+        if not ranked:
+            return None
+        found = max(ranked, key=lambda pair: pair[0])[1]
+        self.matched.add(found)
+        return found
+
+    def unmatched(self) -> list[Assignment]:
+        """Assignments no item used: a typo shows up here, and so does one for content the study lacks."""
+        return [a for a in self.assignments if a not in self.matched]
 
     def dds_method(self, oid: str) -> dict[str, Any]:
         """

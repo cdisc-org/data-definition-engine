@@ -15,7 +15,7 @@ import logging
 from typing import Any
 
 from ..constants import (BC_SYSTEM, CDISC_ORG_SYSTEM, CRF_ITEM_OID_PREFIX, DATATYPE_MAP,
-                         ORIGIN_ASSIGNED, ORIGIN_COLLECTED, ORIGIN_PROTOCOL, PLACEHOLDER,
+                         ORIGIN_COLLECTED, ORIGIN_DERIVED, ORIGIN_PROTOCOL, PLACEHOLDER,
                          YES_NO, generate_oid)
 from ..sources.crf_specializations import CrfGroup, CrfItem
 from . import sdtm_links
@@ -285,7 +285,7 @@ class ItemBuilder:
     @staticmethod
     def _origin(spec: CrfItem, derived: bool) -> dict[str, str]:
         if derived:
-            return dict(ORIGIN_ASSIGNED)
+            return dict(ORIGIN_DERIVED)
         if spec.prepopulated_term:
             return dict(ORIGIN_PROTOCOL)
         return dict(ORIGIN_COLLECTED)

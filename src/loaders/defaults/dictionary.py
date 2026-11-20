@@ -8,6 +8,8 @@ A dictionary groups its entries by the kind of DDS object they fill (``items``, 
 1. an exact name, then a longer suffix before a shorter one, then ``*``;
 2. at equal rank, an entry with domain filters before one without;
 3. then a later file before an earlier one, and a later entry before an earlier one.
+
+The ranking itself lives in ``loaders/common/ranking.py``, shared with the methods library.
 """
 from __future__ import annotations
 
@@ -15,6 +17,8 @@ import json
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
+
+from loaders.common import ranking
 
 SECTIONS = ("items", "itemGroups", "crfItems", "crfSections")
 SCHEMA_FILE = Path(__file__).resolve().parents[3] / "schemas" / "defaults" / "defaults.schema.json"
@@ -51,24 +55,9 @@ class Entry:
         return text
 
     def rank(self, name: str | None, domain: str | None) -> tuple | None:
-        """This entry's rank for an object, or None when it does not apply."""
-        if self.domains is not None and domain not in self.domains:
-            return None
-        if self.exclude is not None and domain in self.exclude:
-            return None
-        if self.name == "*":
-            kind = (1, 0)
-        elif self.name.startswith("--"):
-            suffix = self.name[2:]
-            if not name or not name.endswith(suffix) or len(name) <= len(suffix):
-                return None
-            kind = (2, len(suffix))
-        elif self.name == name:
-            kind = (3, 0)
-        else:
-            return None
-        filtered = 1 if (self.domains is not None or self.exclude is not None) else 0
-        return kind + (filtered, self.order, self.position)
+        """This entry's rank for an object, or None when it does not apply (``loaders/common/ranking.py``)."""
+        return ranking.rank(self.name, name, domain, domains=self.domains, exclude=self.exclude,
+                            order=self.order, position=self.position)
 
 
 class Dictionary:

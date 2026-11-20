@@ -79,6 +79,8 @@
     {"name": "CMCLASCD", "description": "Convention (WHODrug coding).", "values": {"origin": [{"type": "Assigned", "source": "Sponsor"}]}},
     {"name": "*", "domains": ["TA", "TE", "TV", "TI", "TS", "TD", "TM"], "description": "Convention (trial design comes from the protocol).", "values": {"origin": [{"type": "Protocol", "source": "Sponsor"}]}},
     {"name": "*", "domains": ["SE"], "description": "Convention (SE is derived from the subject's data).", "values": {"origin": [{"type": "Derived", "source": "Sponsor"}]}},
+    {"name": "ETCD", "domains": ["SE"], "description": "SDTM-MSG v2.0 (the subject's Element code is assigned from the trial design, not computed).", "values": {"origin": [{"type": "Assigned", "source": "Sponsor"}]}},
+    {"name": "ELEMENT", "domains": ["SE"], "description": "SDTM-MSG v2.0 (the Element's name comes from the trial design in TE).", "values": {"origin": [{"type": "Protocol", "source": "Sponsor"}]}},
     {"name": "ARMCD", "description": "SDTMIG (at most 20 characters).", "values": {"length": 20}},
     {"name": "ACTARMCD", "description": "SDTMIG (at most 20 characters).", "values": {"length": 20}},
     {"name": "ARM", "domains": ["DM"], "description": "Convention.", "values": {"origin": [{"type": "Assigned", "source": "Sponsor"}]}},

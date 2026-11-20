@@ -43,7 +43,8 @@ if str(_SRC) not in sys.path:
 
 from loaders.common import dds_io  # noqa: E402
 from loaders.common.patch import PLACEHOLDER, is_placeholder  # noqa: E402
-from loaders.crf.builders.sdtm_links import DefineIndex, admits  # noqa: E402
+from loaders.common.where_clauses import admits  # noqa: E402
+from loaders.crf.builders.sdtm_links import DefineIndex  # noqa: E402
 from loaders.pagerefs import review as origin_review  # noqa: E402
 
 logger = logging.getLogger("pagerefs_loader")

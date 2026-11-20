@@ -1,6 +1,8 @@
 """Tests for the codelist, item, form and study-event builders."""
 from __future__ import annotations
 
+import dataclasses
+
 import pytest
 
 from loaders.crf.builders.codelists import CodeListBuilder
@@ -112,6 +114,16 @@ class TestItemBuilder:
         built = {i["OID"]: i for i in items.build_group_items(group)}
         assert built["IT.CRF.SYSBP_VSORRES"]["origin"] == [
             {"type": "Collected", "source": "Investigator"}]
+
+    def test_derived_field_keeps_a_derived_origin(self, items, spec_source):
+        """A derived field (BMI) stays Derived, so the methods loader attaches its method (open item 2)."""
+        group = spec_source.groups()["SYSBP_DENORMALIZED"]
+        spec = next(i for i in group.items if i.crf_item == "SYSBP_VSORRES")
+        derived = dataclasses.replace(spec, derived_variable="Y", derivation_description="Derived from X.")
+        built = {i["OID"]: i for i in items.build_group_items(dataclasses.replace(group, items=[derived]))}
+        item = built["IT.CRF.SYSBP_VSORRES"]
+        assert item["origin"] == [{"type": "Derived", "source": "Sponsor"}]
+        assert item["crfDerived"] is True and item["cdiscNotes"] == "Derived from X."
 
     def test_prepopulated_value_becomes_a_protocol_origin(self, items, spec_source):
         """A pre-populated unit is stated by the protocol, not collected."""
