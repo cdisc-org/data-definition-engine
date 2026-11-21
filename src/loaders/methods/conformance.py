@@ -9,6 +9,8 @@ of a MethodDef, checked on the DDS rather than on a define.xml so a failure name
   item for a person, not a failure);
 * rules 208 and 209: every method's ``type`` is Computation or Imputation;
 * rule 221: every expression has a ``context``;
+* rules 42 and 43: every document a method references names a leaf, and that leaf is one the
+  Define generator writes (root ``resources``, legacy ``documents`` or the annotated CRFs);
 * ODM v2.0: every method has a ``signature``, and every expression exactly one of ``expression``
   (inline code) or ``externalCodeLib``;
 * and every method OID appears once.
@@ -19,19 +21,12 @@ from __future__ import annotations
 
 from typing import Any
 
+from loaders.common.define_patch import is_derived, leaf_ids  # noqa: F401 (is_derived is re-exported)
 from loaders.common.patch import is_placeholder
 
 METHOD_TYPES = ("Computation", "Imputation")
 #: an item's own Define items: OID -> (dataset, variable, item, ValueListDef OID or None)
 DefineItems = dict[str, tuple[str, str, dict[str, Any], str | None]]
-
-
-def is_derived(item: dict[str, Any]) -> bool:
-    """Whether any of the item's origins has type Derived (aCRF pages or not)."""
-    origins = item.get("origin")
-    if isinstance(origins, dict):
-        origins = [origins]
-    return any(isinstance(o, dict) and o.get("type") == "Derived" for o in origins or [])
 
 
 def has_method(item: dict[str, Any]) -> bool:
@@ -52,6 +47,7 @@ def check(dds: dict[str, Any], items: DefineItems) -> list[str]:
     """Every conformance problem in a DDS, as a sentence naming the object; empty when it conforms."""
     problems: list[str] = []
     methods = [m for m in dds.get("methods") or [] if isinstance(m, dict)]
+    leaves = leaf_ids(dds)
     oids: set[str] = set()
     for method in methods:
         oid = method.get("OID")
@@ -62,6 +58,7 @@ def check(dds: dict[str, Any], items: DefineItems) -> list[str]:
             problems.append(f"{oid}: defined twice in methods")
         oids.add(oid)
         problems += [f"{oid}: {p}" for p in method_problems(method)]
+        problems += [f"{oid}: {p}" for p in document_problems(method, leaves)]
     for oid, (_, _, item, _) in items.items():
         if is_derived(item) and not has_method(item):
             problems.append(f"{oid}: Derived item without a method (rule 73)")
@@ -89,4 +86,17 @@ def method_problems(method: dict[str, Any]) -> list[str]:
         if len(bodies) != 1:
             problems.append(f"expression {n} has {len(bodies)} bodies; ODM v2.0 needs exactly one of "
                             "expression or externalCodeLib")
+    return problems
+
+
+def document_problems(method: dict[str, Any], leaves: set[str]) -> list[str]:
+    """Documents a method references that the Define generator could not resolve to a ``def:leaf``."""
+    problems: list[str] = []
+    for n, document in enumerate(method.get("documents") or [], start=1):
+        leaf = document.get("leafID") if isinstance(document, dict) else None
+        if not leaf:
+            problems.append(f"document {n} has no leafID (rule 42)")
+        elif leaf not in leaves:
+            problems.append(f"document {n}: leaf {leaf} is not defined in resources, documents or "
+                            f"annotatedCRFs (rule 43)")
     return problems

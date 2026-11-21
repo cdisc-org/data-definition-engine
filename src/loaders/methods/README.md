@@ -21,6 +21,7 @@ python -m loaders.methods \
   --dds_in  ../output/NCT01797120/dds-defaults.json \
   --dds_out ../output/NCT01797120/dds-methods.json \
   --methods ../data/methods/sdtm_methods.json [study-methods.json ...] \
+  --patch_file ../data/protocols/NCT01797120/define-patch.yaml \
   --report ../output/NCT01797120/methods-report.yaml [--validate]
 ```
 
@@ -28,12 +29,13 @@ python -m loaders.methods \
 |---|---|
 | `--dds_in`, `--dds_out` | The defaults loader's DDS and the DDS to write. They must differ, so a re-run starts from the same input. |
 | `--methods` | One or more libraries; later files win. Default: `data/methods/sdtm_methods.json`. |
+| `--patch_file` | The `define-patch.yaml`: its `methods` and `resources` answers are applied, then the whole file is rewritten with what is still open plus every answered value (see [The define patch](#the-define-patch)). |
 | `--report` | The `methods-report.yaml` to write. |
 | `--validate` | Validate the output against the CRF profile JSON Schema. That schema doesn't constrain methods; the loader's own conformance checks always run. |
 
 A library that fails its checks, or a result that fails conformance, stops the loader with exit 1,
-and nothing is written. Not yet built: the define patch `methods` section, the pipeline stage and
-the open-item count for `--strict` (methods plan M3 and M4).
+and nothing is written. Not yet built: the pipeline stage, which then owns the patch rewrite while
+the defaults loader only reads the patch (methods plan M4).
 
 ## What it does, per Derived item
 
@@ -57,8 +59,43 @@ the open-item count for `--strict` (methods plan M3 and M4).
    `MT.VS.VSORRES.BMI`), name `Algorithm to derive <VAR>`, type Computation, description
    `__PLACEHOLDER__` and an empty signature.
 
-A variable Derived both on its value-list parent and at value level gets a method at both levels
-(rule 73), and is reported under `bothLevels`, because one level is usually enough.
+Then the define patch answers go onto the placeholders (below). A variable Derived both on its
+value-list parent and at value level gets a method at both levels (rule 73), and is reported under
+`bothLevels`, because one level is usually enough.
+
+## The define patch
+
+A placeholder is a study-specific derivation for a person to write, so the loader lists it in
+`define-patch.yaml`, the same file that holds every other open Define value:
+
+```yaml
+methods:
+  MT.RS.RSLNKGRP:  # used by IT.RS.RSLNKGRP
+    name: Algorithm to derive RSLNKGRP
+    type: Computation                      # Computation | Imputation
+    description: Links each tumor response record to the TR records it was assessed from.
+    documents:                             # optional; physical page numbers only
+      - leafID: LF.RECIST
+        pages: [3, 4]
+resources:
+  LF.RECIST:                               # each supporting PDF once, beside define.xml
+    title: RECIST 1.1 derivations
+    href: recist-derivations.pdf
+```
+
+- The input DDS comes from the defaults loader and has no placeholders, so every run makes them
+  again and then applies the answers. A placeholder takes every answered field that differs from
+  its own; a method that already has a description (a library method) is never changed.
+- An answered leaf becomes a DDS root `resources` DocumentReference, which the Define generator
+  writes as a `def:leaf`. A document whose leaf has no title and href yet waits, and the leaf is
+  listed open with `__PLACEHOLDER__` values.
+- A string page (a named destination) or a document without a `leafID` stops the run: named
+  destinations wait for the upstream `DocumentReference` change (methods plan M6).
+- The rewrite keeps a method answer while the DDS has the method or a Derived item that would get
+  that placeholder OID, and a leaf while a kept method references it. Stage A ignores both sections,
+  and a defaults rewrite carries their answers over.
+- The summary's `open define patch methods` is what the pipeline counts as `define patch open
+  methods`; `--strict` fails while it is not zero.
 
 ## Conformance
 
@@ -72,6 +109,7 @@ concern methods, plus what ODM v2.0 needs:
 | 56, 210 | Every method has a non-empty `description` (a placeholder is an open item, not a failure) |
 | 208, 209 | Every method's `type` is Computation or Imputation |
 | 221 | Every expression has a `context` |
+| 42, 43 | Every document a method references names a leaf, defined in `resources`, the legacy `documents` or `annotatedCRFs` |
 | ODM v2.0 | Every method has a `signature`; every expression has exactly one of `expression` or `externalCodeLib` |
 
 Each method OID must also appear only once. The checks cover methods already in the input DDS too,
@@ -85,6 +123,8 @@ so a method a person wrote with type Analysis stops the run.
 |---|---|
 | `assigned` | Each library method attached, with the assignment that chose it and the items it serves |
 | `placeholders` | Each method whose description is still `__PLACEHOLDER__`, with its items |
+| `answered` | Each placeholder method (and leaf) filled from the define patch, with the fields filled |
+| `openLeaves` | Leaves a method answer references that still need a title and href |
 | `kept` | Derived items that already named a method |
 | `bothLevels` | Variables Derived at both the value-list parent and value level |
 | `unmatched` | Library assignments no item used: a typo, content the study doesn't have, or an assignment a later file outranks |
@@ -107,7 +147,7 @@ The Define generator then writes 31 MethodDefs and makes no placeholders of its 
 ## Tests
 
 ```bash
-cd src/loaders/methods && pytest    # 131 tests, no network
+cd src/loaders/methods && pytest    # 152 tests, no network
 ```
 
 | File | Covers |
@@ -117,3 +157,4 @@ cd src/loaders/methods && pytest    # 131 tests, no network
 | `test_matching.py` | The shared ranking, `where`, the seed's assignments, layering |
 | `test_loader.py` | Who gets which method, placeholders, the report, the outputs |
 | `test_conformance.py` | One failing case per rule; a failure stops the loader before it writes |
+| `test_patch.py` | The define patch loop: placeholders listed, answers applied, leaves, the rewrite |

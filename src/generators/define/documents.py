@@ -33,3 +33,24 @@ class Documents(define_object.DefineObject):
         lf = DEFINE.leaf(ID=leaf_id, href=doc["href"])
         lf.title = DEFINE.title(_content=doc["title"])
         return lf
+
+
+class Resources(Documents):
+    """
+    DDS root ``resources`` (DDS_FOR_METHODS.md D9): each DocumentReference with a leafID, such as a
+    method's supporting PDF, becomes a def:leaf. Resource entries (no leafID) describe data sources
+    and have no Define-XML 2.1 counterpart, so they are skipped. A leaf another section already wrote
+    (the annotated CRF, a legacy documents entry) is written once.
+    """
+    def create_define_objects(self, template, define_objects, lang, acrf):
+        self.lang = lang
+        for doc in template or []:
+            if not isinstance(doc, dict) or not doc.get("leafID"):
+                continue
+            leaf_id = doc["leafID"]
+            if self.find_object(define_objects["leaf"], leaf_id) is not None:
+                continue
+            context = f"resources {leaf_id}"
+            leaf = self._create_leaf_object(leaf_id, {"href": self.require_key(doc, "href", context),
+                                                      "title": self.require_key(doc, "title", context)})
+            define_objects["leaf"].append(leaf)

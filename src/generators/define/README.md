@@ -41,9 +41,12 @@ following Define-XML element types under `MetaDataVersion`:
   `NamedDestination`s. Post-processing remains a safety net: a `Derived` ItemDef whose ItemRef has no `MethodOID`
   gets a `__PLACEHOLDER__` MethodDef, each one logged. In the pipeline (stage G) the generator reads
   `dds-defaults.json`, where the defaults loader (`src/loaders/defaults/`, stage F) has filled well-known lengths
-  and origins; until the methods loader exists, each Derived origin gets one of these placeholders
+  and origins; on the methods loader's output (`src/loaders/methods/`) every Derived item already names a method,
+  so post-processing makes none
 - `CommentDef` — comments
-- `def:leaf` / Documents — supporting document references, including the annotated CRF
+- `def:leaf` / Documents — supporting document references: the annotated CRF (`annotatedCRFs`), the DDS root
+  `resources` entries that have a `leafID` (a method's supporting PDF; Resource entries without one are skipped)
+  and the legacy root `documents` list. Each leaf is written once
 
 ## Prerequisites
 - **Python 3.10 or higher** (the code uses `X | None` union type hints).

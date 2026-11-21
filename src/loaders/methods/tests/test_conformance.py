@@ -69,6 +69,30 @@ class TestRules:
         assert conformance.method_problems(method) == [
             f"expression 1 has {len(bodies)} bodies; ODM v2.0 needs exactly one of expression or externalCodeLib"]
 
+    def test_rules_42_43_a_document_names_a_defined_leaf(self):
+        dds = one_item(origin=DERIVED, method="MT.LB.CUSTOM")
+        dds["methods"][0]["documents"] = [{"leafID": "LF.NONE", "pages": [2]}, {"pages": [3]}]
+        assert problems(dds) == [
+            "MT.LB.CUSTOM: document 1: leaf LF.NONE is not defined in resources, documents or annotatedCRFs (rule 43)",
+            "MT.LB.CUSTOM: document 2 has no leafID (rule 42)"]
+
+    @pytest.mark.parametrize("where, leaf", [
+        ("resources", {"OID": "LF.X", "leafID": "LF.X", "title": "X", "href": "x.pdf"}),
+        ("documents", {"ID": "LF.X", "title": "X", "href": "x.pdf"}),
+        ("annotatedCRFs", {"leafID": "LF.X", "href": "acrf.pdf"}),
+    ])
+    def test_a_leaf_from_resources_documents_or_the_acrf_conforms(self, where, leaf):
+        dds = one_item(origin=DERIVED, method="MT.LB.CUSTOM")
+        dds["methods"][0]["documents"] = [{"leafID": "LF.X", "pages": [2]}]
+        dds[where] = [leaf]
+        assert problems(dds) == []
+
+    def test_an_acrf_without_a_leaf_id_is_lf_acrf(self):
+        dds = one_item(origin=DERIVED, method="MT.LB.CUSTOM")
+        dds["methods"][0]["documents"] = [{"leafID": "LF.acrf"}]
+        dds["annotatedCRFs"] = [{"href": "acrf.pdf"}]
+        assert problems(dds) == []
+
     def test_a_method_oid_appears_once(self):
         dds = one_item(origin=DERIVED, method="MT.LB.CUSTOM")
         dds["methods"].append(copy.deepcopy(CUSTOM))

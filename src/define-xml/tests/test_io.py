@@ -8,6 +8,8 @@ Tests for file I/O methods:
 """
 
 import json
+import sys
+from pathlib import Path
 import yaml
 import pytest
 
@@ -253,6 +255,57 @@ class TestApplyPatch:
         patch_file = _make_patch_file(tmp_path, "items:\n  IT.VS.VSORRES:\n    length: 20\n")
         processor.apply_patch(patch_file)
         assert processor.template["itemGroups"][0]["items"][0]["length"] == 20
+
+    def test_ignores_the_methods_and_resources_sections(self, processor, tmp_path):
+        """The methods loader adds methods and resources to the define patch; Stage A applies only
+        its own sections and adds nothing else."""
+        ig = {
+            **_minimal_item_group(key_sequence=["STUDYID"]),
+            "items": [{"OID": "IT.VS.VSORRES", "name": "VSORRES", "length": None}],
+        }
+        processor.item_groups = [ig]
+        processor.template["itemGroups"] = processor.item_groups
+        processor.code_lists_map = {}
+        patch_file = _make_patch_file(tmp_path, (
+            "items:\n  IT.VS.VSORRES:\n    length: 20\n"
+            "methods:\n  MT.VS.VSORRES:\n    name: Algorithm to derive VSORRES\n    type: Computation\n"
+            "    description: Weight / height squared.\n    documents:\n      - leafID: LF.VS\n        pages: [3, 4]\n"
+            "resources:\n  LF.VS:\n    title: VS derivations\n    href: vs.pdf\n"))
+        processor.apply_patch(patch_file)
+        assert processor.template["itemGroups"][0]["items"][0]["length"] == 20
+        assert "methods" not in processor.template or processor.template["methods"] in ([], None)
+        assert "resources" not in processor.template
+
+    def test_reads_a_patch_the_methods_loader_wrote(self, processor, tmp_path):
+        """Round trip: ``loaders/common/define_patch.write`` with a methods section, read by Stage A."""
+        src = Path(__file__).resolve().parents[2]
+        if str(src) not in sys.path:
+            sys.path.insert(0, str(src))
+        from loaders.common import define_patch
+
+        ig = {
+            **_minimal_item_group(key_sequence=["STUDYID"]),
+            "items": [{"OID": "IT.VS.VSORRES", "name": "VSORRES", "dataType": "text", "length": None,
+                       "origin": [{"type": "Derived", "source": "Sponsor"}], "method": "MT.VS.VSORRES"}],
+        }
+        dds = {"studyName": "T", "itemGroups": [ig],
+               "methods": [{"OID": "MT.VS.VSORRES", "name": "Algorithm to derive VSORRES", "type": "Computation",
+                            "description": "__PLACEHOLDER__", "signature": {"parameters": [], "returnValues": []}}]}
+        answers = define_patch.empty()
+        answers["items"]["IT.VS.VSORRES"] = {"length": 20}
+        answers["methods"]["MT.VS.VSORRES"] = {"description": "Weight / height squared.",
+                                               "documents": [{"leafID": "LF.VS", "pages": [3]}]}
+        answers["resources"]["LF.VS"] = {"title": "VS derivations", "href": "vs.pdf"}
+        patch_file = tmp_path / "define-patch.yaml"
+        define_patch.write(patch_file, dds, define_patch.collect_remaining(dds), answers, writer="methods")
+        assert "methods:" in patch_file.read_text() and "resources:" in patch_file.read_text()
+
+        processor.item_groups = [ig]
+        processor.template["itemGroups"] = processor.item_groups
+        processor.code_lists_map = {}
+        processor.apply_patch(str(patch_file))
+        assert processor.template["itemGroups"][0]["items"][0]["length"] == 20
+        assert "resources" not in processor.template
 
     def test_applies_origin_type_and_source(self, processor, tmp_path):
         ig = {

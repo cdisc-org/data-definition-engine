@@ -59,6 +59,7 @@ import yaml
 SRC = Path(__file__).resolve().parents[1]
 STAGES = ("A", "B", "C", "D", "E", "F", "G")
 PLACEHOLDER = "__PLACEHOLDER__"
+METHOD_SECTIONS = ("methods", "resources")   # the define patch sections the methods loader answers
 DEFAULT_DICTIONARY = SRC.parent / "data" / "defaults" / "well_known_defaults.json"
 
 
@@ -294,6 +295,7 @@ class Pipeline:
         patch = self.study.define_patch if self.study.define_patch.exists() else self.study.define_patch_stage_a
         items = {
             "define patch open values": _count_open(patch),
+            "define patch open methods": _count_open(patch, methods=True),
             "CRF mappingReview": len(_load_yaml(self.study.crf_refinement).get("mappingReview") or {}),
         }
         refs = _load_json(self.study.output_dir / "acrf.pagerefs.json")
@@ -332,15 +334,16 @@ def _load_json(path: Path) -> dict[str, Any]:
         return {}
 
 
-def _count_open(path: Path) -> int:
-    """Values still to fill in a define patch: each ``__PLACEHOLDER__`` and each null."""
+def _count_open(path: Path, methods: bool = False) -> int:
+    """Values still to fill in a define patch: each ``__PLACEHOLDER__`` and each null, in the
+    ``methods`` and ``resources`` sections (``methods=True``) or in the others."""
     def walk(value: Any) -> int:
         if isinstance(value, dict):
             return sum(walk(v) for v in value.values())
         if isinstance(value, list):
             return sum(walk(v) for v in value)
         return 1 if value is None or value == PLACEHOLDER else 0
-    return walk(_load_yaml(path))
+    return walk({k: v for k, v in _load_yaml(path).items() if (k in METHOD_SECTIONS) == methods})
 
 
 def main(argv: list[str] | None = None) -> int:

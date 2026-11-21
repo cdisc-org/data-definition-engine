@@ -186,3 +186,16 @@ def test_an_unusable_study_yaml(tmp_path, capsys):
     path.write_text("study: X\n")
     assert P.main(["--study", str(path)]) == 1
     assert "has no usdm_file" in capsys.readouterr().err
+
+
+def test_open_methods_are_counted_apart(study_yaml):
+    study = P.load_study(study_yaml)
+    study.output_dir.mkdir(parents=True, exist_ok=True)
+    study.define_patch.write_text(yaml.safe_dump({
+        "items": {"IT.X": {"length": None}},
+        "methods": {"MT.AE.AEENRF": {"name": "Algorithm to derive AEENRF", "type": "Computation",
+                                     "description": "__PLACEHOLDER__"},
+                    "MT.RS.RSLNKGRP": {"description": "Answered."}},
+        "resources": {"LF.AE": {"title": "AE derivations", "href": "__PLACEHOLDER__"}}}))
+    items = P.Pipeline(study, runner=Recorder(), echo=lambda _: None).open_items()
+    assert items["define patch open values"] == 1 and items["define patch open methods"] == 2

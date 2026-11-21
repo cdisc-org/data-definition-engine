@@ -22,8 +22,10 @@ pagerefs loader removes the origin of a value-list parent on purpose. A ``length
 text, integer and float items, ``significantDigits`` only on float ones, and an entry whose
 dataType differs from the item's contributes no type-dependent field.
 
-The loader then rewrites ``define-patch.yaml`` with what is still open plus every answered value,
-and writes ``defaults-report.yaml``.
+The loader then rewrites ``define-patch.yaml`` with what is still open plus every answered value
+(``--patch_read_only`` applies the answers without rewriting it: in the pipeline the methods loader,
+which runs next, owns the rewrite), and writes ``defaults-report.yaml``. A rewrite carries the
+``methods`` and ``resources`` answers over for the methods loader to apply.
 """
 from __future__ import annotations
 
@@ -74,6 +76,8 @@ class DefaultsLoader:
             self.answers = define_patch.read_answers(patch_file)
         except (OSError, json.JSONDecodeError, yaml.YAMLError) as exc:
             raise DefaultsError(str(exc)) from exc
+        except define_patch.PatchError as exc:
+            raise DefaultsError(f"{patch_file}: {exc}") from exc
         try:
             self.dictionary = Dictionary.load(defaults or [DEFAULT_DICTIONARY])
         except DictionaryError as exc:
@@ -199,7 +203,7 @@ class DefaultsLoader:
         return found
 
     def open_items(self) -> dict[str, int]:
-        return {"define patch values": define_patch.count_open(self.remaining),
+        return {"define patch values": define_patch.count_open(self.remaining, define_patch.CORE_SECTIONS),
                 "noPages": len(self.report.no_pages),
                 "CRF placeholders": sum(len(v) for v in self.remaining_crf().values())}
 
@@ -218,7 +222,7 @@ class DefaultsLoader:
         lines += [f"  filled {field:.<19} {count}" for field, count in sorted(r.filled.items())]
         lines += [
             f"  from define-patch answers  {r.answered}",
-            f"  Derived origins filled ... {len(r.derived)} (each gets a MethodDef placeholder in define.xml)",
+            f"  Derived origins filled ... {len(r.derived)} (the methods loader attaches a method to each)",
             f"  dataType conflicts ....... {sum(len(v) for v in r.conflicts.values())}",
             f"  unmatched entries ........ {len(self.dictionary.unmatched())}",
         ]
@@ -248,12 +252,18 @@ def set_cmd_line_args() -> argparse.Namespace:
     parser.add_argument("--patch_file",
                         help="the define-patch.yaml: its answers are applied, then it is rewritten "
                              "with what is still open plus every answered value")
+    parser.add_argument("--patch_read_only", action="store_true",
+                        help="apply the --patch_file answers without rewriting the file (in the pipeline "
+                             "the methods loader rewrites it)")
     parser.add_argument("--report", help="the defaults-report.yaml to write")
     parser.add_argument("--validate", nargs="?", const="default", default=None,
                         help="validate the output against the CRF profile JSON Schema")
     parser.add_argument("-l", "--log-level", default="INFO",
                         choices=["DEBUG", "INFO", "WARNING", "ERROR"])
-    return parser.parse_args()
+    args = parser.parse_args()
+    if args.patch_read_only and not args.patch_file:
+        parser.error("--patch_read_only needs --patch_file")
+    return args
 
 
 def main() -> None:
@@ -270,7 +280,7 @@ def main() -> None:
         sys.exit(1)
     loader.save()
     print(f"✅ DDS with defaults written to {args.dds_out}")
-    if args.patch_file:
+    if args.patch_file and not args.patch_read_only:
         loader.write_patch(args.patch_file)
         print(f"✅ define patch (what is still open) written to {args.patch_file}")
     if args.report:

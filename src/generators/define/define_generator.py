@@ -45,6 +45,9 @@ SECTION_ORDER = [
     "conceptProperties",
     "dictionaries",
     "documents",
+    # DDS root resources: the DocumentReference entries with a leafID (method PDFs, D9); documents
+    # above is the legacy list, kept as a fallback
+    "resources",
     "comments",
     "conditions",
     "methods",
@@ -66,6 +69,7 @@ LOADERS = {
     "dictionaries": dictionaries.Dictionaries,
     "comments": comments.Comments,
     "documents": documents.Documents,
+    "resources": documents.Resources,
 }
 
 """

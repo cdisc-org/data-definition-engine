@@ -44,14 +44,14 @@ class DefineObject(ABC):
 
     def find_object(self, objects: list[Any], oid: str) -> Any | None:
         """
-        Find an object in a list by its OID attribute.
+        Find an object in a list by its OID attribute, or by its ID for a def:leaf (which has no OID).
 
-        :param objects: list of odmlib objects with OID attribute
-        :param oid: OID to search for
+        :param objects: list of odmlib objects with an OID (or, for leaf, an ID) attribute
+        :param oid: OID (or leaf ID) to search for
         :return: object with matching OID or None if not found
         """
         for o in objects:
-            if oid == o.OID:
+            if oid == getattr(o, "OID", None) or oid == getattr(o, "ID", None):
                 return o
         return None
 

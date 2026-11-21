@@ -88,7 +88,7 @@ class TestPlaceholders:
         assert placeholder == {"OID": "MT.AE.AEENRF", "name": "Algorithm to derive AEENRF", "type": "Computation",
                                "description": PLACEHOLDER, "signature": {"parameters": [], "returnValues": []}}
         assert loader.report.placeholders == {"MT.AE.AEENRF": ["IT.AE.AEENRF"]}
-        assert loader.open_items() == {"placeholder methods": 1}
+        assert loader.open_items()["define patch methods"] == 1
 
 
 class TestReport:
@@ -100,7 +100,8 @@ class TestReport:
         loader = run(dds)
         loader.write_report(str(tmp_path / "methods-report.yaml"))
         report = yaml.safe_load((tmp_path / "methods-report.yaml").read_text(encoding="utf-8"))
-        assert list(report) == ["assigned", "placeholders", "kept", "bothLevels", "unmatched", "unreferenced"]
+        assert list(report) == ["assigned", "placeholders", "answered", "openLeaves", "kept", "bothLevels",
+                                "unmatched", "unreferenced"]
         assert report["assigned"]["MT.STRESN"] == {"assignments": ["--STRESN (sdtm_methods.json)"],
                                                    "items": ["IT.QS.QSSTRESN", "IT.QS.QSSTRESN.TOTAL"]}
         assert "RFSTDTC (sdtm_methods.json) -> MT.RFSTDTC" in report["unmatched"]

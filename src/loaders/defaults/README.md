@@ -30,6 +30,7 @@ python -m loaders.defaults \
 | `--dds_in`, `--dds_out` | The pagerefs loader's DDS and the DDS to write. They must differ, so a re-run starts from the same input. |
 | `--defaults` | One or more dictionaries; later files win. Default: `data/defaults/well_known_defaults.json`. |
 | `--patch_file` | The `define-patch.yaml`: its answers are applied, then it is rewritten with what is still open plus every answered value. |
+| `--patch_read_only` | Apply the `--patch_file` answers without rewriting the file. In the pipeline the methods loader runs next and owns the rewrite (methods plan M4). A rewrite by this loader carries the `methods` and `resources` answers over for the methods loader. |
 | `--report` | The `defaults-report.yaml` to write. |
 | `--validate` | Validate the output against the CRF profile JSON Schema. |
 

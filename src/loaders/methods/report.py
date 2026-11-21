@@ -7,6 +7,10 @@ Sections:
   (``--SEQ (sdtm_methods.json)``) and the items it serves;
 * ``placeholders`` — each method whose description is still ``__PLACEHOLDER__``, with the items it
   serves: a study-specific derivation for a person to write;
+* ``answered`` — placeholder methods (and the leaves they reference) filled from define-patch
+  answers, with the fields each answer filled;
+* ``openLeaves`` — leaves a method answer references but ``resources`` does not define yet: the
+  define patch lists them for a title and href, and the document waits until then;
 * ``kept`` — Derived items that already named a method, left as they were;
 * ``bothLevels`` — variables Derived both on the value-list parent and at value level: both get a
   method so rule 73 holds, but one level is usually enough;
@@ -38,6 +42,8 @@ class Report:
     def __init__(self) -> None:
         self.assigned: dict[str, dict[str, Any]] = {}
         self.placeholders: dict[str, list[str]] = {}
+        self.answered: dict[str, list[str]] = {}
+        self.open_leaves: dict[str, dict[str, Any]] = {}
         self.kept: dict[str, str] = {}
         self.both_levels: dict[str, dict[str, Any]] = {}
         self.unreferenced: list[str] = []
@@ -61,6 +67,8 @@ class Report:
         content = {
             "assigned": self.assigned,
             "placeholders": self.placeholders,
+            "answered": self.answered,
+            "openLeaves": sorted(self.open_leaves),
             "kept": self.kept,
             "bothLevels": self.both_levels,
             "unmatched": [source(a) + f" -> {a.method}" for a in unmatched],
