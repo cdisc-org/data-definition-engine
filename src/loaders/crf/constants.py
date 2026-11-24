@@ -76,7 +76,9 @@ ALIAS_CONTEXTS = frozenset({
 #: Origins assigned to CRF items by how the item is populated.
 ORIGIN_COLLECTED = {"type": "Collected", "source": "Investigator"}
 ORIGIN_PROTOCOL = {"type": "Protocol", "source": "Sponsor"}
-ORIGIN_ASSIGNED = {"type": "Assigned", "source": "Sponsor"}
+#: A derived field (CRF Specialization derived_variable = Y, such as BMI) stays Derived, aCRF pages or
+#: not (SDTM-MSG v2.0 §5.5.3), so the methods loader attaches its method (methods plan open item 2).
+ORIGIN_DERIVED = {"type": "Derived", "source": "Sponsor"}
 
 
 def generate_oid(descriptors: list[str]) -> str:

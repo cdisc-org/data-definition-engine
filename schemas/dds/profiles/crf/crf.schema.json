@@ -150,7 +150,7 @@
             "type": "object",
             "required": ["type", "source"],
             "properties": {
-              "type": {"enum": ["Collected", "Assigned", "Protocol"]},
+              "type": {"enum": ["Collected", "Derived", "Assigned", "Protocol"]},
               "source": {"type": "string", "minLength": 1}
             }
           }

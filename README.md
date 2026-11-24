@@ -49,6 +49,7 @@ flowchart LR
     LIB[("CDISC Library<br/>BCs · Specializations<br/>CDASHIG · CT")]
     CSV["CRF Specializations<br/>(draft CSV)"]
     DICT["Defaults dictionary<br/>(JSON)"]
+    METH["SDTM method library<br/>(JSON)"]
 
     DL["Define loader<br/>create_define_json.py"]
     CL["CRF loader<br/>crf_loader.py"]
@@ -56,6 +57,7 @@ flowchart LR
     CDDS[/"Combined DDS<br/>Define + CRF metadata"/]
     PR["Pagerefs loader<br/>aCRF pages → Origin"]
     DFL["Defaults loader<br/>well-known defaults"]
+    ML["Methods loader<br/>SDTM methods"]
     FDDS[/"Final DDS"/]
 
     DG["Define generator<br/>define_generator.py"]
@@ -78,7 +80,9 @@ flowchart LR
     CDDS --> PR
     PR --> DFL
     DICT --> DFL
-    DFL --> FDDS
+    DFL --> ML
+    METH --> ML
+    ML --> FDDS
     FDDS --> DG
     DG --> DX
 ```
@@ -87,6 +91,7 @@ flowchart LR
 - The **CRF loader** is an *enrichment* loader — DDS in, DDS out. It reads the Define DDS and the USDM schedule of activities, picks a CRF Specialization for each Biomedical Concept, fills it out from CDASHIG and CDASH Controlled Terminology, and writes a **combined DDS** carrying both Define-XML and CRF metadata.
 - The **pagerefs loader** reads the page each annotation lands on in the rendered aCRF (crfutils `crfpdf`) and writes each Define item's Origin with its aCRF pages.
 - The **defaults loader** fills what is still unfilled from a dictionary of well-known defaults (STUDYID is Protocol/Sponsor, --SEQ is Derived/Sponsor with length 3, --TESTCD has at most 8 characters) and never changes a value another loader wrote. The define.xml at this stage is a specification built before any data exist, so these are specification values, which the sponsor can change.
+- The **methods loader** gives every Derived variable a method from a library of standard SDTM derivations (one `MT.SEQ` for every --SEQ), or a placeholder method that a person writes in the define patch, so the define.xml carries reviewed MethodDefs.
 - Each **generator** reads the whole DDS file and ignores the sections it does not own: the Define generator skips forms, sections and study events; the CRF generator skips tabulation datasets, where clauses and methods.
 - The CRF generator always embeds the SDTM mapping annotations, so **one ODM file is both the blank CRF and the annotated CRF (aCRF)**. Which one you see is a rendering choice.
 
@@ -280,18 +285,30 @@ Combined DDS → ODM CRF, version 1.3.2 or 2.0 from the same input. Requires **o
 
 ### Defaults loader — `src/loaders/defaults`
 
-DDS → DDS with well-known defaults (pipeline stage F). Fills lengths, origins and display formats that are still unfilled from one or more dictionaries ([`data/defaults/`](data/defaults/README.md), schema [`schemas/defaults/`](schemas/defaults/defaults.schema.json)), then rewrites `define-patch.yaml` with what is still open. [Full reference](src/loaders/defaults/README.md); design and seed tables in [`DEFAULT_METADATA_LOADER.md`](DEFAULT_METADATA_LOADER.md).
+DDS → DDS with well-known defaults (pipeline stage F). Fills lengths, origins and display formats that are still unfilled from one or more dictionaries ([`data/defaults/`](data/defaults/README.md), schema [`schemas/defaults/`](schemas/defaults/defaults.schema.json)). Run on its own, it then rewrites `define-patch.yaml` with what is still open; in the pipeline it only reads the patch, and the methods loader rewrites it. [Full reference](src/loaders/defaults/README.md); design and seed tables in [`DEFAULT_METADATA_LOADER.md`](DEFAULT_METADATA_LOADER.md).
 
 | Option | Purpose |
 |---|---|
 | `--dds_in`, `--dds_out` | Input DDS (the pagerefs loader's) and output DDS (required) |
 | `--defaults` | One or more dictionaries, later files win (default `data/defaults/well_known_defaults.json`) |
 | `--patch_file` | The define patch: its answers are applied, then it is rewritten with what is still open plus every answered value |
+| `--patch_read_only` | Apply the `--patch_file` answers without rewriting the file (the pipeline passes it) |
 | `--report` | Write `defaults-report.yaml`: what was filled, dataType conflicts, Collected/Investigator origins without aCRF pages, unmatched entries |
+
+### Methods loader — `src/loaders/methods`
+
+DDS → DDS with a method on every Derived item (pipeline stage G). Each Define item with a Derived origin gets a method from a sponsor-editable library of standard SDTM derivations ([`data/methods/`](data/methods/README.md), schema [`schemas/methods/`](schemas/methods/methods.schema.json)), or a placeholder method for a person to write in the `methods` section of `define-patch.yaml`. It checks the Define-XML 2.1 method rules, then rewrites the define patch with what is still open. [Full reference](src/loaders/methods/README.md); design in `Plan SDTM MethodDef Loader for the DDS.md`.
+
+| Option | Purpose |
+|---|---|
+| `--dds_in`, `--dds_out` | Input DDS (the defaults loader's) and output DDS (required) |
+| `--methods` | One or more libraries, later files win (default `data/methods/sdtm_methods.json`) |
+| `--patch_file` | The define patch: its `methods` and `resources` answers are applied, then the whole file is rewritten with what is still open plus every answered value |
+| `--report` | Write `methods-report.yaml`: the methods assigned, the placeholders, the answers applied, unmatched assignments |
 
 ### Pipeline — `src/pipeline`
 
-Runs stages A-G for one study from its `pipeline.yaml`: the Define loader, CRF loader, CRF generator, crfutils `crfvalidate`/`crfpdf`, the pagerefs loader (`src/loaders/pagerefs`), the defaults loader and the Define generator. `--from`/`--to` re-run part of it, `--strict` fails while a review item is open, and `--dry-run` prints the commands. [Full reference](src/pipeline/README.md).
+Runs stages A-H for one study from its `pipeline.yaml`: the Define loader, CRF loader, CRF generator, crfutils `crfvalidate`/`crfpdf`, the pagerefs loader (`src/loaders/pagerefs`), the defaults loader, the methods loader and the Define generator. `--from`/`--to` re-run part of it (`--from G` after answering method placeholders), `--strict` fails while a review item is open, and `--dry-run` prints the commands. [Full reference](src/pipeline/README.md).
 
 ---
 
@@ -303,11 +320,13 @@ data-definition-engine/
 │   ├── protocols/NCT01797120/     # USDM 4.0 study from SoA Workbench
 │   ├── crf_specializations/       # Draft CDISC CRF Specializations (CSV) + PROVENANCE.md
 │   ├── defaults/                  # Well-known defaults dictionaries for the defaults loader
+│   ├── methods/                   # SDTM method library for the methods loader
 │   └── metadata_xlsx/             # SDTM/ADaM metadata spreadsheets and the Define Excel template
 ├── documents/                     # Solution overview, glossary, presentations
 ├── schemas/                       # Vendored schemas (see schemas/README.md)
 │   ├── dds/                       # DDS LinkML model, and profiles/crf (CRF profile)
 │   ├── defaults/                  # JSON Schema of the defaults dictionary (DDE-owned)
+│   ├── methods/                   # JSON Schema of the method library (DDE-owned)
 │   ├── define/                    # Define-XML 2.0 and 2.1 XSDs
 │   └── odm/                       # ODM 1.3.2 and 2.0 XSDs
 ├── stylesheets/                   # ODM 1.3.2 and 2.0 CRF stylesheets (XSLT 2.0)
@@ -318,8 +337,9 @@ data-definition-engine/
     │   ├── common/                # Shared loader utilities (DDS I/O, USDM, Library cache, patching)
     │   ├── crf/                   # CRF loader: Define DDS + USDM -> combined DDS
     │   ├── pagerefs/              # Pagerefs loader: aCRF page references -> Define Origin
-    │   └── defaults/              # Defaults loader: well-known defaults for what is still unfilled
-    ├── pipeline/                  # The driver: stages A-G for one study
+    │   ├── defaults/              # Defaults loader: well-known defaults for what is still unfilled
+    │   └── methods/               # Methods loader: a method for every Derived item
+    ├── pipeline/                  # The driver: stages A-H for one study
     ├── generators/
     │   ├── define/                # Define generator: DDS -> Define-XML v2.1 (+ define2-1.xsl)
     │   └── crf/                   # CRF generator: DDS -> ODM 1.3.2 / 2.0 (targets/ holds version differences)
@@ -337,6 +357,7 @@ cd src/define-xml         && pytest tests
 cd src/loaders/crf        && pytest
 cd src/loaders/pagerefs   && pytest
 cd src/loaders/defaults   && pytest
+cd src/loaders/methods    && pytest
 cd src/pipeline           && pytest
 cd src/generators/define  && pytest
 cd src/generators/crf     && pytest

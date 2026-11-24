@@ -1,0 +1,454 @@
+{
+  "$schema": "../../../../../schemas/methods/methods.schema.json",
+  "schemaVersion": "1.0",
+  "name": "SDTM-MSG v2.0 study file",
+  "description": "A test study file listed after the shared seed (data/methods/sdtm_methods.json). It adds the 13 SDTM-MSG v2.0 methods the seed does not ship and the assignments for the 14 items the seed alone gives another method or a placeholder, so the seed plus this file reproduces every method assignment in the MSG v2.0 define.xml.",
+  "methods": [
+    {
+      "OID": "MT.AEENTPT",
+      "name": "Algorithm to derive AEENTPT",
+      "type": "Computation",
+      "description": "If AEENRTPT is populated, AEENTPT is DM.RFPENDTC for the subject.",
+      "signature": {
+        "parameters": [
+          {
+            "name": "AEENRTPT",
+            "dataType": "text",
+            "description": "End relative to reference time point",
+            "orderNumber": 1
+          },
+          {
+            "name": "RFPENDTC",
+            "dataType": "datetime",
+            "description": "End of participation, from DM",
+            "orderNumber": 2
+          }
+        ],
+        "returnValues": [
+          {
+            "name": "AEENTPT",
+            "dataType": "date",
+            "description": "End reference time point",
+            "orderNumber": 1
+          }
+        ]
+      },
+      "basis": "SDTM-MSG v2.0 define.xml MT.AEENTPT, verbatim; draft signature."
+    },
+    {
+      "OID": "MT.CMENTPT",
+      "name": "Algorithm to derive CMENTPT",
+      "type": "Computation",
+      "description": "If CMENRTPT is populated, CMENTPT is DM.RFPENDTC for the subject.",
+      "signature": {
+        "parameters": [
+          {
+            "name": "CMENRTPT",
+            "dataType": "text",
+            "description": "End relative to reference time point",
+            "orderNumber": 1
+          },
+          {
+            "name": "RFPENDTC",
+            "dataType": "datetime",
+            "description": "End of participation, from DM",
+            "orderNumber": 2
+          }
+        ],
+        "returnValues": [
+          {
+            "name": "CMENTPT",
+            "dataType": "date",
+            "description": "End reference time point",
+            "orderNumber": 1
+          }
+        ]
+      },
+      "basis": "SDTM-MSG v2.0 define.xml MT.CMENTPT, verbatim; draft signature."
+    },
+    {
+      "OID": "MT.DISEQ",
+      "name": "Algorithm to derive DISEQ",
+      "type": "Computation",
+      "description": "Starts at \"1\" for first device identifier and increments by one for each DIPARM",
+      "signature": {
+        "parameters": [
+          {
+            "name": "SPDEVID",
+            "dataType": "text",
+            "description": "Sponsor device identifier",
+            "orderNumber": 1
+          },
+          {
+            "name": "DIPARM",
+            "dataType": "text",
+            "description": "Device characteristic",
+            "orderNumber": 2
+          }
+        ],
+        "returnValues": [
+          {
+            "name": "DISEQ",
+            "dataType": "integer",
+            "description": "Sequence number within the device",
+            "orderNumber": 1
+          }
+        ]
+      },
+      "basis": "SDTM-MSG v2.0 define.xml MT.DISEQ, verbatim; draft signature."
+    },
+    {
+      "OID": "MT.EXDOSE",
+      "name": "Algorithm to derive EXDOSE",
+      "type": "Computation",
+      "description": "EXDOSE = ECDOSE * ECPSTRG expressed in mg.",
+      "signature": {
+        "parameters": [
+          {
+            "name": "ECDOSE",
+            "dataType": "float",
+            "description": "Dose per administration, in the exposure-as-collected units",
+            "orderNumber": 1
+          },
+          {
+            "name": "ECPSTRG",
+            "dataType": "float",
+            "description": "Pharmaceutical strength",
+            "orderNumber": 2
+          }
+        ],
+        "returnValues": [
+          {
+            "name": "EXDOSE",
+            "dataType": "float",
+            "description": "Dose in mg",
+            "orderNumber": 1
+          }
+        ]
+      },
+      "basis": "SDTM-MSG v2.0 define.xml MT.EXDOSE, verbatim; draft signature."
+    },
+    {
+      "OID": "MT.FTSTRESN",
+      "name": "Algorithm to derive FTSTRESN",
+      "type": "Computation",
+      "description": "If FTSTRESC is numeric then FTSTRESN=FTSTRESC in numeric format, else null.",
+      "signature": {
+        "parameters": [
+          {
+            "name": "FTSTRESC",
+            "dataType": "text",
+            "description": "Result in standard format",
+            "orderNumber": 1
+          }
+        ],
+        "returnValues": [
+          {
+            "name": "FTSTRESN",
+            "dataType": "float",
+            "description": "Numeric result",
+            "orderNumber": 1
+          }
+        ]
+      },
+      "basis": "SDTM-MSG v2.0 define.xml MT.FTSTRESN, verbatim; draft signature."
+    },
+    {
+      "OID": "MT.IEORRES",
+      "name": "Algorithm to derive IEORRES",
+      "type": "Computation",
+      "description": "If IECAT=INCLUSION then IEORRES=N, else if IECAT=EXCLUSION then IEORRES=Y",
+      "signature": {
+        "parameters": [
+          {
+            "name": "IECAT",
+            "dataType": "text",
+            "description": "Inclusion/exclusion category",
+            "orderNumber": 1
+          }
+        ],
+        "returnValues": [
+          {
+            "name": "IEORRES",
+            "dataType": "text",
+            "description": "Criterion not met (N or Y)",
+            "orderNumber": 1
+          }
+        ]
+      },
+      "basis": "SDTM-MSG v2.0 define.xml MT.IEORRES, verbatim; draft signature."
+    },
+    {
+      "OID": "MT.LBSTRESC",
+      "name": "Algorithm to derive LBSTRESC",
+      "type": "Computation",
+      "description": "LBSTRESC is equal to LBORRES or the value in standard units if a conversion is necessary.",
+      "signature": {
+        "parameters": [
+          {
+            "name": "LBORRES",
+            "dataType": "text",
+            "description": "Result as collected",
+            "orderNumber": 1
+          },
+          {
+            "name": "LBORRESU",
+            "dataType": "text",
+            "description": "Original units",
+            "orderNumber": 2
+          },
+          {
+            "name": "LBSTRESU",
+            "dataType": "text",
+            "description": "Standard units",
+            "orderNumber": 3
+          }
+        ],
+        "returnValues": [
+          {
+            "name": "LBSTRESC",
+            "dataType": "text",
+            "description": "Result in standard format",
+            "orderNumber": 1
+          }
+        ]
+      },
+      "basis": "SDTM-MSG v2.0 define.xml MT.LBSTRESC, verbatim; draft signature."
+    },
+    {
+      "OID": "MT.QSSTRESC_PH",
+      "name": "Algorithm to derive QSSTRESC_PH",
+      "type": "Computation",
+      "description": "If QSORRES=\"Not at all\" then 0\nIf QSORRES=\"Several days\" then 1\nIf QSORRES=\"More than half the days\" then 2\nIf QSORRES=\"Nearly every day\" then 3",
+      "signature": {
+        "parameters": [
+          {
+            "name": "QSORRES",
+            "dataType": "text",
+            "description": "PHQ-9 response, questions 1-9",
+            "orderNumber": 1
+          }
+        ],
+        "returnValues": [
+          {
+            "name": "QSSTRESC",
+            "dataType": "integer",
+            "description": "Item score, 0 to 3",
+            "orderNumber": 1
+          }
+        ]
+      },
+      "basis": "SDTM-MSG v2.0 define.xml MT.QSSTRESC_PH, verbatim; draft signature."
+    },
+    {
+      "OID": "MT.QSSTRESC_PH_10_11",
+      "name": "Algorithm to derive QSSTRESC_PH_10_11",
+      "type": "Computation",
+      "description": "QSSTRESC=QSORRES",
+      "signature": {
+        "parameters": [
+          {
+            "name": "QSORRES",
+            "dataType": "text",
+            "description": "PHQ-9 response, question 10",
+            "orderNumber": 1
+          }
+        ],
+        "returnValues": [
+          {
+            "name": "QSSTRESC",
+            "dataType": "text",
+            "description": "Response in standard format",
+            "orderNumber": 1
+          }
+        ]
+      },
+      "basis": "SDTM-MSG v2.0 define.xml MT.QSSTRESC_PH_10_11, verbatim; draft signature."
+    },
+    {
+      "OID": "MT.QSSTRESC_SL",
+      "name": "Algorithm to derive QSSTRESC_SL",
+      "type": "Computation",
+      "description": "If QSORRES=\"Strongly disagree\" then 1\nIf QSORRES=\"Disagree\" then 2\nIf QSORRES=\"Slightly disagree\" then 3\nIf QSORRES=\"Neither agree nor disagree\" then 4\nIf QSORRES=\"Slightly agree\" then 5\nIf QSORRES=\"Agree\" then 6\nIf QSORRES=\"Strongly agree\" then 7",
+      "signature": {
+        "parameters": [
+          {
+            "name": "QSORRES",
+            "dataType": "text",
+            "description": "Agreement scale response",
+            "orderNumber": 1
+          }
+        ],
+        "returnValues": [
+          {
+            "name": "QSSTRESC",
+            "dataType": "text",
+            "description": "Item score, 1 to 7",
+            "orderNumber": 1
+          }
+        ]
+      },
+      "basis": "SDTM-MSG v2.0 define.xml MT.QSSTRESC_SL, verbatim; draft signature."
+    },
+    {
+      "OID": "MT.QSSTRESN",
+      "name": "Algorithm to derive QSSTRESN",
+      "type": "Computation",
+      "description": "If QSSTRESC is numeric then QSSTRESN=QSSTRESC in numeric format, else null.",
+      "signature": {
+        "parameters": [
+          {
+            "name": "QSSTRESC",
+            "dataType": "text",
+            "description": "Result in standard format",
+            "orderNumber": 1
+          }
+        ],
+        "returnValues": [
+          {
+            "name": "QSSTRESN",
+            "dataType": "float",
+            "description": "Numeric result",
+            "orderNumber": 1
+          }
+        ]
+      },
+      "basis": "SDTM-MSG v2.0 define.xml MT.QSSTRESN, verbatim; draft signature."
+    },
+    {
+      "OID": "MT.RSSTRESC",
+      "name": "Algorithm to derive RSSTRESC",
+      "type": "Computation",
+      "description": "RSSTRESC is the corresponding numeric value of RSORRES according the values shown on the HAMD-17 CRF page.",
+      "signature": {
+        "parameters": [
+          {
+            "name": "RSORRES",
+            "dataType": "text",
+            "description": "HAMD-17 response as collected",
+            "orderNumber": 1
+          }
+        ],
+        "returnValues": [
+          {
+            "name": "RSSTRESC",
+            "dataType": "text",
+            "description": "Item score",
+            "orderNumber": 1
+          }
+        ]
+      },
+      "basis": "SDTM-MSG v2.0 define.xml MT.RSSTRESC, verbatim; draft signature."
+    },
+    {
+      "OID": "MT.VSSTRESC",
+      "name": "Algorithm to derive VSSTRESC",
+      "type": "Computation",
+      "description": "Data collected in conventional units (i.e. F, lbs, inches) is converted using standard conversion factors to standard units (C, kg, cm).",
+      "signature": {
+        "parameters": [
+          {
+            "name": "VSORRES",
+            "dataType": "text",
+            "description": "Result as collected",
+            "orderNumber": 1
+          },
+          {
+            "name": "VSORRESU",
+            "dataType": "text",
+            "description": "Original units",
+            "orderNumber": 2
+          },
+          {
+            "name": "VSSTRESU",
+            "dataType": "text",
+            "description": "Standard units",
+            "orderNumber": 3
+          }
+        ],
+        "returnValues": [
+          {
+            "name": "VSSTRESC",
+            "dataType": "text",
+            "description": "Result in standard units",
+            "orderNumber": 1
+          }
+        ]
+      },
+      "basis": "SDTM-MSG v2.0 define.xml MT.VSSTRESC, verbatim; draft signature."
+    }
+  ],
+  "assignments": [
+    {
+      "name": "AEENTPT",
+      "method": "MT.AEENTPT"
+    },
+    {
+      "name": "CMENTPT",
+      "method": "MT.CMENTPT"
+    },
+    {
+      "name": "DISEQ",
+      "method": "MT.DISEQ",
+      "description": "Outranks the seed's --SEQ: an exact name beats a suffix."
+    },
+    {
+      "name": "EXDOSE",
+      "method": "MT.EXDOSE"
+    },
+    {
+      "name": "FTSTRESN",
+      "method": "MT.FTSTRESN"
+    },
+    {
+      "name": "IEORRES",
+      "method": "MT.IEORRES"
+    },
+    {
+      "name": "LBSTRESC",
+      "method": "MT.LBSTRESC"
+    },
+    {
+      "name": "QSSTRESC",
+      "domains": [
+        "QS"
+      ],
+      "where": {
+        "QSTESTCD": "PHQ0101"
+      },
+      "method": "MT.QSSTRESC_PH",
+      "description": "QSPH value level: the where clause QSTESTCD IN (PHQ0101, ..., PHQ0109) admits PHQ0101."
+    },
+    {
+      "name": "QSSTRESC",
+      "domains": [
+        "QS"
+      ],
+      "where": {
+        "QSTESTCD": "PHQ0110"
+      },
+      "method": "MT.QSSTRESC_PH_10_11",
+      "description": "QSPH value level: QSTESTCD = PHQ0110."
+    },
+    {
+      "name": "QSSTRESC",
+      "domains": [
+        "QS"
+      ],
+      "method": "MT.QSSTRESC_SL",
+      "description": "QSSL. QSPH and QSSL are both domain QS, so a where entry above outranks this one for the QSPH value-level items."
+    },
+    {
+      "name": "QSSTRESN",
+      "method": "MT.QSSTRESN"
+    },
+    {
+      "name": "RSSTRESC",
+      "method": "MT.RSSTRESC"
+    },
+    {
+      "name": "VSSTRESC",
+      "method": "MT.VSSTRESC"
+    }
+  ]
+}

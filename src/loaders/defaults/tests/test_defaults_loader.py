@@ -223,6 +223,26 @@ class TestAnswers:
         again = _run(files, patch=patch)
         assert _items(again.dds)["IT.LB.LBSEQ"]["length"] == 5
 
+    def test_a_rewrite_keeps_the_methods_answers_for_the_methods_loader(self, files, tmp_path):
+        # LBSEQ becomes Derived here (--SEQ); its placeholder method is MT.LB.LBSEQ once the methods loader runs
+        method = {"description": "Our LBSEQ.", "documents": [{"leafID": "LF.LB", "pages": [2]}]}
+        unanswered = {"name": "Algorithm to derive STRESN", "type": "Computation", "description": PLACEHOLDER}
+        patch = self._patch(tmp_path, {"methods": {"MT.LB.LBSEQ": method, "MT.LB.LBSTRESN": unanswered,
+                                                   "MT.GONE": {"description": "x"}},
+                                       "resources": {"LF.LB": {"title": "LB", "href": "lb.pdf"},
+                                                     "LF.GONE": {"title": "G", "href": "g.pdf"}}})
+        loader = _run(files, patch=patch)
+        assert "methods" not in loader.dds and "resources" not in loader.dds    # not the defaults loader's to apply
+        loader.write_patch(patch)
+        written = yaml.safe_load(Path(patch).read_text(encoding="utf-8"))
+        assert written["methods"] == {"MT.LB.LBSEQ": method, "MT.LB.LBSTRESN": unanswered}   # still open
+        assert written["resources"] == {"LF.LB": {"title": "LB", "href": "lb.pdf"}}
+
+    def test_an_unusable_method_answer_stops_the_run(self, files, tmp_path):
+        patch = self._patch(tmp_path, {"methods": {"MT.LB.LBSEQ": {"documents": [{"leafID": "LF.LB", "pages": ["LB"]}]}}})
+        with pytest.raises(DefaultsError, match="named destinations"):
+            _run(files, patch=patch)
+
     def test_count_open(self, files):
         loader = _run(files)
         # lengths of LBORNRLO, LBORRES, SE.ETCD, TA.ARM and TA.EPOCH; TA's keySequence; one CL.X term
@@ -286,6 +306,26 @@ class TestOutputs:
         assert written["unmatched"] == ["items EPOCH [not TA] (defaults-0.json)", "items NOSUCH (defaults-0.json)"]
         assert yaml.safe_load(patch.read_text(encoding="utf-8"))["items"]
         assert json.loads(Path(dds_out).read_text(encoding="utf-8"))["itemGroups"]
+
+    def test_patch_read_only_applies_the_answers_and_leaves_the_file_alone(self, files, tmp_path):
+        dds_in, dds_out, paths = files()
+        patch = tmp_path / "define-patch.yaml"
+        patch.write_text(yaml.safe_dump({"items": {"IT.LB.LBSEQ": {"length": 5}}}), encoding="utf-8")
+        before = patch.read_text(encoding="utf-8")
+        completed = subprocess.run(
+            [sys.executable, "-m", "loaders.defaults", "--dds_in", dds_in, "--dds_out", dds_out,
+             "--defaults", *paths, "--patch_file", str(patch), "--patch_read_only"],
+            cwd=SRC, capture_output=True, text=True)
+        assert completed.returncode == 0, completed.stderr
+        assert patch.read_text(encoding="utf-8") == before
+        assert "define patch (what is still open) written" not in completed.stdout
+        assert _items(json.loads(Path(dds_out).read_text(encoding="utf-8")))["IT.LB.LBSEQ"]["length"] == 5
+
+    def test_patch_read_only_needs_a_patch_file(self, files):
+        dds_in, dds_out, paths = files()
+        completed = subprocess.run([sys.executable, "-m", "loaders.defaults", "--dds_in", dds_in,
+                                    "--dds_out", dds_out, "--patch_read_only"], cwd=SRC, capture_output=True, text=True)
+        assert completed.returncode == 2 and "--patch_read_only needs --patch_file" in completed.stderr
 
     def test_the_seeded_output_of_a_combined_dds_validates(self, tmp_path):
         fixture = SRC / "generators" / "crf" / "tests" / "fixtures" / "dds-360i-crf.json"

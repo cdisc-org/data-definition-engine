@@ -1,0 +1,7 @@
+PyYAML==6.0.3
+jsonschema==4.26.0
+odmlib>=0.2.1
+xmlschema>=4.0
+pytest>=7.0.0
+# test_define_output.py runs the Define generator; its conformance checks need defineutils >= 0.4.0 and skip otherwise
+defineutils>=0.2.1

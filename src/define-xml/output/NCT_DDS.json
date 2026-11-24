@@ -3,7 +3,7 @@
   "name": "MDV NCT01797120",
   "description": "Data Definitions for NCT01797120",
   "fileOID": "ODM.DEFINE-JSON.NCT01797120.Version1.Design1",
-  "creationDateTime": "2026-10-25T10:15:45.096623+00:00",
+  "creationDateTime": "2026-10-29T09:16:20.771165+00:00",
   "odmVersion": "1.3.2",
   "fileType": "Snapshot",
   "originator": "Define-JSON Processor",
@@ -10767,7 +10767,12 @@
           "codeSystem": "nci:ExtCodeID"
         }
       ],
-      "codeListItems": []
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
     },
     {
       "OID": "CL.ONCRSR",
@@ -10780,7 +10785,12 @@
           "codeSystem": "nci:ExtCodeID"
         }
       ],
-      "codeListItems": []
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
     },
     {
       "OID": "CL.EVAL",
@@ -11031,6 +11041,10 @@
             "code": "C49673",
             "codeSystem": "nci:ExtCodeID"
           }
+        },
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
         }
       ]
     },
@@ -11045,7 +11059,12 @@
           "codeSystem": "nci:ExtCodeID"
         }
       ],
-      "codeListItems": []
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
     },
     {
       "OID": "CL.VSRESU_WT",
@@ -11058,7 +11077,12 @@
           "codeSystem": "nci:ExtCodeID"
         }
       ],
-      "codeListItems": []
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
     },
     {
       "OID": "CL.LOC",
@@ -11211,7 +11235,12 @@
           "codeSystem": "nci:ExtCodeID"
         }
       ],
-      "codeListItems": []
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
     },
     {
       "OID": "CL.LBTESTCD",
@@ -11894,6 +11923,10 @@
       ],
       "codeListItems": [
         {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        },
+        {
           "codedValue": "s",
           "decode": "sec",
           "coding": {
@@ -11954,7 +11987,12 @@
           "codeSystem": "nci:ExtCodeID"
         }
       ],
-      "codeListItems": []
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
     },
     {
       "OID": "CL.NRIND",
@@ -11967,7 +12005,12 @@
           "codeSystem": "nci:ExtCodeID"
         }
       ],
-      "codeListItems": []
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
     },
     {
       "OID": "CL.SPECTYPE",
@@ -12160,7 +12203,12 @@
           "codeSystem": "nci:ExtCodeID"
         }
       ],
-      "codeListItems": []
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
     },
     {
       "OID": "CL.FRM",
@@ -12173,7 +12221,12 @@
           "codeSystem": "nci:ExtCodeID"
         }
       ],
-      "codeListItems": []
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
     },
     {
       "OID": "CL.FREQ",
@@ -12186,7 +12239,12 @@
           "codeSystem": "nci:ExtCodeID"
         }
       ],
-      "codeListItems": []
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
     },
     {
       "OID": "CL.ROUTE",
@@ -12199,7 +12257,12 @@
           "codeSystem": "nci:ExtCodeID"
         }
       ],
-      "codeListItems": []
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
     },
     {
       "OID": "CL.STENRF",
@@ -12212,7 +12275,12 @@
           "codeSystem": "nci:ExtCodeID"
         }
       ],
-      "codeListItems": []
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
     },
     {
       "OID": "CL.NY_Y",
@@ -12225,7 +12293,12 @@
           "codeSystem": "nci:ExtCodeID"
         }
       ],
-      "codeListItems": []
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
     },
     {
       "OID": "CL.RETESTCD",
@@ -12486,7 +12559,12 @@
           "codeSystem": "nci:ExtCodeID"
         }
       ],
-      "codeListItems": []
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
     },
     {
       "OID": "CL.DIR",
@@ -12499,7 +12577,12 @@
           "codeSystem": "nci:ExtCodeID"
         }
       ],
-      "codeListItems": []
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
     },
     {
       "OID": "CL.AESEV",
@@ -12512,7 +12595,12 @@
           "codeSystem": "nci:ExtCodeID"
         }
       ],
-      "codeListItems": []
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
     },
     {
       "OID": "CL.ACN",
@@ -12525,7 +12613,12 @@
           "codeSystem": "nci:ExtCodeID"
         }
       ],
-      "codeListItems": []
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
     },
     {
       "OID": "CL.OUT",
@@ -12538,7 +12631,12 @@
           "codeSystem": "nci:ExtCodeID"
         }
       ],
-      "codeListItems": []
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
     },
     {
       "OID": "CL.TRTESTCD",
@@ -12643,7 +12741,12 @@
           "codeSystem": "nci:ExtCodeID"
         }
       ],
-      "codeListItems": []
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
     },
     {
       "OID": "CL.TUTESTCD",
@@ -12772,6 +12875,10 @@
             "code": "C94520",
             "codeSystem": "nci:ExtCodeID"
           }
+        },
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
         }
       ]
     },
@@ -12990,7 +13097,12 @@
           "codeSystem": "nci:ExtCodeID"
         }
       ],
-      "codeListItems": []
+      "codeListItems": [
+        {
+          "codedValue": "__PLACEHOLDER__",
+          "decode": "__PLACEHOLDER__"
+        }
+      ]
     },
     {
       "OID": "CL.CNTMODE",

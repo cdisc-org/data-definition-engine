@@ -26,6 +26,8 @@ import re
 from dataclasses import dataclass, field
 from typing import Any
 
+from ...common.where_clauses import admits, item_where  # noqa: F401 (admits is re-exported)
+
 # mapping codes recorded in crfSdtmTarget.mapping and emitted as Alias SDTMMappingType
 DIRECT = "direct"
 CONCATENATED = "concatenated"
@@ -218,17 +220,6 @@ def mapping_type(cdash_variable: str, annotation: Annotation, library_variables:
 # --------------------------------------------------------------------------------
 # The Define side
 # --------------------------------------------------------------------------------
-def admits(comparator: str, values: tuple, value: str) -> bool:
-    """Whether a where-clause condition admits one value."""
-    if comparator == "EQ":
-        return value in values[:1]
-    if comparator == "IN":
-        return value in values
-    if comparator == "NE":
-        return value not in values
-    return False
-
-
 class DefineIndex:
     """The Define items, value lists and where clauses of a DDS, for linking."""
 
@@ -259,7 +250,7 @@ class DefineIndex:
                         continue
                     self.value_lists.setdefault((dataset, item["name"]), []).append(
                         ValueLevelItem(item["OID"],
-                                       _where(item.get("applicableWhen"), where_clauses, conditions),
+                                       item_where(item.get("applicableWhen"), where_clauses, conditions),
                                        tuple(c.get("code") for c in item.get("coding") or []
                                              if isinstance(c, dict) and c.get("code"))))
         self._decodes = _testcd_decodes(dds, items_by_oid)
@@ -302,20 +293,6 @@ class DefineIndex:
         if not self.has_dataset(dataset):
             return Link(dataset, variable, None, f"the Define has no {dataset} dataset")
         return Link(dataset, variable, None, f"the Define has no {dataset}.{variable}")
-
-
-def _where(wc_oids: list[str] | None, where_clauses: dict[str, list[str]],
-           conditions: dict[str, dict[str, Any]]) -> dict[str, tuple]:
-    """A value-level item's where clause as variable -> (comparator, values)."""
-    out: dict[str, tuple] = {}
-    for wc_oid in (wc_oids or [])[:1]:   # the first where clause; DDE writes one per item
-        for condition_oid in where_clauses.get(wc_oid) or []:
-            for check in (conditions.get(condition_oid) or {}).get("rangeChecks") or []:
-                variable = str(check.get("item") or "").rsplit(".", 1)[-1]
-                if variable:
-                    out[variable] = (str(check.get("comparator") or "EQ").upper(),
-                                     tuple(str(v) for v in check.get("checkValues") or []))
-    return out
 
 
 def _matches(where: dict[str, tuple], conditions: tuple, context: dict[str, str]) -> bool:

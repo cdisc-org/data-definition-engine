@@ -1,0 +1,383 @@
+{
+  "$schema": "../../schemas/methods/methods.schema.json",
+  "schemaVersion": "1.0",
+  "name": "DDE standard SDTM methods",
+  "description": "Shared SDTM derivation methods, MSG v2 style: one method per algorithm with generic -- text and no domain in the OID. Each method carries a draft ODM v2.0 MethodSignature; none carries a FormalExpression yet. 'basis' states where the wording comes from; entries marked Draft are new text to be checked against the SDTMIG CDISC Notes. See data/methods/README.md.",
+  "methods": [
+    {
+      "OID": "MT.USUBJID",
+      "name": "Algorithm to derive USUBJID",
+      "type": "Computation",
+      "description": "Concatenation of STUDYID, SITEID and SUBJID.",
+      "signature": {
+        "parameters": [
+          {"name": "STUDYID", "dataType": "text", "description": "Study identifier", "orderNumber": 1},
+          {"name": "SITEID", "dataType": "text", "description": "Study site identifier", "orderNumber": 2},
+          {"name": "SUBJID", "dataType": "text", "description": "Subject identifier within the study", "orderNumber": 3}
+        ],
+        "returnValues": [
+          {"name": "USUBJID", "dataType": "text", "description": "Unique subject identifier across all studies", "orderNumber": 1}
+        ]
+      },
+      "basis": "Draft: sponsor convention to confirm (methods plan open item 1). Matches the defaults dictionary's USUBJID length basis. CDISC01 MT.USUBJID concatenates STUDYID and SUBJID; SDTM-MSG v2.0 section 5.2.1 says the concatenation is not required."
+    },
+    {
+      "OID": "MT.SEQ",
+      "name": "Algorithm to derive --SEQ",
+      "type": "Computation",
+      "description": "Unique sequence number within a subject, restarting at 1 for every subject, applied to sorted data.",
+      "signature": {
+        "parameters": [
+          {"name": "USUBJID", "dataType": "text", "description": "Subject the record belongs to; records are sorted by the dataset's key variables", "orderNumber": 1}
+        ],
+        "returnValues": [
+          {"name": "SEQ", "dataType": "integer", "description": "Sequence number of the record within the subject", "orderNumber": 1}
+        ]
+      },
+      "basis": "SDTM-MSG v2.0 define.xml MT.SEQ, verbatim."
+    },
+    {
+      "OID": "MT.TSSEQ",
+      "name": "Algorithm to derive TSSEQ",
+      "type": "Computation",
+      "description": "Unique sequence number within each TSPARM, restarting at 1 for each TSPARM, applied to sorted data.",
+      "signature": {
+        "parameters": [
+          {"name": "TSPARMCD", "dataType": "text", "description": "Trial summary parameter short name", "orderNumber": 1}
+        ],
+        "returnValues": [
+          {"name": "TSSEQ", "dataType": "integer", "description": "Sequence number of the record within the parameter", "orderNumber": 1}
+        ]
+      },
+      "basis": "SDTM-MSG v2.0 define.xml MT.TSSEQ, with 'for per TSPARM' corrected to 'for each TSPARM'."
+    },
+    {
+      "OID": "MT.DAYCALC",
+      "name": "Algorithm to derive --DY",
+      "type": "Computation",
+      "description": "Study day relative to RFSTDTC. Date - RFSTDTC + 1 if on or after RFSTDTC. Date - RFSTDTC if date precedes RFSTDTC.",
+      "signature": {
+        "parameters": [
+          {"name": "DTC", "dataType": "datetime", "description": "Date of the observation (--DTC, --STDTC or --ENDTC)", "orderNumber": 1},
+          {"name": "RFSTDTC", "dataType": "datetime", "description": "Subject reference start date from DM", "orderNumber": 2}
+        ],
+        "returnValues": [
+          {"name": "DY", "dataType": "integer", "description": "Study day of the observation", "orderNumber": 1}
+        ]
+      },
+      "basis": "SDTM-MSG v2.0 define.xml MT.DAYCALC, verbatim; SDTMIG 3.4 section 4.4.4."
+    },
+    {
+      "OID": "MT.STRESC",
+      "name": "Algorithm to derive --STRESC",
+      "type": "Computation",
+      "description": "--STRESC is equal to --ORRES, or to the value in standard units when a conversion is necessary. \"--\" represents the domain code.",
+      "signature": {
+        "parameters": [
+          {"name": "ORRES", "dataType": "text", "description": "Result or finding in original units", "orderNumber": 1},
+          {"name": "ORRESU", "dataType": "text", "description": "Original units", "orderNumber": 2},
+          {"name": "STRESU", "dataType": "text", "description": "Standard units", "orderNumber": 3}
+        ],
+        "returnValues": [
+          {"name": "STRESC", "dataType": "text", "description": "Result or finding in standard format", "orderNumber": 1}
+        ]
+      },
+      "basis": "SDTM-MSG v2.0 define.xml MT.LBSTRESC, generalized to -- the way MSG generalized MT.STRESN."
+    },
+    {
+      "OID": "MT.STRESN",
+      "name": "Algorithm to derive --STRESN",
+      "type": "Computation",
+      "description": "If --STRESC represents a numeric value then --STRESN is the numeric version of --STRESC, else null. \"--\" represents the domain code.",
+      "signature": {
+        "parameters": [
+          {"name": "STRESC", "dataType": "text", "description": "Result or finding in standard format", "orderNumber": 1}
+        ],
+        "returnValues": [
+          {"name": "STRESN", "dataType": "float", "description": "Numeric result or finding in standard units", "orderNumber": 1}
+        ]
+      },
+      "basis": "SDTM-MSG v2.0 define.xml MT.STRESN, verbatim."
+    },
+    {
+      "OID": "MT.LOBXFL",
+      "name": "Algorithm to derive --LOBXFL",
+      "type": "Computation",
+      "description": "Set to \"Y\" for last record with non-null original result on or before the first dose date (RFXSTDTC). Null otherwise.",
+      "signature": {
+        "parameters": [
+          {"name": "ORRES", "dataType": "text", "description": "Result or finding in original units", "orderNumber": 1},
+          {"name": "DTC", "dataType": "datetime", "description": "Date of the observation", "orderNumber": 2},
+          {"name": "RFXSTDTC", "dataType": "datetime", "description": "Date of first study treatment from DM", "orderNumber": 3}
+        ],
+        "returnValues": [
+          {"name": "LOBXFL", "dataType": "text", "description": "Last observation before exposure flag", "orderNumber": 1}
+        ]
+      },
+      "basis": "SDTM-MSG v2.0 define.xml MT.LOBXFL, verbatim."
+    },
+    {
+      "OID": "MT.EPOCH",
+      "name": "Algorithm to derive EPOCH",
+      "type": "Computation",
+      "description": "EPOCH from SE where date >= SESTDTC and date < SEENDTC",
+      "signature": {
+        "parameters": [
+          {"name": "DTC", "dataType": "datetime", "description": "Date of the observation", "orderNumber": 1},
+          {"name": "SESTDTC", "dataType": "datetime", "description": "Start of the subject's Element from SE", "orderNumber": 2},
+          {"name": "SEENDTC", "dataType": "datetime", "description": "End of the subject's Element from SE", "orderNumber": 3}
+        ],
+        "returnValues": [
+          {"name": "EPOCH", "dataType": "text", "description": "Epoch of the SE record whose interval contains the date", "orderNumber": 1}
+        ]
+      },
+      "basis": "SDTM-MSG v2.0 define.xml MT.EPOCH, verbatim."
+    },
+    {
+      "OID": "MT.SESTDTC",
+      "name": "Algorithm to derive SESTDTC",
+      "type": "Computation",
+      "description": "SESTDTC is set to the --DTC for that subject which exists in the data for the defined start of the Element, such as DSSTDTC when DSDECOD=INFORMED CONSENT OBTAINED for Screening Elements or min(EXSTDTC) for Dosing Elements.",
+      "signature": {
+        "parameters": [
+          {"name": "DTC", "dataType": "datetime", "description": "The --DTC that marks the defined start of the Element", "orderNumber": 1}
+        ],
+        "returnValues": [
+          {"name": "SESTDTC", "dataType": "datetime", "description": "Start date/time of the Element", "orderNumber": 1}
+        ]
+      },
+      "basis": "SDTM-MSG v2.0 define.xml MT.SESTDTC, with 'SESTDTC if set to' corrected to 'SESTDTC is set to'."
+    },
+    {
+      "OID": "MT.SEENDTC",
+      "name": "Algorithm to derive SEENDTC",
+      "type": "Computation",
+      "description": "SEENDTC is set to the start of the next Element, or RFPENDTC for the last Element.",
+      "signature": {
+        "parameters": [
+          {"name": "NEXTSESTDTC", "dataType": "datetime", "description": "SESTDTC of the subject's next Element", "orderNumber": 1},
+          {"name": "RFPENDTC", "dataType": "datetime", "description": "End of participation from DM", "orderNumber": 2}
+        ],
+        "returnValues": [
+          {"name": "SEENDTC", "dataType": "datetime", "description": "End date/time of the Element", "orderNumber": 1}
+        ]
+      },
+      "basis": "SDTM-MSG v2.0 define.xml MT.SEENDTC, verbatim."
+    },
+    {
+      "OID": "MT.SVSTDTC",
+      "name": "Algorithm to derive SVSTDTC",
+      "type": "Computation",
+      "description": "For each scheduled visit, SVSTDTC = the first (min) date associated with a subject for that visit. For unplanned visits, SVSTDTC is the date of the visit.",
+      "signature": {
+        "parameters": [
+          {"name": "VISITNUM", "dataType": "float", "description": "Visit number", "orderNumber": 1},
+          {"name": "DTC", "dataType": "datetime", "description": "Dates the subject's records carry for the visit", "orderNumber": 2}
+        ],
+        "returnValues": [
+          {"name": "SVSTDTC", "dataType": "datetime", "description": "Start date/time of the visit", "orderNumber": 1}
+        ]
+      },
+      "basis": "SDTM-MSG v2.0 define.xml MT.SVSTDTC, verbatim."
+    },
+    {
+      "OID": "MT.SVENDTC",
+      "name": "Algorithm to derive SVENDTC",
+      "type": "Computation",
+      "description": "For each scheduled visit, SVENDTC = the last (max) date associated with a subject for that visit. For unplanned visits, SVENDTC is the date of the visit.",
+      "signature": {
+        "parameters": [
+          {"name": "VISITNUM", "dataType": "float", "description": "Visit number", "orderNumber": 1},
+          {"name": "DTC", "dataType": "datetime", "description": "Dates the subject's records carry for the visit", "orderNumber": 2}
+        ],
+        "returnValues": [
+          {"name": "SVENDTC", "dataType": "datetime", "description": "End date/time of the visit", "orderNumber": 1}
+        ]
+      },
+      "basis": "SDTM-MSG v2.0 define.xml MT.SVENDTC, verbatim."
+    },
+    {
+      "OID": "MT.RFSTDTC",
+      "name": "Algorithm to derive RFSTDTC",
+      "type": "Computation",
+      "description": "The first date/time of study drug. Null for screen failures.",
+      "signature": {
+        "parameters": [
+          {"name": "EXSTDTC", "dataType": "datetime", "description": "Start dates of study drug exposure", "orderNumber": 1},
+          {"name": "ARMNRS", "dataType": "text", "description": "Reason arm is null; identifies screen failures", "orderNumber": 2}
+        ],
+        "returnValues": [
+          {"name": "RFSTDTC", "dataType": "datetime", "description": "Subject reference start date/time", "orderNumber": 1}
+        ]
+      },
+      "basis": "SDTM-MSG v2.0 define.xml MT.RFSTDTC, verbatim."
+    },
+    {
+      "OID": "MT.RFENDTC",
+      "name": "Algorithm to derive RFENDTC",
+      "type": "Computation",
+      "description": "The Date of Study Completion or Early Termination. Null for screen failures.",
+      "signature": {
+        "parameters": [
+          {"name": "DSSTDTC", "dataType": "datetime", "description": "Disposition date of study completion or early termination", "orderNumber": 1},
+          {"name": "ARMNRS", "dataType": "text", "description": "Reason arm is null; identifies screen failures", "orderNumber": 2}
+        ],
+        "returnValues": [
+          {"name": "RFENDTC", "dataType": "datetime", "description": "Subject reference end date/time", "orderNumber": 1}
+        ]
+      },
+      "basis": "SDTM-MSG v2.0 define.xml MT.RFENDTC, verbatim."
+    },
+    {
+      "OID": "MT.RFXSTDTC",
+      "name": "Algorithm to derive RFXSTDTC",
+      "type": "Computation",
+      "description": "The first date/time of study drug administration. Null for subjects with no treatment data.",
+      "signature": {
+        "parameters": [
+          {"name": "EXSTDTC", "dataType": "datetime", "description": "Start dates of study drug administration", "orderNumber": 1}
+        ],
+        "returnValues": [
+          {"name": "RFXSTDTC", "dataType": "datetime", "description": "Date/time of first study treatment", "orderNumber": 1}
+        ]
+      },
+      "basis": "SDTM-MSG v2.0 define.xml MT.RFXSTDTC, verbatim."
+    },
+    {
+      "OID": "MT.RFXENDTC",
+      "name": "Algorithm to derive RFXENDTC",
+      "type": "Computation",
+      "description": "The last date/time of study drug administration. Null for subjects with no treatment data.",
+      "signature": {
+        "parameters": [
+          {"name": "EXENDTC", "dataType": "datetime", "description": "End dates of study drug administration", "orderNumber": 1}
+        ],
+        "returnValues": [
+          {"name": "RFXENDTC", "dataType": "datetime", "description": "Date/time of last study treatment", "orderNumber": 1}
+        ]
+      },
+      "basis": "SDTM-MSG v2.0 define.xml MT.RFXENDTC, verbatim."
+    },
+    {
+      "OID": "MT.RFPENDTC",
+      "name": "Algorithm to derive RFPENDTC",
+      "type": "Computation",
+      "description": "The latest date of assessment for the subject as determined by the End of Study Form, any scheduled assessments, Adverse Events, or Concomitant Medications.",
+      "signature": {
+        "parameters": [
+          {"name": "EOSDTC", "dataType": "datetime", "description": "Date recorded on the End of Study form", "orderNumber": 1},
+          {"name": "ASSESSDTC", "dataType": "datetime", "description": "Dates of the subject's scheduled assessments", "orderNumber": 2},
+          {"name": "AEDTC", "dataType": "datetime", "description": "Dates of the subject's adverse events", "orderNumber": 3},
+          {"name": "CMDTC", "dataType": "datetime", "description": "Dates of the subject's concomitant medications", "orderNumber": 4}
+        ],
+        "returnValues": [
+          {"name": "RFPENDTC", "dataType": "datetime", "description": "Date/time of end of participation", "orderNumber": 1}
+        ]
+      },
+      "basis": "SDTM-MSG v2.0 define.xml MT.RFPENDTC, verbatim."
+    },
+    {
+      "OID": "MT.RFICDTC",
+      "name": "Algorithm to derive RFICDTC",
+      "type": "Computation",
+      "description": "Date/time of informed consent, from DSSTDTC where DSDECOD = INFORMED CONSENT OBTAINED.",
+      "signature": {
+        "parameters": [
+          {"name": "DSSTDTC", "dataType": "datetime", "description": "Start date/time of the disposition event", "orderNumber": 1},
+          {"name": "DSDECOD", "dataType": "text", "description": "Standardized disposition term", "orderNumber": 2}
+        ],
+        "returnValues": [
+          {"name": "RFICDTC", "dataType": "datetime", "description": "Date/time of informed consent", "orderNumber": 1}
+        ]
+      },
+      "basis": "Draft: SDTMIG DM notes for RFICDTC."
+    },
+    {
+      "OID": "MT.AGE",
+      "name": "Algorithm to derive AGE",
+      "type": "Computation",
+      "description": "Age in AGEU at RFSTDTC: complete years from BRTHDTC to RFSTDTC.",
+      "signature": {
+        "parameters": [
+          {"name": "BRTHDTC", "dataType": "date", "description": "Date of birth", "orderNumber": 1},
+          {"name": "RFSTDTC", "dataType": "datetime", "description": "Subject reference start date/time", "orderNumber": 2}
+        ],
+        "returnValues": [
+          {"name": "AGE", "dataType": "integer", "description": "Age of the subject", "orderNumber": 1}
+        ]
+      },
+      "basis": "Draft: CDISC01 MT.AGE and the SDTMIG DM notes for AGE."
+    },
+    {
+      "OID": "MT.DTHFL",
+      "name": "Algorithm to derive DTHFL",
+      "type": "Computation",
+      "description": "If DTHDTC is populated then DTHFL='Y'",
+      "signature": {
+        "parameters": [
+          {"name": "DTHDTC", "dataType": "datetime", "description": "Date/time of death", "orderNumber": 1}
+        ],
+        "returnValues": [
+          {"name": "DTHFL", "dataType": "text", "description": "Subject death flag", "orderNumber": 1}
+        ]
+      },
+      "basis": "SDTM-MSG v2.0 define.xml MT.DTHFL, verbatim."
+    },
+    {
+      "OID": "MT.BMI",
+      "name": "Algorithm to derive BMI",
+      "type": "Computation",
+      "description": "BMI = Weight (kg) / Height (m)^2. Not calculated if missing or invalid.",
+      "signature": {
+        "parameters": [
+          {"name": "WEIGHT", "dataType": "float", "description": "Weight in kg", "orderNumber": 1},
+          {"name": "HEIGHT", "dataType": "float", "description": "Height in m", "orderNumber": 2}
+        ],
+        "returnValues": [
+          {"name": "BMI", "dataType": "float", "description": "Body mass index in kg/m2", "orderNumber": 1}
+        ]
+      },
+      "basis": "CRF Specialization BMI row (data/crf_specializations/cdisc_crf_specializations_draft.csv), derivation_description verbatim."
+    },
+    {
+      "OID": "MT.ISO8601",
+      "name": "Algorithm to derive --DTC",
+      "type": "Computation",
+      "description": "--DTC is the ISO 8601 combination of the collected date and time components. Components not collected are omitted (partial date/time).",
+      "signature": {
+        "parameters": [
+          {"name": "DAT", "dataType": "date", "description": "Collected date (CDASH --DAT)", "orderNumber": 1},
+          {"name": "TIM", "dataType": "time", "description": "Collected time (CDASH --TIM)", "orderNumber": 2}
+        ],
+        "returnValues": [
+          {"name": "DTC", "dataType": "datetime", "description": "ISO 8601 date/time; partialDatetime once PR-DDS-3 adds it", "orderNumber": 1}
+        ]
+      },
+      "basis": "Draft: CDASHIG mapping instructions for --DAT/--TIM and the SDTMIG ISO 8601 rules. Attaches only where another source already made a --DTC Derived."
+    }
+  ],
+  "assignments": [
+    {"name": "USUBJID", "method": "MT.USUBJID"},
+    {"name": "--SEQ", "method": "MT.SEQ"},
+    {"name": "TSSEQ", "method": "MT.TSSEQ", "description": "TSSEQ restarts per TSPARM, not per subject."},
+    {"name": "--DY", "method": "MT.DAYCALC", "description": "Covers --DY, --STDY and --ENDY. VISITDY is Protocol, so it never reaches here."},
+    {"name": "--STRESC", "method": "MT.STRESC"},
+    {"name": "--STRESN", "method": "MT.STRESN"},
+    {"name": "--LOBXFL", "method": "MT.LOBXFL"},
+    {"name": "EPOCH", "excludeDomains": ["TA"], "method": "MT.EPOCH", "description": "TA.EPOCH is Protocol."},
+    {"name": "SESTDTC", "method": "MT.SESTDTC"},
+    {"name": "SEENDTC", "method": "MT.SEENDTC"},
+    {"name": "SVSTDTC", "method": "MT.SVSTDTC"},
+    {"name": "SVENDTC", "method": "MT.SVENDTC"},
+    {"name": "RFSTDTC", "method": "MT.RFSTDTC"},
+    {"name": "RFENDTC", "method": "MT.RFENDTC"},
+    {"name": "RFXSTDTC", "method": "MT.RFXSTDTC"},
+    {"name": "RFXENDTC", "method": "MT.RFXENDTC"},
+    {"name": "RFPENDTC", "method": "MT.RFPENDTC"},
+    {"name": "RFICDTC", "method": "MT.RFICDTC"},
+    {"name": "AGE", "method": "MT.AGE"},
+    {"name": "DTHFL", "method": "MT.DTHFL"},
+    {"name": "VSORRES", "domains": ["VS"], "where": {"VSTESTCD": "BMI"}, "method": "MT.BMI", "description": "Value level: the VSORRES item whose where clause admits VSTESTCD = BMI."},
+    {"name": "--DTC", "method": "MT.ISO8601", "description": "Exact entries (RFSTDTC, SESTDTC, SVSTDTC, ...) outrank this suffix."}
+  ]
+}

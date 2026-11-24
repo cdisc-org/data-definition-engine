@@ -235,6 +235,7 @@ enums:
     description: How a CRF item's value comes to be.
     permissible_values:
       Collected:
+      Derived:
       Assigned:
       Protocol:
 

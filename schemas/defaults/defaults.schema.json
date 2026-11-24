@@ -54,9 +54,11 @@
       "then": {"required": ["domains"]}
     },
     "dataType": {
-      "description": "The DDS DataType enum (schemas/dds/dds.yaml).",
+      "description": "The DDS DataType enum (schemas/dds/dds.yaml) plus the seven ISO 8601 types PR-DDS-3 adds (DDS_FOR_METHODS.md change 7, D5).",
       "enum": ["text", "integer", "float", "date", "time", "datetime", "boolean", "double", "hex",
-               "base64", "hexBinary", "durationDatetime"]
+               "base64", "hexBinary", "durationDatetime",
+               "partialDate", "partialTime", "partialDatetime", "intervalDatetime",
+               "incompleteDatetime", "incompleteDate", "incompleteTime"]
     },
     "length": {
       "description": "An integer, or a length computed from a DDS study-level string: its length plus an optional constant.",
