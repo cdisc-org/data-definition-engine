@@ -1,0 +1,376 @@
+{
+  "OID": "MDV.CDISC01_1.1.SDTMIG.3.1.2.SDTM.1.2_X",
+  "name": "Study CDISC01_1, Data Definitions V-1",
+  "description": "Data Definitions for CDISC01-01 SDTM datasets. This metadata version contains only a subset of datasets compared to the prior version. The metadata provided is only intended to illustrate most Define-XML 2.1 new features and not meant to serve as a comprehensive example of all metadata expected to be defined to fully describe an SDTM dataset package. Notes:   1) Supplemental documents released in prior Define-XML versions were not updated to reflect changes to the metadata.   2) This example is prepared for a context other than submission; however, still using the approach of non-standard variables prepared as supplemental qualifiers datasets.",
+  "studyOID": "STDY.www.cdisc.org.CDISC01_1",
+  "studyName": "CDISC01_1",
+  "studyDescription": "CDISC Test Study Modified to illustrate Define-XML 2.1 features",
+  "protocolName": "CDISC01-1",
+  "standards": [
+    {"OID": "STD.1", "name": "SDTMIG", "type": "IG", "version": "3.1.2", "status": "Final"},
+    {"OID": "STD.2", "name": "SDTMIG", "type": "IG", "version": "3.2", "status": "Final"},
+    {"OID": "STD.2_1", "name": "SDTMIG-MD", "type": "IG", "version": "1.0", "status": "Final"},
+    {"OID": "STD.3", "name": "CDISC/NCI", "type": "CT", "version": "2011-12-09", "status": "Final", "publishingSet": "SDTM"},
+    {"OID": "STD.4", "name": "CDISC/NCI", "type": "CT", "version": "2015-12-18", "status": "Final", "publishingSet": "SDTM"},
+    {"OID": "STD.5", "name": "CDISC/NCI", "type": "CT", "version": "2026-03-27", "status": "Final", "publishingSet": "DEFINE-XML"}
+  ],
+  "itemGroups": [
+    {
+      "OID": "IG.TS",
+      "name": "TS",
+      "domain": "TS",
+      "standard": "STD.1",
+      "description": "Trial Summary",
+      "purpose": "Tabulation",
+      "structure": "One record per trial summary parameter value",
+      "items": [
+        {"OID": "IT.TS.STUDYID", "name": "STUDYID", "dataType": "text", "length": 7, "description": "Study Identifier", "origin": [{"type": "Protocol", "source": "Sponsor"}]},
+        {"OID": "IT.TS.DOMAIN", "name": "DOMAIN", "dataType": "text", "length": 2, "description": "Domain Abbreviation", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.TS.TSSEQ", "name": "TSSEQ", "dataType": "integer", "length": 1, "description": "Sequence Number", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.TS.TSPARMCD", "name": "TSPARMCD", "dataType": "text", "length": 8, "description": "Trial Summary Parameter Short Name", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.TS.TSPARM", "name": "TSPARM", "dataType": "text", "length": 36, "description": "Trial Summary Parameter", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.TS.TSVAL", "name": "TSVAL", "dataType": "text", "length": 100, "description": "Parameter Value", "origin": [{"type": "Protocol", "source": "Sponsor"}]}
+      ]
+    },
+    {
+      "OID": "IG.DI",
+      "name": "DI",
+      "domain": "DI",
+      "standard": "STD.2_1",
+      "description": "Device Identifiers",
+      "purpose": "Tabulation",
+      "structure": "One record per device identifier per device",
+      "items": [
+        {"OID": "IT.DI.STUDYID", "name": "STUDYID", "dataType": "text", "length": 7, "description": "Study Identifier", "origin": [{"type": "Protocol", "source": "Sponsor"}]},
+        {"OID": "IT.DOMAIN", "name": "DOMAIN", "dataType": "text", "length": 2, "description": "Domain Abbreviation", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.DI.SPDEVID", "name": "SPDEVID", "dataType": "text", "length": 30, "description": "Sponsor Device Identifier", "origin": [{"type": "Collected", "source": "Vendor"}]},
+        {"OID": "IT.DISEQ", "name": "DISEQ", "dataType": "integer", "length": 3, "description": "Sequence Number", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.DIPARMCD", "name": "DIPARMCD", "dataType": "text", "length": 20, "description": "Device Identifier Element Short Name", "origin": [{"type": "Assigned", "source": "Vendor"}]},
+        {"OID": "IT.DIPARM", "name": "DIPARM", "dataType": "text", "length": 100, "description": "Device Identifier Element Name", "origin": [{"type": "Assigned", "source": "Vendor"}]},
+        {"OID": "IT.DIVAL", "name": "DIVAL", "dataType": "text", "length": 200, "description": "Device Identifier Element Value", "origin": [{"type": "Collected", "source": "Vendor"}]}
+      ]
+    },
+    {
+      "OID": "IG.DM",
+      "name": "DM",
+      "domain": "DM",
+      "standard": "STD.1",
+      "description": "Demographics",
+      "purpose": "Tabulation",
+      "structure": "One record per subject",
+      "items": [
+        {"OID": "IT.DM.STUDYID", "name": "STUDYID", "dataType": "text", "length": 7, "description": "Study Identifier", "origin": [{"type": "Protocol", "source": "Sponsor"}]},
+        {"OID": "IT.DM.DOMAIN", "name": "DOMAIN", "dataType": "text", "length": 2, "description": "Domain Abbreviation", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.DM.USUBJID", "name": "USUBJID", "dataType": "text", "length": 14, "description": "Unique Subject Identifier", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.DM.SUBJID", "name": "SUBJID", "dataType": "text", "length": 6, "description": "Subject Identifier for the Study", "origin": [{"type": "Collected", "source": "Investigator"}]},
+        {"OID": "IT.DM.RFSTDTC", "name": "RFSTDTC", "dataType": "date", "description": "Subject Reference Start Date/Time", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.DM.RFENDTC", "name": "RFENDTC", "dataType": "date", "description": "Subject Reference End Date/Time", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.DM.SITEID", "name": "SITEID", "dataType": "text", "length": 3, "description": "Study Site Identifier", "origin": [{"type": "Collected", "source": "Investigator"}]},
+        {"OID": "IT.DM.BRTHDTC", "name": "BRTHDTC", "dataType": "date", "description": "Date/Time of Birth", "origin": [{"type": "Collected", "source": "Investigator"}]},
+        {"OID": "IT.DM.AGE", "name": "AGE", "dataType": "integer", "length": 2, "description": "Age", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.DM.AGEU", "name": "AGEU", "dataType": "text", "length": 5, "description": "Age Units", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.DM.SEX", "name": "SEX", "dataType": "text", "length": 16, "description": "Sex", "origin": [{"type": "Collected", "source": "Investigator"}]},
+        {"OID": "IT.DM.RACE", "name": "RACE", "dataType": "text", "length": 41, "description": "Race", "origin": [{"type": "Collected", "source": "Investigator"}]},
+        {"OID": "IT.DM.ETHNIC", "name": "ETHNIC", "dataType": "text", "length": 22, "description": "Ethnicity", "origin": [{"type": "Collected", "source": "Investigator"}]},
+        {"OID": "IT.DM.ARMCD", "name": "ARMCD", "dataType": "text", "length": 8, "description": "Planned Arm Code", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.DM.ARM", "name": "ARM", "dataType": "text", "length": 20, "description": "Description of Planned Arm", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.DM.COUNTRY", "name": "COUNTRY", "dataType": "text", "length": 3, "description": "Country", "origin": [{"type": "Assigned", "source": "Sponsor"}]}
+      ]
+    },
+    {
+      "OID": "IG.EC",
+      "name": "EC",
+      "domain": "EC",
+      "standard": "STD.2",
+      "description": "Exposure as Collected",
+      "purpose": "Tabulation",
+      "structure": "One record per constant dosing interval per subject",
+      "items": [
+        {"OID": "IT.EC.STUDYID", "name": "STUDYID", "dataType": "text", "length": 7, "description": "Study Identifier", "origin": [{"type": "Protocol", "source": "Sponsor"}]},
+        {"OID": "IT.EC.DOMAIN", "name": "DOMAIN", "dataType": "text", "length": 2, "description": "Domain Abbreviation", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.EC.USUBJID", "name": "USUBJID", "dataType": "text", "length": 14, "description": "Unique Subject Identifier", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.EC.EXSEQ", "name": "ECSEQ", "dataType": "integer", "length": 1, "description": "Sequence Number", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.EC.EXTRT", "name": "ECTRT", "dataType": "text", "length": 20, "description": "Name of Actual Treatment", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.EC.EXDOSE", "name": "ECDOSE", "dataType": "integer", "length": 2, "description": "Dose per Administration", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.EC.EXDOSU", "name": "ECDOSU", "dataType": "text", "length": 2, "description": "Dose Units", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.EC.EXDOSFRM", "name": "ECDOSFRM", "dataType": "text", "length": 7, "description": "Dose Form", "origin": [{"type": "Collected", "source": "Investigator"}]},
+        {"OID": "IT.EC.EXSTDTC", "name": "ECSTDTC", "dataType": "date", "description": "Start Date/Time of Treatment", "origin": [{"type": "Collected", "source": "Investigator"}]},
+        {"OID": "IT.EC.EXENDTC", "name": "ECENDTC", "dataType": "date", "description": "End Date/Time of Treatment", "origin": [{"type": "Collected", "source": "Investigator"}]},
+        {"OID": "IT.EC.EXSTDY", "name": "ECSTDY", "dataType": "integer", "length": 2, "description": "Study Day of Start of Treatment", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.EC.EXENDY", "name": "ECENDY", "dataType": "integer", "length": 2, "description": "Study Day of End of Treatment", "origin": [{"type": "Derived", "source": "Sponsor"}]}
+      ]
+    },
+    {
+      "OID": "IG.EX",
+      "name": "EX",
+      "domain": "EX",
+      "standard": "STD.1",
+      "description": "Exposure",
+      "purpose": "Tabulation",
+      "structure": "One record per constant dosing interval per subject",
+      "items": [
+        {"OID": "IT.EX.STUDYID", "name": "STUDYID", "dataType": "text", "length": 7, "description": "Study Identifier", "origin": [{"type": "Protocol", "source": "Sponsor"}]},
+        {"OID": "IT.EX.DOMAIN", "name": "DOMAIN", "dataType": "text", "length": 2, "description": "Domain Abbreviation", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.EX.USUBJID", "name": "USUBJID", "dataType": "text", "length": 14, "description": "Unique Subject Identifier", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.EX.EXSEQ", "name": "EXSEQ", "dataType": "integer", "length": 1, "description": "Sequence Number", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.EX.EXTRT", "name": "EXTRT", "dataType": "text", "length": 20, "description": "Name of Actual Treatment", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.EX.EXDOSE", "name": "EXDOSE", "dataType": "integer", "length": 2, "description": "Dose per Administration", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.EX.EXDOSU", "name": "EXDOSU", "dataType": "text", "length": 2, "description": "Dose Units", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.EX.EXDOSFRM", "name": "EXDOSFRM", "dataType": "text", "length": 7, "description": "Dose Form", "origin": [{"type": "Predecessor", "source": "Sponsor"}]},
+        {"OID": "IT.EX.EXSTDTC", "name": "EXSTDTC", "dataType": "date", "description": "Start Date/Time of Treatment", "origin": [{"type": "Predecessor", "source": "Sponsor"}]},
+        {"OID": "IT.EX.EXENDTC", "name": "EXENDTC", "dataType": "date", "description": "End Date/Time of Treatment", "origin": [{"type": "Predecessor", "source": "Sponsor"}]},
+        {"OID": "IT.EX.EXSTDY", "name": "EXSTDY", "dataType": "integer", "length": 2, "description": "Study Day of Start of Treatment", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.EX.EXENDY", "name": "EXENDY", "dataType": "integer", "length": 2, "description": "Study Day of End of Treatment", "origin": [{"type": "Derived", "source": "Sponsor"}]}
+      ]
+    },
+    {
+      "OID": "IG.LB",
+      "name": "LB",
+      "domain": "LB",
+      "standard": "STD.1",
+      "description": "Laboratory Tests Results",
+      "purpose": "Tabulation",
+      "structure": "One record per analyte per visit per subject",
+      "items": [
+        {"OID": "IT.LB.STUDYID", "name": "STUDYID", "dataType": "text", "length": 7, "description": "Study Identifier", "origin": [{"type": "Protocol", "source": "Sponsor"}]},
+        {"OID": "IT.LB.DOMAIN", "name": "DOMAIN", "dataType": "text", "length": 2, "description": "Domain Abbreviation", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.LB.USUBJID", "name": "USUBJID", "dataType": "text", "length": 14, "description": "Unique Subject Identifier", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.LB.LBSEQ", "name": "LBSEQ", "dataType": "integer", "length": 2, "description": "Sequence Number", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.LB.LBREFID", "name": "LBREFID", "dataType": "text", "length": 7, "description": "Specimen ID", "origin": [{"type": "Collected", "source": "Vendor"}]},
+        {"OID": "IT.LB.LBTESTCD", "name": "LBTESTCD", "dataType": "text", "length": 7, "description": "Lab Test or Examination Short Name", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.LB.LBTEST", "name": "LBTEST", "dataType": "text", "length": 22, "description": "Lab Test or Examination Name", "origin": [{"type": "Collected", "source": "Vendor"}]},
+        {"OID": "IT.LB.LBCAT", "name": "LBCAT", "dataType": "text", "length": 10, "description": "Category for Lab Test", "origin": [{"type": "Collected", "source": "Vendor"}]},
+        {"OID": "IT.LB.LBORRES", "name": "LBORRES", "dataType": "text", "length": 8, "description": "Result or Finding in Original Units"},
+        {"OID": "IT.LB.LBORRESU", "name": "LBORRESU", "dataType": "text", "length": 7, "description": "Original Units", "origin": [{"type": "Collected", "source": "Vendor"}]},
+        {"OID": "IT.LB.LBORNRLO", "name": "LBORNRLO", "dataType": "float", "length": 6, "significantDigits": 2, "description": "Reference Range Lower Limit in Orig Unit", "origin": [{"type": "Collected", "source": "Vendor"}]},
+        {"OID": "IT.LB.LBORNRHI", "name": "LBORNRHI", "dataType": "float", "length": 6, "significantDigits": 2, "description": "Reference Range Upper Limit in Orig Unit", "origin": [{"type": "Collected", "source": "Vendor"}]},
+        {"OID": "IT.LB.LBSTRESC", "name": "LBSTRESC", "dataType": "text", "length": 8, "description": "Character Result/Finding in Std Format", "origin": [{"type": "Collected", "source": "Vendor"}]},
+        {"OID": "IT.LB.LBSTRESN", "name": "LBSTRESN", "dataType": "float", "length": 5, "significantDigits": 2, "description": "Numeric Result/Finding in Standard Units", "origin": [{"type": "Collected", "source": "Vendor"}]},
+        {"OID": "IT.LB.LBSTRESU", "name": "LBSTRESU", "dataType": "text", "length": 7, "description": "Standard Units", "origin": [{"type": "Collected", "source": "Vendor"}]},
+        {"OID": "IT.LB.LBSTNRLO", "name": "LBSTNRLO", "dataType": "float", "length": 4, "significantDigits": 2, "description": "Reference Range Lower Limit-Std Units", "origin": [{"type": "Collected", "source": "Vendor"}]},
+        {"OID": "IT.LB.LBSTNRHI", "name": "LBSTNRHI", "dataType": "float", "length": 4, "significantDigits": 2, "description": "Reference Range Upper Limit-Std Units", "origin": [{"type": "Collected", "source": "Vendor"}]},
+        {"OID": "IT.LB.LBSTNRC", "name": "LBSTNRC", "dataType": "text", "length": 19, "description": "Reference Range for Char Rslt-Std Units", "origin": [{"type": "Collected", "source": "Vendor"}]},
+        {"OID": "IT.LB.LBNRIND", "name": "LBNRIND", "dataType": "text", "length": 20, "description": "Reference Range Indicator", "origin": [{"type": "Assigned", "source": "Vendor"}]},
+        {"OID": "IT.LB.LBNAM", "name": "LBNAM", "dataType": "text", "length": 20, "description": "Vendor Name", "origin": [{"type": "Collected", "source": "Vendor"}]},
+        {"OID": "IT.LB.LBSPEC", "name": "LBSPEC", "dataType": "text", "length": 5, "description": "Specimen Type", "origin": [{"type": "Collected", "source": "Vendor"}]},
+        {"OID": "IT.LB.LBMETHOD", "name": "LBMETHOD", "dataType": "text", "length": 8, "description": "Method of Test or Examination", "origin": [{"type": "Collected", "source": "Vendor"}]},
+        {"OID": "IT.LB.LBBLFL", "name": "LBBLFL", "dataType": "text", "length": 1, "description": "Baseline Flag", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.LB.LBFAST", "name": "LBFAST", "dataType": "text", "length": 1, "description": "Fasting Status", "origin": [{"type": "Collected", "source": "Vendor"}]},
+        {"OID": "IT.LB.VISITNUM", "name": "VISITNUM", "dataType": "integer", "length": 2, "description": "Visit Number", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.LB.VISIT", "name": "VISIT", "dataType": "text", "length": 7, "description": "Visit Name", "origin": [{"type": "Collected", "source": "Vendor"}]},
+        {"OID": "IT.LB.VISITDY", "name": "VISITDY", "dataType": "integer", "length": 3, "description": "Planned Study Day of Visit", "origin": [{"type": "Protocol", "source": "Sponsor"}]},
+        {"OID": "IT.LB.LBDTC", "name": "LBDTC", "dataType": "datetime", "description": "Date/Time of Specimen Collection", "origin": [{"type": "Collected", "source": "Vendor"}]},
+        {"OID": "IT.LB.LBDY", "name": "LBDY", "dataType": "integer", "length": 3, "description": "Study Day of Specimen Collection", "origin": [{"type": "Derived", "source": "Sponsor"}]}
+      ]
+    },
+    {
+      "OID": "IG.VS",
+      "name": "VS",
+      "domain": "VS",
+      "standard": "STD.1",
+      "description": "Vital Signs",
+      "purpose": "Tabulation",
+      "structure": "One record per vital sign measurement per visit per subject",
+      "items": [
+        {"OID": "IT.VS.STUDYID", "name": "STUDYID", "dataType": "text", "length": 7, "description": "Study Identifier", "origin": [{"type": "Protocol", "source": "Sponsor"}]},
+        {"OID": "IT.VS.DOMAIN", "name": "DOMAIN", "dataType": "text", "length": 2, "description": "Domain Abbreviation", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.VS.USUBJID", "name": "USUBJID", "dataType": "text", "length": 14, "description": "Unique Subject Identifier", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.VS.VSSEQ", "name": "VSSEQ", "dataType": "integer", "length": 2, "description": "Sequence Number", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.VS.VSTESTCD", "name": "VSTESTCD", "dataType": "text", "length": 20, "description": "Vital Signs Test Short Name", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.VS.VSTEST", "name": "VSTEST", "dataType": "text", "length": 24, "description": "Vital Signs Test Name", "origin": [{"type": "Collected", "source": "Investigator"}]},
+        {"OID": "IT.VS.VSPOS", "name": "VSPOS", "dataType": "text", "length": 7, "description": "Vital Signs Position of Subject", "origin": [{"type": "Collected", "source": "Investigator"}]},
+        {"OID": "IT.VS.VSORRES", "name": "VSORRES", "dataType": "text", "length": 30, "description": "Result or Finding in Original Units", "origin": [{"type": "Collected", "source": "Investigator"}]},
+        {"OID": "IT.VS.VSORRESU", "name": "VSORRESU", "dataType": "text", "length": 20, "description": "Original Units", "origin": [{"type": "Collected", "source": "Investigator"}]},
+        {"OID": "IT.VS.VSSTRESC", "name": "VSSTRESC", "dataType": "text", "length": 6, "description": "Character Result/Finding in Std Format", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.VS.VSSTRESN", "name": "VSSTRESN", "dataType": "float", "length": 6, "significantDigits": 2, "description": "Numeric Result/Finding in Standard Units", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.VS.VSSTRESU", "name": "VSSTRESU", "dataType": "text", "length": 9, "description": "Standard Units", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.VS.VSBLFL", "name": "VSBLFL", "dataType": "text", "length": 1, "description": "Baseline Flag", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.VS.VISITNUM", "name": "VISITNUM", "dataType": "integer", "length": 2, "description": "Visit Number", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.VS.VISIT", "name": "VISIT", "dataType": "text", "length": 8, "description": "Visit Name", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.VS.VISITDY", "name": "VISITDY", "dataType": "integer", "length": 3, "description": "Planned Study Day of Visit", "origin": [{"type": "Protocol", "source": "Sponsor"}]},
+        {"OID": "IT.VS.VSDTC", "name": "VSDTC", "dataType": "date", "description": "Date/Time of Measurements", "origin": [{"type": "Collected", "source": "Investigator"}]},
+        {"OID": "IT.VS.VSDY", "name": "VSDY", "dataType": "integer", "length": 3, "description": "Study Day of Vital Signs", "origin": [{"type": "Derived", "source": "Sponsor"}]}
+      ],
+      "slices": [
+        {
+          "OID": "VL.VS.VSSTRESC",
+          "type": "ValueList",
+          "items": [
+            {"OID": "IT.VS.VSSTRESC.DIABP", "name": "VSSTRESC", "dataType": "integer", "length": 2, "description": "Diastolic Blood Pressure Char in Std U", "applicableWhen": ["WC.VS.VSTESTCD.DIABP"]},
+            {"OID": "IT.VS.VSSTRESC.FRMSIZE", "name": "VSSTRESC", "dataType": "text", "length": 6, "description": "Body Frame Size - Std", "applicableWhen": ["WC.VS.VSTESTCD.FRMSIZE"]},
+            {"OID": "IT.VS.VSSTRESC.HEIGHT", "name": "VSSTRESC", "dataType": "float", "length": 5, "significantDigits": 1, "description": "Height Char in Std U", "applicableWhen": ["WC.VS.VSTESTCD.HEIGHT"]},
+            {"OID": "IT.VS.VSSTRESC.PULSE", "name": "VSSTRESC", "dataType": "integer", "length": 2, "description": "Pulse Rate Char in Std U", "applicableWhen": ["WC.VS.VSTESTCD.PULSE"]},
+            {"OID": "IT.VS.VSSTRESC.SYSBP", "name": "VSSTRESC", "dataType": "integer", "length": 3, "description": "Systolic Blood Pressure Char in Std U", "applicableWhen": ["WC.VS.VSTESTCD.SYSBP"]},
+            {"OID": "IT.VS.VSSTRESC.WEIGHT", "name": "VSSTRESC", "dataType": "float", "length": 4, "significantDigits": 1, "description": "Weight Char in Std U", "applicableWhen": ["WC.VS.VSTESTCD.WEIGHT"]},
+            {"OID": "IT.VS.VSSTRESC.BMI", "name": "VSSTRESC", "dataType": "float", "length": 6, "significantDigits": 1, "description": "BMI (Std U)", "applicableWhen": ["WC.VS.VSTESTCD.BMI"]}
+          ]
+        },
+        {
+          "OID": "VL.VS.VSSTRESN",
+          "type": "ValueList",
+          "items": [
+            {"OID": "IT.VS.VSSTRESN.DIABP", "name": "VSSTRESN", "dataType": "integer", "length": 2, "description": "Diastolic Blood Pressure Num in Std U", "applicableWhen": ["WC.VS.VSTESTCD.DIABP"]},
+            {"OID": "IT.VS.VSSTRESN.HEIGHT", "name": "VSSTRESN", "dataType": "float", "length": 5, "significantDigits": 1, "description": "Height Num in Std U", "applicableWhen": ["WC.VS.VSTESTCD.HEIGHT"]},
+            {"OID": "IT.VS.VSSTRESN.PULSE", "name": "VSSTRESN", "dataType": "integer", "length": 2, "description": "Pulse Rate Num in Std U", "applicableWhen": ["WC.VS.VSTESTCD.PULSE"]},
+            {"OID": "IT.VS.VSSTRESN.SYSBP", "name": "VSSTRESN", "dataType": "integer", "length": 3, "description": "Systolic Blood Pressure Num in Std U", "applicableWhen": ["WC.VS.VSTESTCD.SYSBP"]},
+            {"OID": "IT.VS.VSSTRESN.WEIGHT", "name": "VSSTRESN", "dataType": "float", "length": 4, "significantDigits": 1, "description": "Weight Num in Std U", "applicableWhen": ["WC.VS.VSTESTCD.WEIGHT"]},
+            {"OID": "IT.VS.VSSTRESN.BMI", "name": "VSSTRESN", "dataType": "float", "length": 6, "significantDigits": 2, "description": "BMI Num in Std U", "origin": [{"type": "Derived", "source": "Sponsor"}], "applicableWhen": ["WC.VS.VSTESTCD.BMI"]}
+          ]
+        }
+      ]
+    },
+    {
+      "OID": "IG.XS",
+      "name": "XS",
+      "domain": "XS",
+      "description": "S Findings",
+      "purpose": "Tabulation",
+      "structure": "One record per finding per visit per subject",
+      "items": [
+        {"OID": "IT.XS.STUDYID", "name": "STUDYID", "dataType": "text", "length": 7, "description": "Study Identifier", "origin": [{"type": "Protocol", "source": "Sponsor"}]},
+        {"OID": "IT.XS.DOMAIN", "name": "DOMAIN", "dataType": "text", "length": 2, "description": "Domain Abbreviation", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.XS.USUBJID", "name": "USUBJID", "dataType": "text", "length": 14, "description": "Unique Subject Identifier", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.XS.SPDEVID", "name": "SPDEVID", "dataType": "text", "length": 30, "description": "Sponsor Device Identifier", "origin": [{"type": "Collected", "source": "Vendor"}]},
+        {"OID": "IT.XS.XSSEQ", "name": "XSSEQ", "dataType": "integer", "length": 2, "description": "Sequence Number", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.XS.XSTESTCD", "name": "XSTESTCD", "dataType": "text", "length": 20, "description": "S Findings Test Short Name", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.XS.XSTEST", "name": "XSTEST", "dataType": "text", "length": 24, "description": "S Findings Test Name", "origin": [{"type": "Collected", "source": "Vendor"}]},
+        {"OID": "IT.XS.XSORRES", "name": "XSORRES", "dataType": "text", "length": 30, "description": "Result or Finding in Original Units", "origin": [{"type": "Collected", "source": "Vendor"}]},
+        {"OID": "IT.XS.XSORRESU", "name": "XSORRESU", "dataType": "text", "length": 20, "description": "Original Units", "origin": [{"type": "Collected", "source": "Vendor"}]},
+        {"OID": "IT.XS.XSSTRESC", "name": "XSSTRESC", "dataType": "text", "length": 30, "description": "Character Result/Finding in Std Format", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.XS.XSSTRESN", "name": "XSSTRESN", "dataType": "float", "length": 5, "significantDigits": 1, "description": "Numeric Result/Finding in Standard Units", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.XS.XSSTRESU", "name": "XSSTRESU", "dataType": "text", "length": 9, "description": "Standard Units", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.XS.XSBLFL", "name": "XSBLFL", "dataType": "text", "length": 1, "description": "Baseline Flag", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.XS.VISITNUM", "name": "VISITNUM", "dataType": "integer", "length": 2, "description": "Visit Number", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.XS.VISIT", "name": "VISIT", "dataType": "text", "length": 8, "description": "Visit Name", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.XS.VISITDY", "name": "VISITDY", "dataType": "integer", "length": 3, "description": "Planned Study Day of Visit", "origin": [{"type": "Protocol", "source": "Sponsor"}]},
+        {"OID": "IT.XS.XSDTC", "name": "XSDTC", "dataType": "date", "description": "Date/Time of Measurements", "origin": [{"type": "Collected", "source": "Vendor"}]},
+        {"OID": "IT.XS.XSDY", "name": "XSDY", "dataType": "integer", "length": 3, "description": "Study Day of Vital Signs", "origin": [{"type": "Derived", "source": "Sponsor"}]}
+      ]
+    },
+    {
+      "OID": "IG.XX",
+      "name": "XX",
+      "domain": "XX",
+      "description": "X Findings",
+      "purpose": "Tabulation",
+      "structure": "One record per finding per visit per subject",
+      "items": [
+        {"OID": "IT.XX.STUDYID", "name": "STUDYID", "dataType": "text", "length": 7, "description": "Study Identifier", "origin": [{"type": "Protocol", "source": "Sponsor"}]},
+        {"OID": "IT.XX.DOMAIN", "name": "DOMAIN", "dataType": "text", "length": 2, "description": "Domain Abbreviation", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.XX.USUBJID", "name": "USUBJID", "dataType": "text", "length": 14, "description": "Unique Subject Identifier", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.XX.XXSEQ", "name": "XXSEQ", "dataType": "integer", "length": 2, "description": "Sequence Number", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.XX.XXTESTCD", "name": "XXTESTCD", "dataType": "text", "length": 20, "description": "X FindingsTest Short Name", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.XX.XXTEST", "name": "XXTEST", "dataType": "text", "length": 24, "description": "X Findings Test Name", "origin": [{"type": "Collected", "source": "Vendor"}]},
+        {"OID": "IT.XX.XXORRES", "name": "XXORRES", "dataType": "text", "length": 30, "description": "Result or Finding in Original Units", "origin": [{"type": "Collected", "source": "Vendor"}]},
+        {"OID": "IT.XX.XXORRESU", "name": "XXORRESU", "dataType": "text", "length": 20, "description": "Original Units", "origin": [{"type": "Collected", "source": "Vendor"}]},
+        {"OID": "IT.XX.XXSTRESC", "name": "XXSTRESC", "dataType": "text", "length": 30, "description": "Character Result/Finding in Std Format", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.XX.XXSTRESN", "name": "XXSTRESN", "dataType": "float", "length": 5, "significantDigits": 1, "description": "Numeric Result/Finding in Standard Units", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.XX.XXSTRESU", "name": "XXSTRESU", "dataType": "text", "length": 9, "description": "Standard Units", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.XX.XXBLFL", "name": "XXBLFL", "dataType": "text", "length": 1, "description": "Baseline Flag", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.XX.VISITNUM", "name": "VISITNUM", "dataType": "integer", "length": 2, "description": "Visit Number", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.XX.VISIT", "name": "VISIT", "dataType": "text", "length": 8, "description": "Visit Name", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.XX.VISITDY", "name": "VISITDY", "dataType": "integer", "length": 3, "description": "Planned Study Day of Visit", "origin": [{"type": "Protocol", "source": "Sponsor"}]},
+        {"OID": "IT.XX.XXDTC", "name": "XXDTC", "dataType": "date", "description": "Date/Time of Measurements", "origin": [{"type": "Collected", "source": "Vendor"}]},
+        {"OID": "IT.XX.XXDY", "name": "XXDY", "dataType": "integer", "length": 3, "description": "Study Day of Vital Signs", "origin": [{"type": "Derived", "source": "Sponsor"}]}
+      ]
+    },
+    {
+      "OID": "IG.SUPPDM",
+      "name": "SUPPDM",
+      "domain": "DM",
+      "standard": "STD.1",
+      "description": "Supplemental Qualifiers for DM",
+      "purpose": "Tabulation",
+      "structure": "One record per IDVAR, IDVARVAL, and QNAM value per subject",
+      "items": [
+        {"OID": "IT.SUPPDM.STUDYID", "name": "STUDYID", "dataType": "text", "length": 7, "description": "Study Identifier", "origin": [{"type": "Protocol", "source": "Sponsor"}]},
+        {"OID": "IT.SUPPDM.RDOMAIN", "name": "RDOMAIN", "dataType": "text", "length": 2, "description": "Related Domain Abbreviation", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.SUPPDM.USUBJID", "name": "USUBJID", "dataType": "text", "length": 14, "description": "Unique Subject Identifier", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.SUPPDM.IDVAR", "name": "IDVAR", "dataType": "text", "length": 1, "description": "Identifying Variable", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.SUPPDM.IDVARVAL", "name": "IDVARVAL", "dataType": "text", "length": 1, "description": "Identifying Variable Value", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.SUPPDM.QNAM", "name": "QNAM", "dataType": "text", "length": 8, "description": "Qualifier Variable Name", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.SUPPDM.QLABEL", "name": "QLABEL", "dataType": "text", "length": 26, "description": "Qualifier Variable Label", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.SUPPDM.QVAL", "name": "QVAL", "dataType": "text", "length": 200, "description": "Data Value"},
+        {"OID": "IT.SUPPDM.QORIG", "name": "QORIG", "dataType": "text", "length": 11, "description": "Origin", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.SUPPDM.QEVAL", "name": "QEVAL", "dataType": "text", "length": 30, "description": "Evaluator", "origin": [{"type": "Assigned", "source": "Sponsor"}]}
+      ],
+      "slices": [
+        {
+          "OID": "VL.SUPPDM.QVAL",
+          "type": "ValueList",
+          "items": [
+            {"OID": "IT.SUPPDM.QVAL.RACE1", "name": "QVAL", "dataType": "text", "length": 41, "description": "Race 1", "origin": [{"type": "Collected", "source": "Investigator"}], "applicableWhen": ["WC.SUPPDM.QNAM.RACE1"]},
+            {"OID": "IT.SUPPDM.QVAL.RACE2", "name": "QVAL", "dataType": "text", "length": 41, "description": "Race 2", "origin": [{"type": "Collected", "source": "Investigator"}], "applicableWhen": ["WC.SUPPDM.QNAM.RACE2"]},
+            {"OID": "IT.SUPPDM.QVAL.RACE3", "name": "QVAL", "dataType": "text", "length": 41, "description": "Race 3", "origin": [{"type": "Collected", "source": "Investigator"}], "applicableWhen": ["WC.SUPPDM.QNAM.RACE3"]},
+            {"OID": "IT.SUPPDM.QVAL.RAND", "name": "QVAL", "dataType": "text", "length": 1, "description": "Randomized Population Flag", "origin": [{"type": "Collected", "source": "Investigator"}], "applicableWhen": ["WC.SUPPDM.QNAM.RAND"]},
+            {"OID": "IT.SUPPDM.QVAL.RANDNO", "name": "QVAL", "dataType": "text", "length": 4, "description": "Randomization Number", "origin": [{"type": "Collected", "source": "Investigator"}], "applicableWhen": ["WC.SUPPDM.QNAM.RANDNO"]},
+            {"OID": "IT.SUPPDM.QVAL.SAFETY", "name": "QVAL", "dataType": "text", "length": 1, "description": "Safety Population Flag", "origin": [{"type": "Derived", "source": "Sponsor"}], "applicableWhen": ["WC.SUPPDM.QNAM.SAFETY"]}
+          ]
+        }
+      ]
+    },
+    {
+      "OID": "IG.SUPPVS",
+      "name": "SUPPVS",
+      "domain": "VS",
+      "standard": "STD.1",
+      "description": "Supplemental Qualifiers for VS",
+      "purpose": "Tabulation",
+      "structure": "One record per IDVAR, IDVARVAL, and QNAM value per subject",
+      "items": [
+        {"OID": "IT.SUPPVS.STUDYID", "name": "STUDYID", "dataType": "text", "length": 7, "description": "Study Identifier", "origin": [{"type": "Protocol", "source": "Sponsor"}]},
+        {"OID": "IT.SUPPVS.RDOMAIN", "name": "RDOMAIN", "dataType": "text", "length": 2, "description": "Related Domain Abbreviation", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.SUPPVS.USUBJID", "name": "USUBJID", "dataType": "text", "length": 14, "description": "Unique Subject Identifier", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.SUPPVS.IDVAR", "name": "IDVAR", "dataType": "text", "length": 5, "description": "Identifying Variable", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.SUPPVS.IDVARVAL", "name": "IDVARVAL", "dataType": "text", "length": 2, "description": "Identifying Variable Value", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.SUPPVS.QNAM", "name": "QNAM", "dataType": "text", "length": 7, "description": "Qualifier Variable Name", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.SUPPVS.QLABEL", "name": "QLABEL", "dataType": "text", "length": 36, "description": "Qualifier Variable Label", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.SUPPVS.QVAL", "name": "QVAL", "dataType": "text", "length": 2, "description": "Data Value"},
+        {"OID": "IT.SUPPVS.QORIG", "name": "QORIG", "dataType": "text", "length": 7, "description": "Origin", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.SUPPVS.QEVAL", "name": "QEVAL", "dataType": "text", "length": 30, "description": "Evaluator", "origin": [{"type": "Assigned", "source": "Sponsor"}]}
+      ],
+      "slices": [
+        {
+          "OID": "VL.SUPPVS.QVAL",
+          "type": "ValueList",
+          "items": [
+            {"OID": "IT.SUPPVS.QVAL.VSCLSIG", "name": "QVAL", "dataType": "text", "length": 1, "description": "Clinically Significant", "origin": [{"type": "Derived", "source": "Sponsor"}], "applicableWhen": ["WC.SUPPVS.QNAM.VSCLSIG"]}
+          ]
+        }
+      ]
+    }
+  ],
+  "conditions": [
+    {"OID": "COND.VS.VSTESTCD.DIABP.1", "rangeChecks": [{"comparator": "EQ", "softHard": "Soft", "item": "IT.VS.VSTESTCD", "checkValues": ["DIABP"]}]},
+    {"OID": "COND.VS.VSTESTCD.FRMSIZE.1", "rangeChecks": [{"comparator": "EQ", "softHard": "Soft", "item": "IT.VS.VSTESTCD", "checkValues": ["FRMSIZE"]}]},
+    {"OID": "COND.VS.VSTESTCD.HEIGHT.1", "rangeChecks": [{"comparator": "EQ", "softHard": "Soft", "item": "IT.VS.VSTESTCD", "checkValues": ["HEIGHT"]}]},
+    {"OID": "COND.VS.VSTESTCD.PULSE.1", "rangeChecks": [{"comparator": "EQ", "softHard": "Soft", "item": "IT.VS.VSTESTCD", "checkValues": ["PULSE"]}]},
+    {"OID": "COND.VS.VSTESTCD.SYSBP.1", "rangeChecks": [{"comparator": "EQ", "softHard": "Soft", "item": "IT.VS.VSTESTCD", "checkValues": ["SYSBP"]}]},
+    {"OID": "COND.VS.VSTESTCD.WEIGHT.1", "rangeChecks": [{"comparator": "EQ", "softHard": "Soft", "item": "IT.VS.VSTESTCD", "checkValues": ["WEIGHT"]}]},
+    {"OID": "COND.VS.VSTESTCD.BMI.1", "rangeChecks": [{"comparator": "EQ", "softHard": "Soft", "item": "IT.VS.VSTESTCD", "checkValues": ["BMI"]}]},
+    {"OID": "COND.SUPPDM.QNAM.RACE1.1", "rangeChecks": [{"comparator": "EQ", "softHard": "Soft", "item": "IT.SUPPDM.QNAM", "checkValues": ["RACE1"]}]},
+    {"OID": "COND.SUPPDM.QNAM.RACE2.1", "rangeChecks": [{"comparator": "EQ", "softHard": "Soft", "item": "IT.SUPPDM.QNAM", "checkValues": ["RACE2"]}]},
+    {"OID": "COND.SUPPDM.QNAM.RACE3.1", "rangeChecks": [{"comparator": "EQ", "softHard": "Soft", "item": "IT.SUPPDM.QNAM", "checkValues": ["RACE3"]}]},
+    {"OID": "COND.SUPPDM.QNAM.RAND.1", "rangeChecks": [{"comparator": "EQ", "softHard": "Soft", "item": "IT.SUPPDM.QNAM", "checkValues": ["RAND"]}]},
+    {"OID": "COND.SUPPDM.QNAM.RANDNO.1", "rangeChecks": [{"comparator": "EQ", "softHard": "Soft", "item": "IT.SUPPDM.QNAM", "checkValues": ["RANDNO"]}]},
+    {"OID": "COND.SUPPDM.QNAM.SAFETY.1", "rangeChecks": [{"comparator": "EQ", "softHard": "Soft", "item": "IT.SUPPDM.QNAM", "checkValues": ["SAFETY"]}]},
+    {"OID": "COND.SUPPVS.QNAM.VSCLSIG.1", "rangeChecks": [{"comparator": "EQ", "softHard": "Soft", "item": "IT.SUPPVS.QNAM", "checkValues": ["VSCLSIG"]}]}
+  ],
+  "whereClauses": [
+    {"OID": "WC.VS.VSTESTCD.DIABP", "conditions": ["COND.VS.VSTESTCD.DIABP.1"]},
+    {"OID": "WC.VS.VSTESTCD.FRMSIZE", "conditions": ["COND.VS.VSTESTCD.FRMSIZE.1"]},
+    {"OID": "WC.VS.VSTESTCD.HEIGHT", "conditions": ["COND.VS.VSTESTCD.HEIGHT.1"]},
+    {"OID": "WC.VS.VSTESTCD.PULSE", "conditions": ["COND.VS.VSTESTCD.PULSE.1"]},
+    {"OID": "WC.VS.VSTESTCD.SYSBP", "conditions": ["COND.VS.VSTESTCD.SYSBP.1"]},
+    {"OID": "WC.VS.VSTESTCD.WEIGHT", "conditions": ["COND.VS.VSTESTCD.WEIGHT.1"]},
+    {"OID": "WC.VS.VSTESTCD.BMI", "conditions": ["COND.VS.VSTESTCD.BMI.1"]},
+    {"OID": "WC.SUPPDM.QNAM.RACE1", "conditions": ["COND.SUPPDM.QNAM.RACE1.1"]},
+    {"OID": "WC.SUPPDM.QNAM.RACE2", "conditions": ["COND.SUPPDM.QNAM.RACE2.1"]},
+    {"OID": "WC.SUPPDM.QNAM.RACE3", "conditions": ["COND.SUPPDM.QNAM.RACE3.1"]},
+    {"OID": "WC.SUPPDM.QNAM.RAND", "conditions": ["COND.SUPPDM.QNAM.RAND.1"]},
+    {"OID": "WC.SUPPDM.QNAM.RANDNO", "conditions": ["COND.SUPPDM.QNAM.RANDNO.1"]},
+    {"OID": "WC.SUPPDM.QNAM.SAFETY", "conditions": ["COND.SUPPDM.QNAM.SAFETY.1"]},
+    {"OID": "WC.SUPPVS.QNAM.VSCLSIG", "conditions": ["COND.SUPPVS.QNAM.VSCLSIG.1"]}
+  ],
+  "methods": []
+}

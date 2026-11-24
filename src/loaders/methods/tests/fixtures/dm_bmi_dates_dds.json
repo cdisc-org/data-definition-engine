@@ -1,0 +1,111 @@
+{
+  "OID": "MDV.DMBMI01",
+  "name": "MDV DMBMI01",
+  "description": "Data Definitions for DMBMI01",
+  "context": "Other",
+  "defineVersion": "2.1.0",
+  "studyOID": "ODM.DMBMI01",
+  "studyName": "DMBMI01",
+  "studyDescription": "Hand-built methods loader fixture: demographics, value-level BMI and an ISO 8601 date.",
+  "protocolName": "DMBMI01",
+  "standards": [
+    {"OID": "STD.SDTMIG", "name": "SDTMIG", "type": "IG", "version": "3.4", "status": "Final"}
+  ],
+  "annotatedCRFs": [{"leafID": "LF.acrf", "title": "Annotated CRF", "href": "acrf.pdf"}],
+  "itemGroups": [
+    {
+      "OID": "IG.DM",
+      "name": "DM",
+      "domain": "DM",
+      "description": "Demographics",
+      "purpose": "Tabulation",
+      "structure": "One record per subject",
+      "isReferenceData": false,
+      "repeating": false,
+      "standard": "STD.SDTMIG",
+      "observationClass": {
+        "name": "SPECIAL PURPOSE"
+      },
+      "items": [
+        {"OID": "IT.DM.STUDYID", "name": "STUDYID", "mandatory": true, "description": "Study Identifier", "dataType": "text", "length": 7, "keySequence": 1, "role": "Identifier", "origin": [{"type": "Protocol", "source": "Sponsor"}]},
+        {"OID": "IT.DM.DOMAIN", "name": "DOMAIN", "mandatory": true, "description": "Domain Abbreviation", "dataType": "text", "length": 2, "role": "Identifier", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.DM.USUBJID", "name": "USUBJID", "mandatory": true, "description": "Unique Subject Identifier", "dataType": "text", "length": 16, "keySequence": 2, "role": "Identifier", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.DM.SUBJID", "name": "SUBJID", "mandatory": true, "description": "Subject Identifier for the Study", "dataType": "text", "length": 4, "role": "Topic", "origin": [{"type": "Collected", "source": "Investigator", "documents": [{"leafID": "LF.acrf", "pages": [1]}]}]},
+        {"OID": "IT.DM.RFSTDTC", "name": "RFSTDTC", "mandatory": false, "description": "Subject Reference Start Date/Time", "dataType": "datetime", "role": "Record Qualifier", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.DM.RFENDTC", "name": "RFENDTC", "mandatory": false, "description": "Subject Reference End Date/Time", "dataType": "datetime", "role": "Record Qualifier", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.DM.RFXSTDTC", "name": "RFXSTDTC", "mandatory": false, "description": "Date/Time of First Study Treatment", "dataType": "datetime", "role": "Record Qualifier", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.DM.RFXENDTC", "name": "RFXENDTC", "mandatory": false, "description": "Date/Time of Last Study Treatment", "dataType": "datetime", "role": "Record Qualifier", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.DM.RFICDTC", "name": "RFICDTC", "mandatory": false, "description": "Date/Time of Informed Consent", "dataType": "datetime", "role": "Record Qualifier", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.DM.RFPENDTC", "name": "RFPENDTC", "mandatory": false, "description": "Date/Time of End of Participation", "dataType": "datetime", "role": "Record Qualifier", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.DM.DTHDTC", "name": "DTHDTC", "mandatory": false, "description": "Date/Time of Death", "dataType": "datetime", "role": "Record Qualifier", "origin": [{"type": "Collected", "source": "Investigator", "documents": [{"leafID": "LF.acrf", "pages": [3]}]}]},
+        {"OID": "IT.DM.DTHFL", "name": "DTHFL", "mandatory": false, "description": "Subject Death Flag", "dataType": "text", "length": 1, "role": "Record Qualifier", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.DM.SITEID", "name": "SITEID", "mandatory": true, "description": "Study Site Identifier", "dataType": "text", "length": 3, "role": "Record Qualifier", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.DM.BRTHDTC", "name": "BRTHDTC", "mandatory": false, "description": "Date/Time of Birth", "dataType": "date", "role": "Record Qualifier", "origin": [{"type": "Collected", "source": "Investigator", "documents": [{"leafID": "LF.acrf", "pages": [1]}]}]},
+        {"OID": "IT.DM.AGE", "name": "AGE", "mandatory": false, "description": "Age", "dataType": "integer", "length": 3, "role": "Record Qualifier", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.DM.AGEU", "name": "AGEU", "mandatory": false, "description": "Age Units", "dataType": "text", "length": 5, "role": "Variable Qualifier", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.DM.SEX", "name": "SEX", "mandatory": true, "description": "Sex", "dataType": "text", "length": 1, "role": "Record Qualifier", "origin": [{"type": "Collected", "source": "Investigator", "documents": [{"leafID": "LF.acrf", "pages": [1]}]}]},
+        {"OID": "IT.DM.ARMCD", "name": "ARMCD", "mandatory": false, "description": "Planned Arm Code", "dataType": "text", "length": 8, "role": "Record Qualifier", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.DM.ARM", "name": "ARM", "mandatory": false, "description": "Description of Planned Arm", "dataType": "text", "length": 40, "role": "Synonym Qualifier", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.DM.ACTARMCD", "name": "ACTARMCD", "mandatory": false, "description": "Actual Arm Code", "dataType": "text", "length": 8, "role": "Record Qualifier", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.DM.ACTARM", "name": "ACTARM", "mandatory": false, "description": "Description of Actual Arm", "dataType": "text", "length": 40, "role": "Synonym Qualifier", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.DM.COUNTRY", "name": "COUNTRY", "mandatory": true, "description": "Country", "dataType": "text", "length": 3, "role": "Record Qualifier", "origin": [{"type": "Assigned", "source": "Sponsor"}]}
+      ]
+    },
+    {
+      "OID": "IG.VS",
+      "name": "VS",
+      "domain": "VS",
+      "description": "Vital Signs",
+      "purpose": "Tabulation",
+      "structure": "One record per vital sign measurement per visit per subject",
+      "isReferenceData": false,
+      "repeating": true,
+      "standard": "STD.SDTMIG",
+      "observationClass": {
+        "name": "FINDINGS"
+      },
+      "items": [
+        {"OID": "IT.VS.STUDYID", "name": "STUDYID", "mandatory": true, "description": "Study Identifier", "dataType": "text", "length": 7, "keySequence": 1, "role": "Identifier", "origin": [{"type": "Protocol", "source": "Sponsor"}]},
+        {"OID": "IT.VS.DOMAIN", "name": "DOMAIN", "mandatory": true, "description": "Domain Abbreviation", "dataType": "text", "length": 2, "role": "Identifier", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.VS.USUBJID", "name": "USUBJID", "mandatory": true, "description": "Unique Subject Identifier", "dataType": "text", "length": 16, "keySequence": 2, "role": "Identifier", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.VS.VSSEQ", "name": "VSSEQ", "mandatory": true, "description": "Sequence Number", "dataType": "integer", "length": 3, "role": "Identifier", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.VS.VSTESTCD", "name": "VSTESTCD", "mandatory": true, "description": "Vital Signs Test Short Name", "dataType": "text", "length": 8, "keySequence": 3, "role": "Topic", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.VS.VSTEST", "name": "VSTEST", "mandatory": true, "description": "Vital Signs Test Name", "dataType": "text", "length": 24, "role": "Synonym Qualifier", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.VS.VSORRES", "name": "VSORRES", "mandatory": false, "description": "Result or Finding in Original Units", "dataType": "text", "length": 8, "role": "Result Qualifier"},
+        {"OID": "IT.VS.VSORRESU", "name": "VSORRESU", "mandatory": false, "description": "Original Units", "dataType": "text", "length": 5, "role": "Variable Qualifier", "origin": [{"type": "Collected", "source": "Investigator", "documents": [{"leafID": "LF.acrf", "pages": [2]}]}]},
+        {"OID": "IT.VS.VSSTRESC", "name": "VSSTRESC", "mandatory": false, "description": "Character Result/Finding in Std Format", "dataType": "text", "length": 8, "role": "Result Qualifier", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.VS.VSSTRESN", "name": "VSSTRESN", "mandatory": false, "description": "Numeric Result/Finding in Standard Units", "dataType": "float", "length": 8, "role": "Result Qualifier", "origin": [{"type": "Derived", "source": "Sponsor"}], "significantDigits": 2},
+        {"OID": "IT.VS.VSSTRESU", "name": "VSSTRESU", "mandatory": false, "description": "Standard Units", "dataType": "text", "length": 5, "role": "Variable Qualifier", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.VS.VSLOBXFL", "name": "VSLOBXFL", "mandatory": false, "description": "Last Observation Before Exposure Flag", "dataType": "text", "length": 1, "role": "Record Qualifier", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.VS.VISITNUM", "name": "VISITNUM", "mandatory": false, "description": "Visit Number", "dataType": "integer", "length": 3, "keySequence": 4, "role": "Timing", "origin": [{"type": "Assigned", "source": "Sponsor"}]},
+        {"OID": "IT.VS.EPOCH", "name": "EPOCH", "mandatory": false, "description": "Epoch", "dataType": "text", "length": 9, "role": "Timing", "origin": [{"type": "Derived", "source": "Sponsor"}]},
+        {"OID": "IT.VS.VSDTC", "name": "VSDTC", "mandatory": false, "description": "Date/Time of Measurements", "dataType": "datetime", "role": "Timing", "origin": [{"type": "Derived", "source": "Sponsor", "documents": [{"leafID": "LF.acrf", "pages": [2]}]}]},
+        {"OID": "IT.VS.VSDY", "name": "VSDY", "mandatory": false, "description": "Study Day of Vital Signs", "dataType": "integer", "length": 4, "role": "Timing", "origin": [{"type": "Derived", "source": "Sponsor"}]}
+      ],
+      "slices": [
+        {
+          "OID": "VL.VS.VSORRES",
+          "name": "VL_VS_VSORRES",
+          "type": "ValueList",
+          "wasDerivedFrom": "IT.VS.VSORRES",
+          "items": [
+            {"OID": "IT.VS.VSORRES.HEIGHT", "name": "VSORRES", "mandatory": false, "description": "Height", "dataType": "float", "length": 5, "origin": [{"type": "Collected", "source": "Investigator", "documents": [{"leafID": "LF.acrf", "pages": [2]}]}], "significantDigits": 1, "applicableWhen": ["WC.VS.VSTESTCD.HEIGHT"]},
+            {"OID": "IT.VS.VSORRES.WEIGHT", "name": "VSORRES", "mandatory": false, "description": "Weight", "dataType": "float", "length": 5, "origin": [{"type": "Collected", "source": "Investigator", "documents": [{"leafID": "LF.acrf", "pages": [2]}]}], "significantDigits": 1, "applicableWhen": ["WC.VS.VSTESTCD.WEIGHT"]},
+            {"OID": "IT.VS.VSORRES.BMI", "name": "VSORRES", "mandatory": false, "description": "Body Mass Index", "dataType": "float", "length": 5, "origin": [{"type": "Derived", "source": "Sponsor", "documents": [{"leafID": "LF.acrf", "pages": [2]}]}], "significantDigits": 1, "applicableWhen": ["WC.VS.VSTESTCD.BMI"]}
+          ]
+        }
+      ]
+    }
+  ],
+  "conditions": [
+    {"OID": "COND.VS.VSTESTCD.HEIGHT", "rangeChecks": [{"comparator": "EQ", "checkValues": ["HEIGHT"], "item": "IT.VS.VSTESTCD", "softHard": "Soft"}]},
+    {"OID": "COND.VS.VSTESTCD.WEIGHT", "rangeChecks": [{"comparator": "EQ", "checkValues": ["WEIGHT"], "item": "IT.VS.VSTESTCD", "softHard": "Soft"}]},
+    {"OID": "COND.VS.VSTESTCD.BMI", "rangeChecks": [{"comparator": "EQ", "checkValues": ["BMI"], "item": "IT.VS.VSTESTCD", "softHard": "Soft"}]}
+  ],
+  "whereClauses": [
+    {"OID": "WC.VS.VSTESTCD.HEIGHT", "conditions": ["COND.VS.VSTESTCD.HEIGHT"]},
+    {"OID": "WC.VS.VSTESTCD.WEIGHT", "conditions": ["COND.VS.VSTESTCD.WEIGHT"]},
+    {"OID": "WC.VS.VSTESTCD.BMI", "conditions": ["COND.VS.VSTESTCD.BMI"]}
+  ],
+  "methods": []
+}
