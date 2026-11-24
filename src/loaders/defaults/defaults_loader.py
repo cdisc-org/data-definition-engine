@@ -1,9 +1,9 @@
 """Stage F: fill what no other loader supplied from a dictionary of well-known defaults.
 
-An enrichment loader, like ``loaders/crf`` and ``loaders/pagerefs``: DDS in, DDS out. It runs
-after the pagerefs loader and before the Define generator, so every other source has had its
-turn, and it fills only values that are still unfilled. Content another loader wrote is never
-changed.
+An enrichment loader, like ``loaders/crf`` and ``loaders/pagerefs``: DDS in, DDS out. It runs after
+the pagerefs loader and before the methods loader (stage G), so every other source of these values
+has had its turn, and it fills only values that are still unfilled. Content another loader wrote is
+never changed.
 
 The define.xml at this stage is a specification built from the study design before any data
 exist, so the defaults are specification values: a length is an estimate, to be set from the
@@ -23,9 +23,9 @@ text, integer and float items, ``significantDigits`` only on float ones, and an 
 dataType differs from the item's contributes no type-dependent field.
 
 The loader then rewrites ``define-patch.yaml`` with what is still open plus every answered value
-(``--patch_read_only`` applies the answers without rewriting it: in the pipeline the methods loader,
-which runs next, owns the rewrite), and writes ``defaults-report.yaml``. A rewrite carries the
-``methods`` and ``resources`` answers over for the methods loader to apply.
+(``--patch_read_only``, which the pipeline passes, applies the answers without rewriting it: there
+the methods loader, which runs next, owns the rewrite), and writes ``defaults-report.yaml``. A
+rewrite carries the ``methods`` and ``resources`` answers over for the methods loader to apply.
 """
 from __future__ import annotations
 

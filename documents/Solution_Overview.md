@@ -28,6 +28,7 @@ graph LR
         CLIB["CDISC Library<br/>(all loaders)"]
         GAP["Gap / Replacement<br/>Metadata<br/>(patch YAML)"]
         DEFS["Well-known<br/>Defaults<br/>(dictionary)"]
+        METH["SDTM Method<br/>Library"]
         XLS["Metadata<br/>Spreadsheets"]
         DEF_IN["Define-XML<br/>Files"]
         CRF_IN["Template CRFs"]
@@ -40,6 +41,7 @@ graph LR
         L7["CRF Loader<br/>(USDM + BC<br/>+ CRF Spec.)"]
         L6["Enrichment<br/>(patch files)"]
         L9["Defaults<br/>Loader"]
+        L10["Methods<br/>Loader"]
         L2["Spreadsheet<br/>Loader"]
         L3["Define-XML<br/>Loader"]
         L4["Template CRF<br/>Loader"]
@@ -87,6 +89,7 @@ graph LR
     CRFS --> L7
     GAP --> L6
     DEFS --> L9
+    METH --> L10
     XLS --> L2
     DEF_IN --> L3
     CRF_IN --> L4
@@ -100,6 +103,7 @@ graph LR
     L7 --> DDS
     L6 --> DDS
     L9 --> DDS
+    L10 --> DDS
     L2 --> DDS
     L3 --> DDS
     L4 --> DDS
@@ -144,8 +148,8 @@ graph LR
     classDef legendPartial fill:#fff,stroke:#374151,stroke-width:2.5px,stroke-dasharray: 6 4,color:#111
     linkStyle default stroke:#5f6b7a,stroke-width:1.5px
 
-    class USDM,BC,DSS,CRFS,CLIB,GAP,DEFS source
-    class L1,L7,L9 loader
+    class USDM,BC,DSS,CRFS,CLIB,GAP,DEFS,METH source
+    class L1,L7,L9,L10 loader
     class DDS core
     class G1,G3 generator
     class A1,A3 artifact
@@ -174,8 +178,9 @@ between the two halves of the system: each generator reads the whole file and ig
 - **Define generator** (`src/generators/define/define_generator.py`). Generates Define-XML v2.1 using odmlib.
 - **CRF generator** (`src/generators/crf/crf_generator.py`). Generates ODM v1.3.2 or v2.0 from the same DDS. Every difference between the two ODM versions sits behind a single target abstraction, so the rest of the generator is written once. SDTM annotations are always embedded, so one ODM file is both the blank CRF and the annotated CRF (aCRF); which one you see is a rendering choice. Each CRF item also states the Define-XML ItemDefs it populates (`SDTMItemOIDs`) and how it maps (`SDTMMappingType`), and each concept its fixed values.
 - **Pagerefs loader** (`src/loaders/pagerefs/`). A third enrichment loader: crfutils `crfpdf` renders the aCRF PDF and writes the page each annotation lands on, and this loader writes each Define item's Origin with those pages. It runs after the CRF generator because Origin pages only exist once the PDF does.
-- **Defaults loader** (`src/loaders/defaults/`). A fourth enrichment loader: it fills the values that are still unfilled once every other source has had its turn, such as variable lengths and the origins of identifiers, timing variables and coded terms, from a sponsor-editable dictionary of well-known defaults (`data/defaults/`), and never changes a value another loader wrote. It then rewrites the define patch so a person sees only what is still open.
-- **Pipeline** (`src/pipeline/`). Runs the Define loader, CRF loader, CRF generator, crfpdf, pagerefs loader, defaults loader and Define generator in order for one study, from a per-study YAML, and reports the open review items.
+- **Defaults loader** (`src/loaders/defaults/`). A fourth enrichment loader: it fills the values that are still unfilled once every other source has had its turn, such as variable lengths and the origins of identifiers, timing variables and coded terms, from a sponsor-editable dictionary of well-known defaults (`data/defaults/`), and never changes a value another loader wrote.
+- **Methods loader** (`src/loaders/methods/`). A fifth enrichment loader: it gives every Derived variable a method from a sponsor-editable library of standard SDTM derivations (`data/methods/`), shared the way the SDTM-MSG v2.0 example shares them (one `MT.SEQ` for every --SEQ). A study-specific derivation gets a placeholder method, which a person writes in the define patch. It never changes an origin, and checks the Define-XML 2.1 method rules before it writes. It then rewrites the define patch so a person sees only what is still open.
+- **Pipeline** (`src/pipeline/`). Runs the Define loader, CRF loader, CRF generator, crfpdf, pagerefs loader, defaults loader, methods loader and Define generator in order for one study, from a per-study YAML, and reports the open review items.
 
 ### Enrichment
 No single source supplies every value a study artifact needs. Each loader marks the values it cannot derive as 
@@ -194,6 +199,11 @@ rewritten to list only what the defaults could not supply. The define.xml at thi
 the study design before any data exist, and it can help drive the SDTM programming, so the defaults are specification 
 values: a length is an estimate of the room a variable needs, which the sponsor sets to the longest value in the data 
 when preparing a submission. The dictionary belongs to the sponsor, and a study can override it with its own file.
+
+Methods follow the same pattern. Most derivations are the same in every study (--SEQ, --DY, --STRESN), so the methods 
+loader attaches them from a shared library of SDTM methods. The derivations a library cannot know get placeholder 
+methods, which are listed in the define patch beside the other open values. A person writes each one there, and can 
+point it at pages of a supporting PDF, which the define patch defines once under `resources`.
 
 The CRF content in a combined DDS is itself a potential source for enriching the Define content. The first item below 
 is implemented for Origin (the pagerefs loader writes CRF-evidenced origins with their aCRF pages, and lists every 
@@ -249,7 +259,8 @@ joined by a CRF loader that adds CRF metadata to the DDS. The loaders and their 
 - **USDM + BCs + CRF Specializations**: *Implemented* as the CRF loader, which adds to an existing DDS (see [Incremental Loading](#incremental-loading)).
 - **CDISC Library**: *Implemented* as part of both loaders. The CRF loader caches Library responses on disk, so repeated runs are fast.
 - **Phase 1 metadata gaps**: *Partial*. Addresses specific metadata elements identified during Phase 1 as unavailable from the primary sources (e.g., variable-level metadata not derivable from BCs or DSSs, missing computational methods, and other content required for complete artifact generation). Gaps that are the same in every study are filled by the defaults loader below; the rest through the loaders' patch files (see [Enrichment](#enrichment)).
-- **Well-known defaults**: *Implemented* as the defaults loader, from a sponsor-editable JSON dictionary with a JSON Schema. It fills only values that are still unfilled, so every other source wins. Computational methods are not in the dictionary yet.
+- **Well-known defaults**: *Implemented* as the defaults loader, from a sponsor-editable JSON dictionary with a JSON Schema. It fills only values that are still unfilled, so every other source wins.
+- **SDTM method library**: *Implemented* as the methods loader, from a sponsor-editable JSON library of shared SDTM methods with a JSON Schema. Each method is held in ODM v2.0 form, with a MethodSignature.
 - **Lab Data Transfer Agreements (DTAs)**: *Planned*. A draft LinkML model of the lab DTA, tracing USDM and Biomedical Concepts through Dataset Specializations to SDTM, is in `src/dta2sdtm/`.
 - **Template CRFs**: *Planned*.
 - **Define-XML files**: *Planned*.
@@ -327,21 +338,22 @@ adds CRF content to it (forms, CRF items and codelists, study events, and the CD
 Define content. The whole input DDS serves as context; for example, each CRF item is linked to the SDTM variables it 
 maps to. Patch files are the second mechanism: they enrich existing content in place, matched by OID. Loading 
 content into a DDS that already holds content of the same kind is not yet supported: running the CRF loader on its own 
-output adds the forms a second time. The pagerefs and defaults loaders are enrichment loaders of a third kind: each 
-writes a new DDS from the same input on every run, so a re-run replaces what it wrote rather than stacking it, and the 
-defaults loader changes nothing when run on its own output.
+output adds the forms a second time. The pagerefs, defaults and methods loaders are enrichment loaders of a third 
+kind: each writes a new DDS from the same input on every run, so a re-run replaces what it wrote rather than stacking 
+it, and the defaults loader changes nothing when run on its own output.
 
 ### Orchestration
 Incremental loading will almost certainly require an orchestrator of some kind, to make the initial and enrichment 
 loaders work together to build the full DDS. **Status: a first driver exists** (`src/pipeline`): a per-study YAML 
-names the inputs, standards versions, output folder, the three review files and the defaults dictionaries; the driver 
+names the inputs, standards versions, output folder, the three review files, the defaults dictionaries and the method 
+libraries; the driver 
 runs each stage in order, 
 applies each review file that exists, stops on a failing stage, re-runs part of the chain with `--from`/`--to`, records 
 every step with input and output hashes, and fails with `--strict` while review items are open. The coordination it 
 has to handle grows with every loader added:
 - **Order.** An enrichment loader depends on content that earlier loaders wrote. The CRF loader needs the Define DDS to link CRF items to SDTM variables, patch values apply only to OIDs that already exist, and enriching the Define content from the CRFs (see [Enrichment](#enrichment)) would add a step after both loaders.
 - **Re-runs.** The CRF loader cannot yet be re-run on its own output, so when a source changes, the chain is re-run from the initial loader, applying each patch file at its step.
-- **Ownership and conflicts.** Each loader owns some sections of the DDS and reads others as context. When two sources supply the same value, the orchestrator needs a rule for which wins, informed by the provenance described below. The defaults loader is the first such rule in place: it runs last and fills only what is still unfilled, so any other source wins over a default. Its define patch is the one review file with two stages involved: stage A applies it, and stage F rewrites it with what is still open.
+- **Ownership and conflicts.** Each loader owns some sections of the DDS and reads others as context. When two sources supply the same value, the orchestrator needs a rule for which wins, informed by the provenance described below. The defaults loader is the first such rule in place: it runs after every other source of the values it fills and fills only what is still unfilled, so any other source wins over a default. The methods loader follows the same rule for methods, and never changes an origin. The define patch is the one review file that several stages read: stages A and F apply it, the methods loader (stage G) applies its `methods` and `resources` sections, and only stage G rewrites it with what is still open.
 - **Completeness.** The profiles of the artifacts to be generated determine which loaders must run, and validation against them shows when the DDS is complete (see [DDS Profiles](#dds-profiles)).
 
 The orchestrator need not be a separate service; a pipeline definition that declares each loader's inputs, outputs, 

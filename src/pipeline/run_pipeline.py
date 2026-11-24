@@ -1,4 +1,4 @@
-"""Run the DDE stages A-G for one study, from its study design to define.xml and the annotated CRF.
+"""Run the DDE stages A-H for one study, from its study design to define.xml and the annotated CRF.
 
 | Stage | Program | Writes |
 |---|---|---|
@@ -7,16 +7,18 @@
 | C | generators/crf/crf_generator.py | crf-2.0.xml |
 | D | crfutils crfvalidate + crfpdf | acrf.pdf, acrf.pagerefs.json |
 | E | loaders/pagerefs | DDS3 (with Origin and pages), origin-review.yaml |
-| F | loaders/defaults | DDS4 (with well-known defaults), define-patch.yaml, defaults-report.yaml |
-| G | generators/define/define_generator.py (+ defineutils) | define.xml |
+| F | loaders/defaults | DDS4 (with well-known defaults), defaults-report.yaml |
+| G | loaders/methods | DDS5 (with methods), define-patch.yaml, methods-report.yaml |
+| H | generators/define/define_generator.py (+ defineutils) | define.xml |
 
 Each stage runs as a subprocess in the folder it needs (``define-xml/`` and
 ``generators/define/`` use flat imports; the loaders run as packages from ``src/``), with every
 path made absolute. A stage that exits non-zero stops the run. A stage whose review file exists
 applies it and writes it back with what is still open. The define patch is the exception to
-"each stage its own file": stage A applies it but writes its full list to ``output_dir``, and
-stage F rewrites it with what is still open once the defaults are filled, so the file a person
-edits has one writer. The run ends with a summary of open review items; with ``--strict`` it
+"each stage its own file": stage A applies it but writes its full list to ``output_dir``, stage F
+applies it without writing it (``--patch_read_only``), and stage G rewrites it with what is still
+open once the defaults are filled and the methods attached, so the file a person edits has one
+writer. The run ends with a summary of open review items; with ``--strict`` it
 exits non-zero while any is open (a define.xml that fails schema validation counts as one).
 
 The study YAML (paths relative to it)::
@@ -37,6 +39,8 @@ The study YAML (paths relative to it)::
       origin_review: origin-review.yaml
     defaults:            # optional; later files win (default: data/defaults/well_known_defaults.json)
       - ../../defaults/well_known_defaults.json
+    methods:             # optional; later files win (default: data/methods/sdtm_methods.json)
+      - ../../methods/sdtm_methods.json
     commands:            # optional; defaults shown
       crfvalidate: crfvalidate
       crfpdf: crfpdf
@@ -57,10 +61,11 @@ from typing import Any, Callable
 import yaml
 
 SRC = Path(__file__).resolve().parents[1]
-STAGES = ("A", "B", "C", "D", "E", "F", "G")
+STAGES = ("A", "B", "C", "D", "E", "F", "G", "H")
 PLACEHOLDER = "__PLACEHOLDER__"
 METHOD_SECTIONS = ("methods", "resources")   # the define patch sections the methods loader answers
 DEFAULT_DICTIONARY = SRC.parent / "data" / "defaults" / "well_known_defaults.json"
+DEFAULT_METHODS = SRC.parent / "data" / "methods" / "sdtm_methods.json"
 
 
 class PipelineError(Exception):
@@ -97,6 +102,7 @@ class Study:
     crfvalidate: list[str]
     crfpdf: list[str]
     defaults: list[Path] = field(default_factory=lambda: [DEFAULT_DICTIONARY])
+    methods: list[Path] = field(default_factory=lambda: [DEFAULT_METHODS])
 
     @property
     def dds_crf(self) -> Path:
@@ -115,8 +121,16 @@ class Study:
         return self.output_dir / "defaults-report.yaml"
 
     @property
+    def dds_methods(self) -> Path:
+        return self.output_dir / "dds-methods.json"
+
+    @property
+    def methods_report(self) -> Path:
+        return self.output_dir / "methods-report.yaml"
+
+    @property
     def define_patch_stage_a(self) -> Path:
-        """Stage A's full placeholder list; the define patch a person edits is stage F's."""
+        """Stage A's full placeholder list; the define patch a person edits is stage G's."""
         return self.output_dir / "define-patch-stageA.yaml"
 
     @property
@@ -143,11 +157,15 @@ def load_study(path: str | Path) -> Study:
             raise PipelineError(f"the study YAML {path} has no {key}")
         return (base / value).resolve()
 
+    def files(key: str, default: Path) -> list[Path]:
+        """A list of files where later ones win (one path is allowed); ``default`` when none is named."""
+        value = data.get(key)
+        if isinstance(value, str):
+            value = [value]
+        return [(base / p).resolve() for p in value] if value else [default]
+
     review = data.get("review") or {}
     commands = data.get("commands") or {}
-    defaults = data.get("defaults")
-    if isinstance(defaults, str):
-        defaults = [defaults]
     return Study(
         path=path, name=str(data.get("study") or path.parent.name),
         usdm_file=file("usdm_file"), crf_spec_file=file("crf_spec_file"),
@@ -160,7 +178,7 @@ def load_study(path: str | Path) -> Study:
         origin_review=(base / review.get("origin_review", "origin-review.yaml")).resolve(),
         crfvalidate=shlex.split(str(commands.get("crfvalidate", "crfvalidate"))),
         crfpdf=shlex.split(str(commands.get("crfpdf", "crfpdf"))),
-        defaults=[(base / p).resolve() for p in defaults] if defaults else [DEFAULT_DICTIONARY],
+        defaults=files("defaults", DEFAULT_DICTIONARY), methods=files("methods", DEFAULT_METHODS),
     )
 
 
@@ -184,7 +202,7 @@ def acrf_name(dds_file: Path) -> str:
 
 
 def steps(study: Study, python: str = sys.executable) -> list[Step]:
-    """Every step of stages A-G, in order. Stage D's PDF name is read from DDS2 when it runs."""
+    """Every step of stages A-H, in order. Stage D's PDF name is read from DDS2 when it runs."""
     out = study.output_dir
     refs = out / "acrf.pagerefs.json"
 
@@ -192,8 +210,8 @@ def steps(study: Study, python: str = sys.executable) -> list[Step]:
         args = ["--patch_file", str(path)]
         return args + ["--apply_patch", str(path)] if path.exists() else args
 
-    # stage A applies the define patch a person answered but writes its own full list elsewhere:
-    # stage F rewrites the define patch once the defaults are filled
+    # stage A applies the define patch a person answered but writes its own full list elsewhere,
+    # stage F applies it without writing it, and stage G rewrites it once the methods are attached
     define_patch = ["--patch_file", str(study.define_patch_stage_a)] + (
         ["--apply_patch", str(study.define_patch)] if study.define_patch.exists() else [])
     return [
@@ -221,14 +239,21 @@ def steps(study: Study, python: str = sys.executable) -> list[Step]:
         Step("F", "defaults loader", [python, "-m", "loaders.defaults", "--dds_in", str(study.dds_origin),
                                       "--dds_out", str(study.dds_defaults),
                                       "--defaults", *[str(p) for p in study.defaults],
-                                      "--patch_file", str(study.define_patch),
+                                      "--patch_file", str(study.define_patch), "--patch_read_only",
                                       "--report", str(study.defaults_report)],
              SRC, [study.dds_origin, study.define_patch, *study.defaults],
-             [study.dds_defaults, study.define_patch, study.defaults_report]),
-        Step("G", "define generator", [python, "define_generator.py", "-t", str(study.dds_defaults),
+             [study.dds_defaults, study.defaults_report]),
+        Step("G", "methods loader", [python, "-m", "loaders.methods", "--dds_in", str(study.dds_defaults),
+                                     "--dds_out", str(study.dds_methods),
+                                     "--methods", *[str(p) for p in study.methods],
+                                     "--patch_file", str(study.define_patch),
+                                     "--report", str(study.methods_report)],
+             SRC, [study.dds_defaults, study.define_patch, *study.methods],
+             [study.dds_methods, study.define_patch, study.methods_report]),
+        Step("H", "define generator", [python, "define_generator.py", "-t", str(study.dds_methods),
                                        "-d", str(study.define)],
-             SRC / "generators" / "define", [study.dds_defaults], [study.define]),
-        Step("G", "define.xml validation", [python, "-m", "defineutils.validate", "-d", str(study.define)],
+             SRC / "generators" / "define", [study.dds_methods], [study.define]),
+        Step("H", "define.xml validation", [python, "-m", "defineutils.validate", "-d", str(study.define)],
              out, [study.define], [], check=True),
     ]
 
@@ -251,7 +276,7 @@ class Pipeline:
         self.record: list[dict[str, Any]] = []
         self.failed_checks: list[str] = []
 
-    def run(self, first: str = "A", last: str = "G") -> None:
+    def run(self, first: str = "A", last: str = "H") -> None:
         """Run stages ``first`` to ``last``. Raises PipelineError when a stage fails."""
         if first not in STAGES or last not in STAGES or STAGES.index(first) > STAGES.index(last):
             raise PipelineError(f"--from {first} --to {last} is not a range of {', '.join(STAGES)}")
@@ -291,7 +316,7 @@ class Pipeline:
     # -- the summary ------------------------------------------------------------
     def open_items(self) -> dict[str, int]:
         """Open review items per source; zero everywhere means --strict passes."""
-        # the define patch stage F writes; before F has run, stage A's full list
+        # the define patch stage G writes; before G has run, stage A's full list
         patch = self.study.define_patch if self.study.define_patch.exists() else self.study.define_patch_stage_a
         items = {
             "define patch open values": _count_open(patch),
@@ -348,10 +373,10 @@ def _count_open(path: Path, methods: bool = False) -> int:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="python -m pipeline",
-                                     description="Run the DDE stages A-G for one study.")
+                                     description="Run the DDE stages A-H for one study.")
     parser.add_argument("--study", required=True, help="the study's pipeline.yaml")
     parser.add_argument("--from", dest="first", default="A", choices=STAGES, help="first stage to run")
-    parser.add_argument("--to", dest="last", default="G", choices=STAGES, help="last stage to run")
+    parser.add_argument("--to", dest="last", default="H", choices=STAGES, help="last stage to run")
     parser.add_argument("--strict", action="store_true",
                         help="exit non-zero while any review item is open")
     parser.add_argument("--dry-run", action="store_true", help="print the commands without running them")

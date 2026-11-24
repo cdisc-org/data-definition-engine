@@ -1,9 +1,10 @@
 """``define-patch.yaml`` read, applied, collected and written outside the Define loader.
 
-Stage A (``create_define_json.py``) applies this file. In the pipeline, stage F (the defaults
-loader) rewrites it once the defaults are filled, so it lists only what is still open plus every
-value a person already answered. The format is Stage A's, so Stage A's ``--apply_patch`` reads the
-rewritten file unchanged:
+Stage A (``create_define_json.py``) applies this file and stage F (the defaults loader) applies it
+again. In the pipeline, stage G (the methods loader) rewrites it once the defaults are filled and
+the methods attached, so it lists only what is still open plus every value a person already
+answered; a standalone defaults run rewrites it too. The format is Stage A's, so Stage A's
+``--apply_patch`` reads the rewritten file unchanged:
 
 * ``itemGroups`` — OID -> name, description, domain, purpose, structure, standard, keySequence;
 * ``items`` — OID -> name, description, role, dataType, length, significantDigits, and origin
@@ -355,15 +356,15 @@ def count_open(remaining: Answers, sections: tuple[str, ...] = SECTIONS) -> int:
 
 # -- writing -------------------------------------------------------------------
 WRITERS = {
-    "defaults": ["Written by loaders/defaults (pipeline stage F): what is still open once the",
+    "defaults": ["Written by loaders/defaults, run on its own: what is still open once the",
                  "defaults are filled, plus every value already answered."],
-    "methods": ["Written by loaders/methods (the methods loader): what is still open once the",
-                "methods are attached, plus every value already answered."],
+    "methods": ["Written by loaders/methods (pipeline stage G): what is still open once the",
+                "defaults are filled and the methods attached, plus every value already answered."],
 }
-RERUN = {
-    "defaults": "  3. Re-run the pipeline: stage A and stage F apply the answers (--from F is enough)",
-    "methods": "  3. Re-run: stage A and stage F apply the answers, the methods loader those under methods and resources",
-}
+RERUN = [
+    "  3. Re-run the pipeline: --from F after answering any value, or --from G",
+    "     when only methods and resources were answered",
+]
 BANNER = [
     "=" * 68,
     "Define-JSON Placeholder Patch File",
@@ -392,7 +393,7 @@ def banner(dds: dict[str, Any], writer: str) -> list[str]:
         if line == "{writer}":
             lines += WRITERS[writer]
         elif line == "{rerun}":
-            lines.append(RERUN[writer])
+            lines += RERUN
         else:
             lines.append(line.format(study=dds.get("studyName") or "N/A", today=date.today().isoformat()))
     return lines

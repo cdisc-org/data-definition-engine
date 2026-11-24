@@ -1,10 +1,12 @@
 # loaders/defaults — Stage F: well-known defaults for the values no other loader supplied
 
-An enrichment loader (DDS in, DDS out), run after the pagerefs loader and before the Define
-generator. It fills the values that are still unfilled once every other source has had its turn
-from a **dictionary of well-known defaults**: STUDYID is Protocol/Sponsor, --SEQ is Derived/Sponsor
-with length 3, --TESTCD has at most 8 characters. Content another loader wrote is never changed.
-It then rewrites `define-patch.yaml` so the file lists only what is still open.
+An enrichment loader (DDS in, DDS out), run after the pagerefs loader and before the methods
+loader (stage G), which attaches a method to each Derived item. It fills the values that are still
+unfilled once every other source has had its turn from a **dictionary of well-known defaults**:
+STUDYID is Protocol/Sponsor, --SEQ is Derived/Sponsor with length 3, --TESTCD has at most 8
+characters. Content another loader wrote is never changed. Run on its own, it then rewrites
+`define-patch.yaml` so the file lists only what is still open; in the pipeline the methods loader
+does that.
 
 The define.xml at this stage is a **specification**, built from the study design before any data
 exist, and it can help drive the SDTM programming. The defaults are specification values: a
@@ -30,12 +32,12 @@ python -m loaders.defaults \
 | `--dds_in`, `--dds_out` | The pagerefs loader's DDS and the DDS to write. They must differ, so a re-run starts from the same input. |
 | `--defaults` | One or more dictionaries; later files win. Default: `data/defaults/well_known_defaults.json`. |
 | `--patch_file` | The `define-patch.yaml`: its answers are applied, then it is rewritten with what is still open plus every answered value. |
-| `--patch_read_only` | Apply the `--patch_file` answers without rewriting the file. In the pipeline the methods loader runs next and owns the rewrite (methods plan M4). A rewrite by this loader carries the `methods` and `resources` answers over for the methods loader. |
+| `--patch_read_only` | Apply the `--patch_file` answers without rewriting the file. The pipeline passes it: the methods loader runs next and owns the rewrite. A rewrite by this loader carries the `methods` and `resources` answers over for the methods loader. |
 | `--report` | The `defaults-report.yaml` to write. |
 | `--validate` | Validate the output against the CRF profile JSON Schema. |
 
-The pipeline (`src/pipeline`) runs it as stage F. A dictionary that fails its schema stops the
-run with exit 1, and nothing is written.
+The pipeline (`src/pipeline`) runs it as stage F, with `--patch_read_only`. A dictionary that fails
+its schema stops the run with exit 1, and nothing is written.
 
 ## The dictionary
 
@@ -86,19 +88,22 @@ Rules:
 - An entry whose `dataType` differs from the item's real dataType contributes no `dataType`,
   `length`, `significantDigits` or `displayFormat` (reported as a conflict); its origin still applies.
 - A Collected/Investigator origin filled without aCRF pages is reported under `noPages`: the Define
-  generator writes `PageRefs="__PLACEHOLDER__"` for it. Each Derived origin gets a MethodDef
-  placeholder from the Define generator's post-processing.
+  generator writes `PageRefs="__PLACEHOLDER__"` for it. Each Derived origin it fills needs a method,
+  which the methods loader attaches (from its library, or as a placeholder for a person to write).
 
 ## define-patch.yaml
 
 Stage A applies the define patch but, in the pipeline, writes its full placeholder list to
 `output_dir/define-patch-stageA.yaml`. Stage F applies the answers again (to values still
-unfilled), fills the defaults, and rewrites the define patch beside `pipeline.yaml` in Stage A's
-format, so Stage A's `--apply_patch` keeps reading it. The rewritten file lists what is still open
-and carries every answered value, so answers survive the next run; answers for OIDs the DDS no
-longer has are dropped. Two differences from Stage A's list: `length` is listed only for text,
-integer and float items, and `standard` is not listed when the group has a `standardOID`. The
-shared code is `loaders/common/define_patch.py`.
+unfilled) and fills the defaults. In the pipeline it stops there (`--patch_read_only`), and stage G,
+the methods loader, rewrites the define patch beside `pipeline.yaml`. Run on its own, this loader
+rewrites it.
+
+Either writer uses Stage A's format, so Stage A's `--apply_patch` keeps reading the file. The
+rewritten file lists what is still open and carries every answered value, so answers survive the
+next run; answers for OIDs the DDS no longer has are dropped. Two differences from Stage A's list:
+`length` is listed only for text, integer and float items, and `standard` is not listed when the
+group has a `standardOID`. The shared code is `loaders/common/define_patch.py`.
 
 ## defaults-report.yaml
 

@@ -1,7 +1,7 @@
 # loaders/methods: SDTM methods for the Derived items
 
-An enrichment loader (DDS in, DDS out), planned as pipeline stage G, after the defaults loader and
-before the Define generator. Every Define item with a Derived origin gets a `method`. It comes from a
+An enrichment loader (DDS in, DDS out): pipeline stage G, after the defaults loader (F) and before
+the Define generator (H). Every Define item with a Derived origin gets a `method`. It comes from a
 **library of standard SDTM derivations** (`MT.SEQ`, `MT.DAYCALC`, `MT.STRESN` and so on), or, for a
 study-specific derivation, from a placeholder for a person to write. Define-XML 2.1 rule 73 requires
 a method on every Derived item. Once each one names a method in the DDS, the Define generator writes
@@ -34,8 +34,15 @@ python -m loaders.methods \
 | `--validate` | Validate the output against the CRF profile JSON Schema. That schema doesn't constrain methods; the loader's own conformance checks always run. |
 
 A library that fails its checks, or a result that fails conformance, stops the loader with exit 1,
-and nothing is written. Not yet built: the pipeline stage, which then owns the patch rewrite while
-the defaults loader only reads the patch (methods plan M4).
+and nothing is written.
+
+The pipeline (`src/pipeline`) runs it as stage G:
+- its input is `dds-defaults.json` and its output `dds-methods.json`, which stage H reads;
+- the libraries come from `methods:` in the study's `pipeline.yaml` (default: the shared seed);
+- it rewrites the study's `define-patch.yaml`; stages A and F only read the patch, so the file has
+  one writer;
+- `--from G` re-runs it and the Define generator after a person answers the `methods` or
+  `resources` sections, or after a library changes.
 
 ## What it does, per Derived item
 
@@ -92,8 +99,9 @@ resources:
 - A string page (a named destination) or a document without a `leafID` stops the run: named
   destinations wait for the upstream `DocumentReference` change (methods plan M6).
 - The rewrite keeps a method answer while the DDS has the method or a Derived item that would get
-  that placeholder OID, and a leaf while a kept method references it. Stage A ignores both sections,
-  and a defaults rewrite carries their answers over.
+  that placeholder OID, and a leaf while a kept method references it. Stage A ignores both sections.
+  A standalone defaults rewrite carries their answers over; in the pipeline the defaults loader
+  runs with `--patch_read_only` and does not rewrite the file.
 - The summary's `open define patch methods` is what the pipeline counts as `define patch open
   methods`; `--strict` fails while it is not zero.
 

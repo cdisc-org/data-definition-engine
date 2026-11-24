@@ -46,8 +46,8 @@ can add its own file under `defaults:` in its `pipeline.yaml`. See [README.md](d
 
 The SDTM method library that `src/loaders/methods` (pipeline stage G) attaches to Derived items, so
 the define.xml carries real MethodDefs instead of placeholders. Methods are shared, MSG v2 style, and
-held in ODM v2.0 form (each with a MethodSignature). A study can add its own file. See
-[README.md](methods/README.md).
+held in ODM v2.0 form (each with a MethodSignature). A study can add its own file under `methods:`
+in its `pipeline.yaml`. See [README.md](methods/README.md).
 
 ### `metadata_xlsx/`
 

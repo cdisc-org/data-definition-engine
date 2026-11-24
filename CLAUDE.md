@@ -8,13 +8,14 @@ The Data Definition Engine (DDE) is part of the CDISC 360i program. It populates
 
 ## Repository layout
 
-Six programs live in `src/` — four loaders and two generators — plus the driver that runs them in order:
+Seven programs live in `src/` — five loaders and two generators — plus the driver that runs them in order:
 
 - `src/define-xml/` — **Define loader**. `create_define_json.py` reads a USDM JSON study design, calls the CDISC Library API for Biomedical Concepts and Dataset Specializations, and writes a Define-JSON file. Validation is against `define.yaml` (a LinkML/YAML schema). Unique structural feature: variable-level metadata is stored as `slices` *inside* each itemGroup, rather than as separate `DataSpecialization` itemGroups.
 - `src/loaders/crf/` — **CRF loader**. `crf_loader.py` is an *enrichment* loader: DDS in → DDS out. It reads the Define DDS plus the USDM, resolves each Biomedical Concept to a CRF Specialization, enriches it from CDASHIG and CDASH CT, and writes a **combined DDS** carrying both Define-XML and CRF metadata. Shared utilities live in `src/loaders/common/`.
 - `src/loaders/pagerefs/` — **Pagerefs loader** (Stage E). Another enrichment loader: it reads the `acrf.pagerefs.json` crfutils `crfpdf` writes beside the annotated CRF and writes each Define item's `origin` with its aCRF pages (`origin[].documents[].pages`). It refuses a pagerefs file that does not belong to its DDS and CRF (crf sha256, header OIDs, PDF name) and writes `origin-review.yaml`.
-- `src/loaders/defaults/` — **Defaults loader** (Stage F). The last enrichment loader: it fills what is still unfilled from a dictionary of well-known defaults (`data/defaults/well_known_defaults.json`, schema `schemas/defaults/defaults.schema.json`; sponsor-editable, later files win), never changes a value another loader wrote, rewrites `define-patch.yaml` with what is still open plus every answered value (`--patch_read_only` applies the answers without rewriting it), and writes `defaults-report.yaml`.
-- `src/pipeline/` — **the driver**. `python -m pipeline --study data/protocols/<study>/pipeline.yaml` runs stages A (Define loader) → B (CRF loader) → C (CRF generator) → D (crfutils crfvalidate/crfpdf) → E (pagerefs loader) → F (defaults loader) → G (Define generator + defineutils), each as a subprocess in its own folder, and ends with the open review items (`--strict` fails while any is open).
+- `src/loaders/defaults/` — **Defaults loader** (Stage F). It fills what is still unfilled from a dictionary of well-known defaults (`data/defaults/well_known_defaults.json`, schema `schemas/defaults/defaults.schema.json`; sponsor-editable, later files win), never changes a value another loader wrote, and writes `defaults-report.yaml`. Run on its own it rewrites `define-patch.yaml` with what is still open plus every answered value; the pipeline passes `--patch_read_only`, which applies the answers without rewriting it.
+- `src/loaders/methods/` — **Methods loader** (Stage G). The last enrichment loader: it gives every Derived Define item a `method` from a library of standard SDTM derivations (`data/methods/sdtm_methods.json`, schema `schemas/methods/methods.schema.json`; sponsor-editable, later files win) or a placeholder method for a person to write, applies the define patch's `methods` and `resources` answers, rewrites `define-patch.yaml` (its one writer in the pipeline), and writes `methods-report.yaml`.
+- `src/pipeline/` — **the driver**. `python -m pipeline --study data/protocols/<study>/pipeline.yaml` runs stages A (Define loader) → B (CRF loader) → C (CRF generator) → D (crfutils crfvalidate/crfpdf) → E (pagerefs loader) → F (defaults loader) → G (methods loader) → H (Define generator + defineutils), each as a subprocess in its own folder, and ends with the open review items (`--strict` fails while any is open).
 - `src/generators/define/` — **Define generator**. `define_generator.py` reads a DDS JSON file and emits Define-XML v2.1 using `odmlib`.
 - `src/generators/crf/` — **CRF generator**. `crf_generator.py` reads a DDS JSON file and emits ODM v1.3.2 or v2.0 CRFs. SDTM mapping annotations are always embedded, so one file is both the blank CRF and the aCRF; which you see is a rendering choice, not a different document. Requires **odmlib >= 0.2.1**.
 
@@ -88,24 +89,25 @@ cd src/loaders/crf && pytest           # 148 tests, no network
 
 Library responses are cached on disk under `.cache/cdisc_library/` (`--no_cache` to bypass), which makes the refinement loop free after the first run.
 
-### Pipeline (`src/pipeline/`), pagerefs loader (`src/loaders/pagerefs/`) and defaults loader (`src/loaders/defaults/`)
+### Pipeline (`src/pipeline/`), pagerefs loader (`src/loaders/pagerefs/`), defaults loader (`src/loaders/defaults/`) and methods loader (`src/loaders/methods/`)
 
 ```bash
 cd src
-python -m pipeline --study ../data/protocols/NCT01797120/pipeline.yaml            # stages A-G
+python -m pipeline --study ../data/protocols/NCT01797120/pipeline.yaml            # stages A-H
 python -m pipeline --study ../data/protocols/NCT01797120/pipeline.yaml --from E   # after answering origin-review.yaml
 python -m pipeline --study ../data/protocols/NCT01797120/pipeline.yaml --from F   # after answering define-patch.yaml or editing a defaults dictionary
+python -m pipeline --study ../data/protocols/NCT01797120/pipeline.yaml --from G   # after answering only its methods/resources, or editing a method library
 python -m loaders.defaults --dds_in ../output/NCT01797120/dds-origin.json --dds_out /tmp/dds-defaults.json \
     --report /tmp/defaults-report.yaml   # standalone; add --patch_file to rewrite a define patch
 python -m loaders.methods --dds_in ../output/NCT01797120/dds-defaults.json --dds_out /tmp/dds-methods.json \
-    --report /tmp/methods-report.yaml --patch_file /tmp/define-patch.yaml   # standalone until stage G (methods plan M4)
-cd src/pipeline && pytest           # 11 tests, stages stubbed
+    --report /tmp/methods-report.yaml --patch_file /tmp/define-patch.yaml   # standalone
+cd src/pipeline && pytest           # 13 tests, stages stubbed; G and H also run for real
 cd src/loaders/pagerefs && pytest   # 22 tests, no network
 cd src/loaders/defaults && pytest   # 73 tests, no network
 cd src/loaders/methods && pytest    # 152 tests, no network
 ```
 
-Stage D needs crfutils (`crfvalidate`, `crfpdf`) on `PATH` or named under `commands:` in the study YAML. The review files (`define-patch.yaml`, `crf-refinement.yaml`, `origin-review.yaml`) sit beside the study YAML; generated files go to `output_dir`. The define patch has one writer: stage A applies it but writes its full list to `output_dir/define-patch-stageA.yaml`, and stage F rewrites it. `defaults:` in the study YAML lists the defaults dictionaries (default: the shared one).
+Stage D needs crfutils (`crfvalidate`, `crfpdf`) on `PATH` or named under `commands:` in the study YAML. The review files (`define-patch.yaml`, `crf-refinement.yaml`, `origin-review.yaml`) sit beside the study YAML; generated files go to `output_dir`. The define patch has one writer: stage A applies it but writes its full list to `output_dir/define-patch-stageA.yaml`, stage F applies it with `--patch_read_only`, and stage G rewrites it (a run that stops before G leaves it as it was). `defaults:` and `methods:` in the study YAML list the defaults dictionaries and the method libraries (default: the shared one of each).
 
 ### Loader (`src/define-xml/`)
 
@@ -157,13 +159,12 @@ Three rules follow, and breaking any of them silently produces a structurally va
 
 ## Methods loader architecture
 
-`MethodsLoader.process()` (`src/loaders/methods/methods_loader.py`, planned pipeline stage G, after the defaults loader) gives every Define item (variable and value level) with a Derived origin a `method`, then runs the conformance checks, and writes the DDS and `methods-report.yaml`. It never changes an origin, and an item that already names a method keeps it.
+`MethodsLoader.process()` (`src/loaders/methods/methods_loader.py`, pipeline stage G, after the defaults loader; it reads `dds-defaults.json` and writes `dds-methods.json`, which stage H reads) gives every Define item (variable and value level) with a Derived origin a `method`, then runs the conformance checks, and writes the DDS and `methods-report.yaml`. It never changes an origin, and an item that already names a method keeps it.
 
 - **The library** (`library.py`, `data/methods/sdtm_methods.json`, schema `schemas/methods/methods.schema.json`; later files win) holds shared methods in the MSG v2 style and `assignments` named like defaults entries. Ranking is the defaults ranking plus a value-level `where` (`{"VSTESTCD": "BMI"}`, admitted by the item's where clause through `loaders/common/where_clauses.py`), which outranks no `where` at equal name rank. A shared method is copied into `methods` once, with `basis` dropped and the DDS-required OIDs generated (`PA.`/`RV.`/`FE.`).
 - **An unmatched Derived item gets a placeholder method** `MT.<DS>.<VAR>` (the Define generator's own OID, value-level OIDs keep their suffix) with description `__PLACEHOLDER__` and an empty signature, so the generator's post-processing makes none on the loader's output.
 - **`conformance.py`** checks Define-XML 2.1 rules 73, 74, 56/210, 208/209, 221 and 42/43 (a method's document names a leaf the generator writes), a signature on every method and exactly one body per expression. A failure stops the loader before it writes; a placeholder description is an open item, not a failure.
-- **The review loop is the define patch** (`--patch_file`): `define_patch.py` has `methods` (OID -> name, type, description, `documents: [{leafID, pages}]`, physical pages only) and `resources` (leafID -> title, href: each supporting PDF once, written to DDS root `resources`). The loader applies the answers to the placeholders it just made (its input has none, so every re-run makes them again and applies the same answers), then rewrites the whole patch. A document whose leaf has no title and href yet waits, and the leaf is listed open. Stage A ignores both sections; a defaults rewrite carries their answers over (a method answer is kept while some Derived item would get that placeholder OID). The pipeline counts `define patch open methods` apart from the other patch values.
-- Not yet: stage G in the pipeline, which then owns the patch rewrite while F gets `--patch_read_only` (methods plan M4).
+- **The review loop is the define patch** (`--patch_file`): `define_patch.py` has `methods` (OID -> name, type, description, `documents: [{leafID, pages}]`, physical pages only) and `resources` (leafID -> title, href: each supporting PDF once, written to DDS root `resources`). The loader applies the answers to the placeholders it just made (its input has none, so every re-run makes them again and applies the same answers), then rewrites the whole patch. A document whose leaf has no title and href yet waits, and the leaf is listed open. Stage A ignores both sections; a standalone defaults rewrite carries their answers over (a method answer is kept while some Derived item would get that placeholder OID). The pipeline counts `define patch open methods` apart from the other patch values, and `--from G` is the re-run after answering them.
 
 ## Generator architecture
 
@@ -172,7 +173,7 @@ Three rules follow, and breaking any of them silently produces a structurally va
 1. **Load JSON** — fail fast with `sys.exit(1)` on `JSONDecodeError`.
 2. **Initialize `define_objects`** — a dict of lists, one per Define-XML element type (`ItemDef`, `ItemGroupDef`, `CodeList`, `MethodDef`, `WhereClauseDef`, `ValueListDef`, `CommentDef`, `leaf`). Every loader writes into this shared dict.
 3. **Dispatch sections to loaders** via the `LOADERS` registry in `define_generator.py`, in `SECTION_ORDER`. Each top-level list in the DDS JSON (`itemGroups`, `conditions`, `whereClauses`, `codeLists`, `methods`, `standards`, `annotatedCRFs`, `concepts`, `conceptProperties`, `dictionaries`, `comments`, `documents`) maps to a loader class. Study-level scalars are not dispatched: `study.Study` receives the *whole* template dict and writes `define_objects["Study"]` and `["MetaDataVersion"]`. Adding a new section means adding both a loader class and a `LOADERS` entry.
-4. **Post-process** — `post_processing.PostProcessing` walks finished `define_objects` to add cross-cutting content. As a safety net it auto-creates (and logs) a `__PLACEHOLDER__` `MethodDef` and wires `MethodOID` onto the `ItemRef` for any `ItemDef` whose `Origin.Type == "Derived"` and whose ItemRef has no `MethodOID` yet; `DefineGenerator.method_summary` records them.
+4. **Post-process** — `post_processing.PostProcessing` walks finished `define_objects` to add cross-cutting content. As a safety net it auto-creates (and logs) a `__PLACEHOLDER__` `MethodDef` and wires `MethodOID` onto the `ItemRef` for any `ItemDef` whose `Origin.Type == "Derived"` and whose ItemRef has no `MethodOID` yet; `DefineGenerator.method_summary` records them. In the pipeline it should never fire: stage H reads the methods loader's `dds-methods.json`, where every Derived item names a method.
 5. **Build the odmlib document tree** — `_build_doc()` assembles `ODM → Study → MetaDataVersion`, attaches Standards, AnnotatedCRF, and appends each element list under `MetaDataVersion`.
 6. **Write XML** via `odm.write_xml()`.
 
@@ -236,7 +237,7 @@ For research and codebase exploration, use parallel Explore subagents by default
 - `src/generators/define/README.md`, `src/define-xml/README.md`, `src/loaders/crf/README.md`, `src/generators/crf/README.md` — per-program usage notes.
 - `DEFAULT_METADATA_LOADER.md` — the defaults loader plan: decisions, dictionary format, the seed tables with each entry's basis, and what it leaves for a person.
 - `data/defaults/README.md`, `src/loaders/defaults/README.md` — the defaults dictionary (provenance, how to change it) and the loader.
-- `Plan SDTM MethodDef Loader for the DDS.md`, `DDS_FOR_METHODS.md` — the methods loader plan (stage G, in progress: M0 generator, M1 library, M2 loader and M3 review loop done) and the DDS model changes it needs (PR-DDS-3/4). `data/methods/README.md` — the SDTM method library (provenance, how to change it); `schemas/methods/methods.schema.json` freezes the PR-DDS-3 slot names until the upstream model carries them, so do not edit `schemas/dds/dds.yaml` locally.
+- `Plan SDTM MethodDef Loader for the DDS.md`, `DDS_FOR_METHODS.md` — the methods loader plan (stage G, in progress: M0 generator, M1 library, M2 loader, M3 review loop and M4 pipeline done; M5 validation next) and the DDS model changes it needs (PR-DDS-3/4). `data/methods/README.md` — the SDTM method library (provenance, how to change it); `schemas/methods/methods.schema.json` freezes the PR-DDS-3 slot names until the upstream model carries them, so do not edit `schemas/dds/dds.yaml` locally.
 - `FIXES.md` — issues found while implementing CRF generation: what was fixed, what is pre-existing and still open (including the loader/generator drift above), and what to report upstream to odmlib and the CDISC ODM team.
 - `CRF_GEN_PLAN.md` — the CRF generation plan (milestones, DDS model additions, mapping tables). M0 and M2–M5 are implemented; M1 (upstream DDS PRs) and M6 (XSLT stylesheets) are not.
 - `schemas/dds/profiles/crf/README.md` — the CRF profile: why the hand-written JSON Schema is what `--validate` uses today, and what unblocks the LinkML one.
