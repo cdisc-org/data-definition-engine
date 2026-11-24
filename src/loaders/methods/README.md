@@ -53,7 +53,8 @@ The pipeline (`src/pipeline`) runs it as stage G:
    - an exact name, then a longer `--` suffix, then a shorter one, then `*`;
    - then a value-level `where` that the item's where clause admits (EQ equal to the value, or IN
      listing it; `loaders/common/where_clauses.py`);
-   - then a domain filter;
+   - then a domain filter (on the dataset's `domain`: QSPH and QSSL are both QS, so a value-level
+     `where` tells them apart);
    - then a later file, and a later entry.
 
    TSSEQ takes `MT.TSSEQ` before `--SEQ`, and SESTDTC takes `MT.SESTDTC` before `--DTC`. The BMI
@@ -152,10 +153,31 @@ placeholders:
 
 The Define generator then writes 31 MethodDefs and makes no placeholders of its own.
 
+**End to end (2026-11-24),** in a scratch copy of the study, after answering all 19 placeholders in
+the define patch and running the pipeline `--from G`: define.xml has 31 MethodDefs, none a
+placeholder. The defineutils conformance rules about methods and their leaves (42, 43, 56, 73, 74,
+205-210, 216, 218, 219, 221, 248, 259) all pass. The XSD errors and the other failing rules are
+open lengths and origins, and Define loader issues (`FIXES.md` §6.2), none about methods.
+
+## Validation against CDISC define.xml files
+
+The seed is checked against two CDISC define.xml files and a hand-built DDS. The fixtures, how to
+rebuild them, and the full results are in [`tests/fixtures/README.md`](tests/fixtures/README.md).
+- **SDTM-MSG v2.0:** the seed alone gives 77 of its 91 Derived items MSG's own method. With the
+  study file `tests/fixtures/msg_v2_methods.json` listed after the seed, all 91 match, with MSG's
+  29 methods in MSG's wording.
+- **CDISC 2019 Define-XML 2.1 SDTM example:**
+  - 20 of its 49 Derived items get the example's method;
+  - 14 get the same algorithm under a shared OID (per-domain --DY, --STRESC and --STRESN);
+  - 1 gets a different method (BMI, which the example derives in VSSTRESN);
+  - 14 become placeholders (--BLFL, EXTRT, EXDOSE, EXDOSU, RDOMAIN, QVAL).
+- **The hand-built DDS** (DM, value-level BMI, an ISO 8601 VSDTC) gets a seed method on all 18
+  Derived items. Its define.xml passes the XSD and all 197 rules defineutils evaluates.
+
 ## Tests
 
 ```bash
-cd src/loaders/methods && pytest    # 152 tests, no network
+cd src/loaders/methods && pytest    # 169 tests, no network
 ```
 
 | File | Covers |
@@ -166,3 +188,5 @@ cd src/loaders/methods && pytest    # 152 tests, no network
 | `test_loader.py` | Who gets which method, placeholders, the report, the outputs |
 | `test_conformance.py` | One failing case per rule; a failure stops the loader before it writes |
 | `test_patch.py` | The define patch loop: placeholders listed, answers applied, leaves, the rewrite |
+| `test_oracle.py` | The MSG v2 and CDISC 2019 oracles, and the hand-built DM/BMI/ISO 8601 fixture |
+| `test_define_output.py` | The hand-built fixture and the MSG oracle through the Define generator, the XSD and defineutils conformance (subprocesses, as stages G and H) |

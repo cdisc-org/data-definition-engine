@@ -133,17 +133,25 @@ class MethodsLoader:
         return self.dds
 
     def _report_levels(self, items: conformance.DefineItems) -> None:
-        """Variables Derived both on the value-list parent and at value level."""
-        parents = {(dataset, variable): (oid, item) for oid, (dataset, variable, item, value_list)
-                   in items.items() if value_list is None}
-        for oid, (dataset, variable, item, value_list) in items.items():
-            if value_list is None or not define_patch.is_derived(item):
+        """Variables Derived both on the value-list parent and at value level. The parent is the
+        variable of that name in the value list's own dataset: two datasets can share a domain
+        (QSPH and QSSL are both QS), so the domain alone does not find it."""
+        for group in self.dds.get("itemGroups") or []:
+            if group.get("type") in dds_io.CRF_GROUP_TYPES:
                 continue
-            parent_oid, parent = parents.get((dataset, variable), (None, None))
-            if parent is not None and define_patch.is_derived(parent):
-                entry = self.report.both_levels.setdefault(
-                    f"{dataset}.{variable}", {"variable": parent_oid, "valueLevel": []})
-                entry["valueLevel"].append(oid)
+            parents = {item.get("name"): item for item in group.get("items") or []}
+            for slice_ in group.get("slices") or []:
+                if slice_.get("type") != "ValueList":
+                    continue
+                for item in slice_.get("items") or []:
+                    oid, parent = item.get("OID"), parents.get(item.get("name"))
+                    if oid not in items or items[oid][2] is not item or not define_patch.is_derived(item):
+                        continue
+                    if parent is not None and define_patch.is_derived(parent):
+                        entry = self.report.both_levels.setdefault(
+                            f"{group.get('name')}.{item.get('name')}",
+                            {"variable": parent.get("OID"), "valueLevel": []})
+                        entry["valueLevel"].append(oid)
 
     def _report_methods(self, items: conformance.DefineItems, already: set[str]) -> None:
         """Placeholder methods with the items they serve, and input methods no item names."""

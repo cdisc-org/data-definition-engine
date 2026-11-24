@@ -94,3 +94,12 @@ The loader checks every file before it changes anything: the schema, one definit
 assignment per name and filter in each file, unique signature names and order numbers, and that every
 assignment names a defined method. `src/loaders/methods/tests/test_seed_odm20.py` also builds every
 seed method as an ODM v2.0 MethodDef and validates it against `schemas/odm/2.0/ODM.xsd`.
+
+## How the seed was checked
+
+The seed was run over a DDS built from the SDTM-MSG v2.0 sample define.xml, with the method
+references stripped. On its own it gives 77 of MSG's 91 Derived items MSG's own method.
+`src/loaders/methods/tests/fixtures/msg_v2_methods.json` is a worked study file: it adds MSG's 13
+other methods and 13 assignments, and with it listed after the seed all 91 match. The CDISC 2019
+Define-XML 2.1 SDTM example and a hand-built DM, BMI and ISO 8601 fixture are the other checks; see
+[`src/loaders/methods/tests/fixtures/README.md`](../../src/loaders/methods/tests/fixtures/README.md).
